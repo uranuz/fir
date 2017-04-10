@@ -1,0 +1,33 @@
+{
+  "name": "fir",
+  "version": "0.0.1",
+  "description": "Interface library used with 'webtank' and 'ivy'",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uranuz/fir.git"
+  },
+  "keywords": [
+    "fir",
+    "webtank",
+    "ivy",
+    "ui",
+    "framework",
+    "web",
+    "js"
+  ],
+  "author": "Ur@nuz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uranuz/fir/issues"
+  },
+  "homepage": "https://github.com/uranuz/fir#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-symlink": "^1.0.0",
+    "grunt-sass": "^2.0.0"
+  }
+}
