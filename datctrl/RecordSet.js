@@ -1,7 +1,7 @@
-define('fir.datctrl.RecordSet', [
-	'fir.common.helpers',
-	'fir.datctrl.RecordFormat',
-	'fir.datctrl.Record'
+define('fir/datctrl/RecordSet', [
+	'fir/common/helpers',
+	'fir/datctrl/RecordFormat',
+	'fir/datctrl/Record'
 ], function(helpers, RecordFormat, Record) {
 	var RecordSet = __mixinProto(function RecordSet(opts) {
 		opts = opts || {}

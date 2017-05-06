@@ -2,7 +2,7 @@
  * @description Модуль для вспомогательных утилит
  * @author Ur@nuz
  */
-define('fir.common.helpers', [], function() {
+define('fir/common/helpers', [], function() {
 	return {
 		inherit: function (proto) {
 			function F() {}
@@ -81,13 +81,3 @@ define('fir.common.helpers', [], function() {
 		}
 	};
 });
-
-function __mixinProto(dst, src) {
-	for( key in src ) {
-		//Don't copy Object's built in properties
-		if( (typeof {}[key] == "undefined") || ({}[key] != src[key]) )
-			dst.prototype[key] = src[key];
-	}
-
-	return dst;
-}

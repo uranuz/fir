@@ -1,4 +1,4 @@
-define('fir.datctrl.RecordFormat', ['fir.common.helpers'], function(helpers) {
+define('fir/datctrl/RecordFormat', ['fir/common/helpers'], function(helpers) {
 	var RecordFormat = __mixinProto(function RecordFormat(opts) {
 		opts = opts || {}
 		if( opts.fields instanceof Array ) {

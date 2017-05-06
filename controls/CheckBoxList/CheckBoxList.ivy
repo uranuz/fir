@@ -1,51 +1,47 @@
 expr {=
-	def cls {=
-		def.pos el;
-		def.body noscope {
-			expr " e-"; expr el; expr " t-wt-"; expr controlTypeName;
-			if name != undef and name != null {% expr " i-"; expr name; } else "";
-			expr " "
-		}
-	};
+	from fir.controls.utils import cls;
 	def CheckBoxList {=
 		def.kv
-			name: ""
+			moduleName: "fir/controls/CheckBoxList/CheckBoxList"
+			controlTypeName: "CheckBoxList"
+			controlName: undef
+			formField: undef
 			items: []
 			hasMasterSwitch: true
-			masterSwitchText: ""
-			controlTypeName: "CheckBoxList"
+			masterSwitchText: undef
 			keyField: "value"
 			titleField: "title"
-			selectedKey: undef;
+			selectedKeys: [];
 		def.body {*
 
-		<div>
-		{=	if hasMasterSwitch {*
-			<div class="{= cls "masterSwitch"}">
-				<label class="{= cls "masterSwitchLabel"}">
+		<div data-fir-module="{{moduleName}}">
+			<input type="hidden" data-fir-opts="{=__dumpScope__}"/>
+		{=if hasMasterSwitch {*
+			<div class="{=cls "masterSwitch"}">
+				<label class="{=cls "masterSwitchLabel"}">
 					<input
 						type="checkbox"
-						class="{= cls "masterSwitchInput"}"
+						class="{=cls "masterSwitchInput"}"
 					/>
-					<span class="{= cls "masterSwitchText"}">{{masterSwitchText}}</span>
+					<span class="{=cls "masterSwitchText"}">{{masterSwitchText}}</span>
 				</label>
 			</div>
 			*}
 		}
 
-			<div class="{= cls "listScroller"}">
-				<div class="{= cls "listContainer"}">{=
+			<div class="{=cls "listScroller"}">
+				<div class="{=cls "listContainer"}">{=
 					repeat item in items {*
-					<div class="{= cls "listItem"}">
-						<label class="{= cls "itemLabel"}">
+					<div class="{=cls "listItem"}">
+						<label class="{=cls "itemLabel"}">
 							<input
 								type="checkbox"
-								name="{{name}}"
-								class="{= cls "itemInput"}"
-								value="{= at item keyField }"
-								{= if selectedKey == {= at item keyField} "checked" else "" }
+								name="{{formField}}"
+								class="{=cls "itemInput"}"
+								value="{=at item keyField }"
+								{=if(not {=empty selectedKeys} and {=has selectedKeys {=at item keyField} }) "checked"}
 							/>
-							<span class="{= cls "itemText"}">{= at item titleField }</span>
+							<span class="{=cls "itemText"}">{=at item titleField }</span>
 						</label>
 					</div>
 					*}

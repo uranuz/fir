@@ -1,8 +1,9 @@
-define('fir.controls.CheckBoxList', ['fir.controls.ITEMControl'], function(ITEMControl) {
+define('fir/controls/PlainDatePicker/PlainDatePicker', [
+	'fir/controls/ITEMControl'
+], function(ITEMControl) {
 	__extends(PlainDatePicker, _super);
 
-	function PlainDatePicker(opts)
-	{
+	function PlainDatePicker(opts) {
 		opts = opts || {};
 		opts.controlTypeName = 'webtank.ui.PlainDatePicker';
 		_super.call(this, opts);

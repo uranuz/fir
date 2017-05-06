@@ -1,7 +1,7 @@
-define('fir.datctrl.helpers', [
-	'fir.datctrl.RecordFormat',
-	'fir.datctrl.Record',
-	'fir.datctrl.RecordSet'
+define('fir/datctrl/helpers', [
+	'fir/datctrl/RecordFormat',
+	'fir/datctrl/Record',
+	'fir/datctrl/RecordSet'
 ], function(RecordFormat, Record, RecordSet) {
 	var helpers = {
 		//трансформирует JSON в Record или RecordSet

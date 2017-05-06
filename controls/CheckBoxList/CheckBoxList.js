@@ -1,25 +1,28 @@
-define('fir.controls.CheckBoxList', ['fir.controls.ITEMControl'], function(ITEMControl) {
-	__extends(CheckBoxList, ITEMControl);
+define('fir/controls/CheckBoxList/CheckBoxList', [
+	'fir/controls/FirControl',
+	'css!fir/controls/CheckBoxList/CheckBoxList'
+], function(FirControl) {
+	__extends(CheckBoxList, FirControl);
 
-	function CheckBoxList( opts ) {
+	function CheckBoxList(opts) {
 		opts = opts || {};
-		opts.controlTypeName = 'webtank.ui.CheckBoxList';
-		_super.call(this, opts);
+		opts.controlTypeName = 'fir.controls.CheckBoxList';
+		FirControl.call(this, opts);
 
-		this._block = this._elems().filter(".e-block");
-		this._masterSwitchLabel = this._elems().filter(".e-master_switch_label")
-			.on( 'click', this.onMasterSwitch_Click.bind(this) );
-		this._masterSwitchInput = this._elems().filter(".e-master_switch_input");
-		this._itemLabels = this._elems().filter('.e-item_label')
-			.on( 'click', this.onItem_Click.bind(this) );
-		this._inputs = this._elems().filter('.e-item_input');
+		this._block = this._elems('block');
+		this._masterSwitchLabel = this._elems('masterSwitchLabel')
+			.on('click', this.onMasterSwitch_Click.bind(this));
+		this._masterSwitchInput = this._elems('masterSwitchInput');
+		this._itemLabels = this._elems('itemLabel')
+			.on('click', this.onItem_Click.bind(this));
+		this._inputs = this._elems('itemInput');
 	}
 
 	return __mixinProto(CheckBoxList, {
 		onMasterSwitch_Click: function() {
 			for( var i = 0; i < this._inputs.length; ++i ) {
 				var input = $(this._inputs[i]);
-				input.prop( 'checked', this._masterSwitchInput.prop( 'checked' ) );
+				input.prop('checked', this._masterSwitchInput.prop('checked'));
 			}
 		},
 		onResetItem_Click: function() {
@@ -43,13 +46,13 @@ define('fir.controls.CheckBoxList', ['fir.controls.ITEMControl'], function(ITEMC
 			}
 
 			if( !allChecked && !allUnchecked ) {
-				this._masterSwitchInput.prop( 'indeterminate', true );
+				this._masterSwitchInput.prop('indeterminate', true);
 			} else {
-				this._masterSwitchInput.prop( 'indeterminate', false );
+				this._masterSwitchInput.prop('indeterminate', false);
 				if( allUnchecked ) {
-					this._masterSwitchInput.prop( 'checked', false );
+					this._masterSwitchInput.prop('checked', false);
 				} else if( allChecked ) {
-					this._masterSwitchInput.prop( 'checked', true );
+					this._masterSwitchInput.prop('checked', true);
 				}
 			}
 		}

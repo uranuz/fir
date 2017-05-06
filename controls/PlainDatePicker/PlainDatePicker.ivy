@@ -1,0 +1,24 @@
+expr {=
+	from fir.controls.utils import cls;
+	def PlainDatePicker {=
+		def.kv
+			controlTypeName: "PlainDatePicker";
+		def.body {*
+			<span class="{{block_cls}}">
+				<span class="{{row_cls}}">
+					<input type="text" name="{{day_field_name}}" class="{{day_field_cls}}"
+						placeholder="{{day_placeholder}}" value="{{day_value}}"/>
+					<select name="{{month_field_name}}" class="{{month_field_cls}}">
+					{= repeat item in items {*
+							<option class="{{month_item_cls}}" value="{{month_item_value}}" {{month_item_selected}}>{{month_item_text}}</option>
+						*}
+					}
+					</select>
+					<input type="text" name="{{year_field_name}}" class="{{year_field_cls}}" placeholder="{{year_placeholder}}" value="{{year_value}}"/>
+				</span>
+			</span>
+		*};
+	};
+
+	expr undef;
+};

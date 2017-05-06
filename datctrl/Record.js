@@ -1,4 +1,7 @@
-define('fir.controls.Record', ['fir.common.helpers', 'fir.datctrl.RecordFormat'], function(helpers, RecordFormat) {
+define('fir/controls/Record', [
+	'fir/common/helpers',
+	'fir/datctrl/RecordFormat'
+], function(helpers, RecordFormat) {
 	var Record = __mixinProto(function Record(opts) {
 		opts = opts || {};
 		if( opts.format != null && opts.fields != null ) {

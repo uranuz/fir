@@ -1,4 +1,4 @@
-define('fir.network.json_rpc', ['fir.common.helpers'], function(commonHelpers) {
+define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 	var json_rpc = {
 		//Аргументы по-умолчанию для вызова ф-ции invoke
 		defaultInvokeArgs: {
