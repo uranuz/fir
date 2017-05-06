@@ -2,7 +2,7 @@ expr {=
 	def cls {=
 		def.pos el;
 		def.body noscope {%
-			expr " e-"; expr el; expr " t-wt-"; expr controlTypeName;
+			expr "e-"; expr el; expr " fir-"; expr controlTypeName;
 			if controlName != undef and controlName != null {% expr " i-"; expr controlName; } else "";
 			expr " ";
 		}
