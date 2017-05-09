@@ -83,7 +83,7 @@ define('fir/controls/FirControl', [
 				}),
 				childControlTags = $(controlTag).find('[data-fir-module]').filter(function(index, childTag) {
 					// Выбираем элементы для которых ближайшим родителем является controlTag
-					return $(childTag).parents('[data-fir-module]').is(controlTag);
+					return $(childTag).parent().closest('[data-fir-module]').is(controlTag);
 				}),
 				childControls = [], // Список дочерних для текущего компонента
 				childLoadCounter = childControlTags.length,
