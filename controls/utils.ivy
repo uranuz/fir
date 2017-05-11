@@ -8,30 +8,41 @@ expr {=
 		}
 	};
 
-	def rsGet {=
-		def.kv rs, field, row;
+	def _rsFieldIndex {=
+		def.pos rsOrRec, fieldName;
 		def.body {=
-			var i: 0, fieldIndex: 0;
-			for format in rs.f {=
-				if format.n == field {=
-					set fieldIndex: i;
+			if {=has rsOrRec "_mapping"} {=
+				at rsOrRec._mapping fieldName
+			} else {=
+				var i: 0, fieldIndex: 100500;
+				for format in rsOrRec.f {=
+					if format.n == fieldName {=
+						set fieldIndex: i;
+					};
+					set i: i + 1;
 				};
-				set i: i + 1;
+				expr fieldIndex;
 			};
-			at {= at rs.d row } fieldIndex;
+		}
+	};
+
+	def rsGet {=
+		def.pos rs, fieldName, rowIndex;
+		def.body {=
+			at {=at rs.d rowIndex} {=_rsFieldIndex rs fieldName};
 		}
 	};
 
 	def recGet {=
 		def.pos record, fieldName;
-		def.body {= at record.d {=at record._mapping fieldName } }
+		def.body {=at record.d {=_rsFieldIndex record fieldName} }
 	};
 
 	def recGetStr {=
 		def.pos record, fieldName;
 		def.body {=
 			var
-				fmt: {= at record.f {=at record._mapping fieldName} },
+				fmt: {= at record.f {=_rsFieldIndex record fieldName} },
 				value: {= recGet record fieldName },
 				result: undef;
 			if {= has fmt "enum" } {=
