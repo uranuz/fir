@@ -7,30 +7,36 @@ define('fir/controls/FirControl', [
 		controlCounter = 0, // Variable used to generate control names
 		controlRegistry = {}; 
 	return __mixinProto(function FirControl(opts) {
-		if (opts.controlName) {
-			this._controlName = opts.controlName;
+		if (opts.instanceName) {
+			this._instanceName = opts.instanceName;
 		} else {
-			this._controlName = 'firControl' + ++controlCounter;
+			this._instanceName = 'firControl' + ++controlCounter;
 		}
-		
-		this._controlTypeName = opts.controlTypeName || 'FirControl';
+
 		this._container = opts.container;
 		this._childControls = opts.childControls;
+		this._cssBaseClass = opts.cssBaseClass;
+		this._cssClass = opts.cssClass;
 		this._registerControl(this); // Компонент сам себя регистрирует
 	}, {
 		/// Возвращает имя экземпляра компонента интерфейса
-		controlName: function() {
-			return this._controlName;
+		instanceName: function() {
+			return this._instanceName;
 		},
 
-		/// Возвращает имя типа компонента интерфейса
-		controlTypeName: function() {
-			return this._controlTypeName;
+		/// Возвращает основной CSS класс, используемый для стилизации компонента
+		cssBaseClass: function() {
+			return this._cssBaseClass;
+		},
+
+		/// Возвращает дополнительные CSS классы для стилизации компонента, добавляемые пользователем
+		cssClass: function() {
+			return this._cssClass;
 		},
 
 		/// Возвращает HTML-класс экземпляра компонента интерфейса
 		instanceHTMLClass: function() {
-			return this._controlName? 'i-' + this._controlName: undefined;
+			return this._instanceName? 'i-' + this._instanceName: undefined;
 		},
 
 		/// Подписаться на событие с именем ev с помощью обработчика hdl
@@ -121,13 +127,13 @@ define('fir/controls/FirControl', [
 			});
 		},
 		_registerControl: function(control) {
-			if( controlRegistry[control.controlName()] ) {
-				throw Error('Control with name "' + control.controlName() + '" already registered!');
+			if( controlRegistry[control.instanceName()] ) {
+				throw Error('Control with name "' + control.instanceName() + '" already registered!');
 			}
-			controlRegistry[control.controlName()] = control;
+			controlRegistry[control.instanceName()] = control;
 		},
-		findControlByName: function(controlName) {
-			return controlRegistry[controlName];
+		findInstanceByName: function(instanceName) {
+			return controlRegistry[instanceName];
 		},
 		// Уничтожить компонент
 		destroy: function() {
@@ -144,8 +150,8 @@ define('fir/controls/FirControl', [
 			}
 
 			// Дерегистрировать компонент из реестра
-			if( controlRegistry[this.controlName()] === this ) {
-				delete controlRegistry[this.controlName()];
+			if( controlRegistry[this.instanceName()] === this ) {
+				delete controlRegistry[this.instanceName()];
 			}
 		}
 	});

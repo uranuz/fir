@@ -5,7 +5,6 @@ define('fir/controls/PlainDatePicker/PlainDatePicker', [
 
 	function PlainDatePicker(opts) {
 		opts = opts || {};
-		opts.controlTypeName = 'webtank.ui.PlainDatePicker';
 		_super.call(this, opts);
 	}
 

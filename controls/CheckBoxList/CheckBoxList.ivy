@@ -3,19 +3,20 @@ expr {=
 	def CheckBoxList {=
 		def.kv
 			moduleName: "fir/controls/CheckBoxList/CheckBoxList"
-			controlTypeName: "CheckBoxList"
-			controlName: undef
+			cssBaseClass: "fir-CheckBoxList"
+			cssClass: undef
+			instanceName: undef
 			formField: undef
 			items: []
 			hasMasterSwitch: true
 			masterSwitchText: undef
 			keyField: "value"
-			titleField: "title"
+			captionField: "caption"
 			selectedKeys: [];
 		def.body {*
 
 		<div data-fir-module="{{moduleName}}">
-			<input type="hidden" data-fir-opts="{=__dumpScope__}"/>
+			<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
 		{=if hasMasterSwitch {*
 			<div class="{=cls "masterSwitch"}">
 				<label class="{=cls "masterSwitchLabel"}">
@@ -41,7 +42,7 @@ expr {=
 								value="{=at item keyField }"
 								{=if(not {=empty selectedKeys} and {=has selectedKeys {=at item keyField} }) "checked"}
 							/>
-							<span class="{=cls "itemText"}">{=at item titleField }</span>
+							<span class="{=cls "itemText"}">{=at item captionField}</span>
 						</label>
 					</div>
 					*}

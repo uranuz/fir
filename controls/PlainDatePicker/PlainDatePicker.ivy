@@ -2,7 +2,8 @@ expr {=
 	from fir.controls.utils import cls;
 	def PlainDatePicker {=
 		def.kv
-			controlTypeName: "PlainDatePicker";
+			instanceName: undef;
+			cssBaseClass: "fir-PlainDatePicker";
 		def.body {*
 			<span class="{{block_cls}}">
 				<span class="{{row_cls}}">

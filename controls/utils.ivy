@@ -2,9 +2,10 @@ expr {=
 	def cls {=
 		def.pos el;
 		def.body noscope {%
-			expr "e-"; expr el; expr " fir-"; expr controlTypeName;
-			if controlName != undef and controlName != null {% expr " i-"; expr controlName; } else "";
-			expr " ";
+			expr "e-"; expr el; expr " ";
+			if not{=empty instanceName} {% expr "i-"; expr instanceName; } else ""; expr " ";
+			if not{=empty cssBaseClass} cssBaseClass; expr " ";
+			if {=has {=scope} "cssClass"} and not{=empty cssClass} cssClass; expr " ";
 		}
 	};
 
@@ -42,12 +43,12 @@ expr {=
 		def.pos record, fieldName;
 		def.body {=
 			var
-				fmt: {= at record.f {=_rsFieldIndex record fieldName} },
-				value: {= recGet record fieldName },
+				fmt: {=at record.f {=_rsFieldIndex record fieldName} },
+				value: {=recGet record fieldName },
 				result: undef;
-			if {= has fmt "enum" } {=
+			if {=has fmt "enum" } {=
 				for enumPair in fmt.enum {=
-					if {=int enumPair.v} == value {=
+					if enumPair.v == value {=
 						if {=has enumPair "n"} {=
 							set result: enumPair.n;
 						} else {=
