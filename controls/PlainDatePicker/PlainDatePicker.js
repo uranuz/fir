@@ -1,11 +1,12 @@
 define('fir/controls/PlainDatePicker/PlainDatePicker', [
-	'fir/controls/ITEMControl'
-], function(ITEMControl) {
-	__extends(PlainDatePicker, _super);
+	'fir/controls/FirControl',
+	'css!fir/controls/PlainDatePicker/PlainDatePicker'
+], function(FirControl) {
+	__extends(PlainDatePicker, FirControl);
 
 	function PlainDatePicker(opts) {
 		opts = opts || {};
-		_super.call(this, opts);
+		FirControl.call(this, opts);
 	}
 
 	return __mixinProto(PlainDatePicker, {

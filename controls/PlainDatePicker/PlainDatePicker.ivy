@@ -2,24 +2,55 @@ expr {=
 	from fir.controls.utils import cls;
 	def PlainDatePicker {=
 		def.kv
-			instanceName: undef;
-			cssBaseClass: "fir-PlainDatePicker";
+			instanceName: undef
+			moduleName: "fir/controls/PlainDatePicker/PlainDatePicker"
+			cssBaseClass: "fir-PlainDatePicker"
+			formField: undef
+			dateTime: undef
+			day: undef
+			month: undef
+			year: undef
+			dayPlaceholder: undef
+			monthPlaceholder: undef
+			yearPlaceholder: undef
+			monthItems: [
+				'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
+			];
 		def.body {*
-			<span class="{{block_cls}}">
-				<span class="{{row_cls}}">
-					<input type="text" name="{{day_field_name}}" class="{{day_field_cls}}"
-						placeholder="{{day_placeholder}}" value="{{day_value}}"/>
-					<select name="{{month_field_name}}" class="{{month_field_cls}}">
-					{= repeat item in items {*
-							<option class="{{month_item_cls}}" value="{{month_item_value}}" {{month_item_selected}}>{{month_item_text}}</option>
+			<span class="{=cls 'block'}" data-fir-module="{{moduleName}}">
+				<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
+				<span class="{=cls 'row'}">
+					<input type="text"
+						{=if not{=empty formField} {*name="{{formField ~ '__day'}}"*} }
+						class="{=cls 'dayField'}"
+						placeholder="{{dayPlaceholder}}"
+						{=if not{=empty dateTime} {*value="{=dtGet dateTime 'day'}"*}
+							else {*value="{{day}}"*}
+						}
+					/>
+					<select
+						{=if not{=empty formField} {*name="{{formField ~ '__month'}}"*} }
+						class="{=cls 'monthField'}">
+					<option class="{=cls 'monthItem'}">{{monthPlaceholder}}</option>
+					{= 
+						var index: 1;
+						repeat item in monthItems {*
+							<option class="{=cls 'monthItem'}" value="{{index}}" {=if month == index "selected"}>{{item}}</option>
+							{=set index: index + 1}
 						*}
 					}
 					</select>
-					<input type="text" name="{{year_field_name}}" class="{{year_field_cls}}" placeholder="{{year_placeholder}}" value="{{year_value}}"/>
+					<input type="text"
+						{=if not{=empty formField} {*name="{{formField ~ '__year'}}"*} }
+						class="{=cls 'yearField'}"
+						placeholder="{{yearPlaceholder}}"
+						{=if not{=empty dateTime} {*value="{=dtGet dateTime 'year'}"*}
+							else {*value="{{year}}"*}
+						}
+					/>
 				</span>
 			</span>
 		*};
 	};
-
 	expr undef;
 };

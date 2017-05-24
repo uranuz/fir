@@ -30,7 +30,7 @@ expr {=
 	def rsGet {=
 		def.pos rs, fieldName, rowIndex;
 		def.body {=
-			at {=at rs.d rowIndex} {=_rsFieldIndex rs fieldName};
+			expr rs;
 		}
 	};
 
