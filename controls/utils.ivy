@@ -30,7 +30,8 @@ expr {=
 	def rsGet {=
 		def.pos rs, fieldName, rowIndex;
 		def.body {=
-			expr rs;
+			var record: {=at rs rowIndex};
+			at record.d {=_rsFieldIndex record fieldName};
 		}
 	};
 
@@ -59,7 +60,7 @@ expr {=
 			} else {=
 				set result: value;
 			};
-			__render__ __result__: result;
+			expr result;
 		}
 	};
 }
