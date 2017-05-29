@@ -39,9 +39,18 @@
 			}
 		},
 		clean: {
-			templates: ['<%= deployPath %>/res/templates/fir/**/*.ivy'],
-			scripts: ['<%= deployPath %>/pub/fir/**/*.js'],
-			styles: ['<%= deployPath %>/pub/fir/**/*.css']
+			templates: {
+				options: { force: true },
+				files: { src: '<%= deployPath %>/res/templates/fir/**/*.ivy' }
+			},
+			scripts: {
+				options: { force: true },
+				files: { src: '<%= deployPath %>/pub/fir/**/*.js' }
+			},
+			styles: {
+				options: { force: true },
+				files: { src: '<%= deployPath %>/pub/fir/**/*.css' }
+			}
 		}
 	});
 
