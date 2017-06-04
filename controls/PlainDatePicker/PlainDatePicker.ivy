@@ -5,14 +5,14 @@ expr {=
 			instanceName: undef
 			moduleName: "fir/controls/PlainDatePicker/PlainDatePicker"
 			cssBaseClass: "fir-PlainDatePicker"
-			formField: undef
-			dateTime: undef
-			day: undef
-			month: undef
-			year: undef
-			dayPlaceholder: undef
-			monthPlaceholder: undef
-			yearPlaceholder: undef
+			formField: null
+			date: null
+			day: null
+			month: null
+			year: null
+			dayPlaceholder: null
+			monthPlaceholder: null
+			yearPlaceholder: null
 			monthItems: [
 				'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
 			];
@@ -24,7 +24,7 @@ expr {=
 						{=if not{=empty formField} {*name="{{formField ~ '__day'}}"*} }
 						class="{=cls 'dayField'}"
 						placeholder="{{dayPlaceholder}}"
-						{=if not{=empty dateTime} {*value="{=dtGet dateTime 'day'}"*}
+						{=if not{=empty date} {*value="{=dtGet date 'day'}"*}
 							else {*value="{{day}}"*}
 						}
 					/>
@@ -44,7 +44,7 @@ expr {=
 						{=if not{=empty formField} {*name="{{formField ~ '__year'}}"*} }
 						class="{=cls 'yearField'}"
 						placeholder="{{yearPlaceholder}}"
-						{=if not{=empty dateTime} {*value="{=dtGet dateTime 'year'}"*}
+						{=if not{=empty date} {*value="{=dtGet date 'year'}"*}
 							else {*value="{{year}}"*}
 						}
 					/>
@@ -52,5 +52,5 @@ expr {=
 			</span>
 		*};
 	};
-	expr undef;
+	expr null;
 };

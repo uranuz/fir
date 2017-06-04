@@ -4,12 +4,12 @@ expr {=
 		def.kv
 			moduleName: "fir/controls/CheckBoxList/CheckBoxList"
 			cssBaseClass: "fir-CheckBoxList"
-			cssClass: undef
+			cssClass: null
 			instanceName: undef
-			formField: undef
+			formField: null
 			items: []
 			hasMasterSwitch: true
-			masterSwitchText: undef
+			masterSwitchText: null
 			keyField: "value"
 			captionField: "caption"
 			selectedKeys: [];
@@ -52,6 +52,5 @@ expr {=
 		</div>
 		*}
 	};
-
-	expr undef;
+	expr null;
 }
