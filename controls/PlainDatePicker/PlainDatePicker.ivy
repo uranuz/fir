@@ -24,9 +24,7 @@ expr {=
 						{=if not{=empty formField} {*name="{{formField ~ '__day'}}"*} }
 						class="{=cls 'dayField'}"
 						placeholder="{{dayPlaceholder}}"
-						{=if not{=empty date} {*value="{=dtGet date 'day'}"*}
-							else {*value="{{day}}"*}
-						}
+						value="{=if {=empty date} day else {=dtGet date 'day'} }"
 					/>
 					<select
 						{=if not{=empty formField} {*name="{{formField ~ '__month'}}"*} }
@@ -35,7 +33,13 @@ expr {=
 					{= 
 						var index: 1;
 						repeat item in monthItems {*
-							<option class="{=cls 'monthItem'}" value="{{index}}" {=if month == index "selected"}>{{item}}</option>
+							<option
+								class="{=cls 'monthItem'}"
+								value="{{index}}"
+								{=if index == {=if {=empty date} month else {=dtGet date 'month'} }
+									"selected"
+								}
+								>{{item}}</option>
 							{=set index: index + 1}
 						*}
 					}
@@ -44,9 +48,7 @@ expr {=
 						{=if not{=empty formField} {*name="{{formField ~ '__year'}}"*} }
 						class="{=cls 'yearField'}"
 						placeholder="{{yearPlaceholder}}"
-						{=if not{=empty date} {*value="{=dtGet date 'year'}"*}
-							else {*value="{{year}}"*}
-						}
+						value="{=if {=empty date} year else {=dtGet date 'year'} }"
 					/>
 				</span>
 			</span>
