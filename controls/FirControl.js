@@ -62,7 +62,7 @@ define('fir/controls/FirControl', [
 		},
 		/// Получить jQuery элемент этого компонента по имени elemName
 		_elems: function(elemName) {
-			return this._container.find(this._elemClass(elemName));
+			return this._container.find(this._elemClass(elemName)).addBack(this._elemClass(elemName));
 		},
 		//Возвращает jQuery-список всех элементов компонента
 		_allElems: function() {
@@ -134,6 +134,14 @@ define('fir/controls/FirControl', [
 		},
 		findInstanceByName: function(instanceName) {
 			return controlRegistry[instanceName];
+		},
+		getChildInstanceByName: function(name) {
+			for( var i = 0; i < this._childControls.length; ++i ) {
+				if( this._childControls[i].instanceName() === name ) {
+					return this._childControls[i];
+				}
+			}
+			return null;
 		},
 		// Уничтожить компонент
 		destroy: function() {

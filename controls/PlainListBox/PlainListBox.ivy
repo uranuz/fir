@@ -1,0 +1,34 @@
+expr {=
+from fir.controls.utils import cls;
+def PlainListBox {=
+	def.kv
+		moduleName: "fir/controls/PlainListBox/PlainListBox"
+		cssBaseClass: "fir-PlainListBox"
+		cssClass: null
+		instanceName: undef
+		formField: null
+		items: []
+		idField: "value"
+		captionField: "caption"
+		selectedId: undef;
+	def.body {*
+	<div data-fir-module="{{moduleName}}">
+		<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
+		<div class="{=cls "listScroller"}">
+			<select class="{=cls "listContainer"}" name="{{formField}}">{=
+				repeat item in items {*
+				<option class="{=cls "listItem"}"
+					value="{=at item idField }"
+					{=if selectedId == {=at item idField} "selected"}
+					>
+					{=at item captionField}
+				</option>
+				*}
+			}
+			</select>
+		</div>
+	</div>
+	*}
+};
+expr null;
+}

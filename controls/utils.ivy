@@ -9,9 +9,11 @@ expr {=
 		}
 	};
 
-	def _rsFieldIndex {=
+	def rsFieldFormat {=
 		def.pos rsOrRec, fieldName;
-		def.body {=at rsOrRec.namesMapping fieldName}
+		def.body {=
+			at rsOrRec.format {=at rsOrRec.namesMapping fieldName}
+		}
 	};
 
 	def rsGet {=
@@ -31,7 +33,7 @@ expr {=
 		def.pos record, fieldName;
 		def.body {=
 			var
-				fmt: {=at record.format {=_rsFieldIndex record fieldName} },
+				fmt: {=rsFieldFormat record fieldName},
 				value: {=recGet record fieldName },
 				result: null;
 			if {=has fmt "enum" } {=
