@@ -2,10 +2,10 @@ expr {=
 	def cls {=
 		def.pos el;
 		def.body noscope {%
-			expr "e-"; expr el; expr " ";
-			if not{=empty instanceName} {% expr "i-"; expr instanceName; } else ""; expr " ";
-			if not{=empty cssBaseClass} cssBaseClass; expr " ";
-			if {=has {=scope} "cssClass"} and not{=empty cssClass} cssClass; expr " ";
+			expr "e-" ~ el ~ " ";
+			if not{=empty instanceName} "i-" ~ instanceName ~ " ";
+			if not{=empty cssBaseClass} cssBaseClass ~ " ";
+			if {=has {=scope} "cssClass"} and not{=empty cssClass} cssClass ~ " ";
 		}
 	};
 

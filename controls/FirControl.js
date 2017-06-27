@@ -55,7 +55,18 @@ define('fir/controls/FirControl', [
 		_notify: function(ev) {
 			return $(this).triggerHandler.apply($(this), arguments);
 		},
-
+		_elemFullClass: function(el) {
+			var cls = "e-" + el + " "
+			if( this._instanceName ) {
+				cls += "i-" + this._instanceName;
+			}
+			if( this._cssBaseClass ) {
+				cls += this._cssBaseClass + " "
+			}
+			if( this._cssClass ) {
+				cls += this._cssClass + " "
+			}
+		},
 		/// Получить класс для выборки элемента по имени elemName
 		_elemClass: function(elemName) {
 			return '.' + this.instanceHTMLClass() + '.e-' + elemName;
@@ -80,7 +91,7 @@ define('fir/controls/FirControl', [
 			});
 		},
 
-		_initControlImpl: function(controlTag, parentChildControls) {
+		_initControlImpl: function(controlTag, parentOpts) {
 			var
 				self = this,
 				moduleName = $(controlTag).attr('data-fir-module'),
@@ -91,8 +102,6 @@ define('fir/controls/FirControl', [
 					// Выбираем элементы для которых ближайшим родителем является controlTag
 					return $(childTag).parent().closest('[data-fir-module]').is(controlTag);
 				}),
-				childControls = [], // Список дочерних для текущего компонента
-				childLoadCounter = childControlTags.length,
 				initThis = function() {
 					require([moduleName], function(ControlClass) {
 						if( configTag.length > 1 ) {
@@ -106,24 +115,31 @@ define('fir/controls/FirControl', [
 							opts = JSON.parse(decodedOpts);
 						}
 						opts.container = $(controlTag); // Устанавливаем корневой тэг для компонента
-						opts.childControls = childControls;
+						opts.childControls = currentOpts.childControls; // К этому моменту дочерние уже загрузились
 						var control = new ControlClass(opts);
-						if( parentChildControls != null ) {
-							parentChildControls.push(control); // Добавляем наш компонент в список дочерних для родителя
+						if( parentOpts != null ) {
+							// Добавляем наш компонент в список дочерних для родителя
+							// Если компонент - корневой, то parentOpts == null
+							parentOpts.childControls.push(control);
+							if( --(parentOpts.childLoadCounter) === 0 ) {
+								// Все компоненты родителя подгрузились - инициализируем его
+								parentOpts.initThis();
+							}
 						}
 					});
+				},
+				currentOpts = {
+					childControls: [], // Список дочерних для текущего компонента
+					childLoadCounter: childControlTags.length,
+					initThis: initThis
 				};
 			
 
-			if( childLoadCounter === 0 ) {
-				initThis(); // Нет дочерних компонентов - инициализируем сразу
+			if( currentOpts.childLoadCounter === 0 ) {
+				initThis(); // Нет дочерних компонентов - инициализируем сразу, иначе асинхронно
 			}
 			childControlTags.each(function(index, childTag) {
-				self._initControlImpl(childTag, childControls); // Инициализируем дочерние компоненты
-				--childLoadCounter;
-				if( childLoadCounter === 0 ) {
-					initThis(); // По инициализации последнего дочернего инициализируем и наш
-				}
+				self._initControlImpl(childTag, currentOpts); // Инициализируем дочерние компоненты
 			});
 		},
 		_registerControl: function(control) {
