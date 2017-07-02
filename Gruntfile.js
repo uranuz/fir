@@ -1,9 +1,13 @@
  module.exports = function (grunt) {
 	'use strict';
 
+	// Force use of Unix newlines
+	grunt.util.linefeed = '\n';
+	var expandTilde = require('expand-tilde');
+
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		deployPath: grunt.option('deployPath') || '.',
+		deployPath: expandTilde(grunt.option('deployPath') || '~/sites/mkk_site'),
 		symlink: {
 			templates: {
 				expand: true,
@@ -51,9 +55,19 @@
 				options: { force: true },
 				files: { src: '<%= deployPath %>/pub/fir/**/*.css' }
 			}
+		},
+		watch: {
+			sass: {
+				files: ['controls/**/*.scss'],
+				tasks: ['sass:dist'],
+				options: {
+					spawn: false,
+				},
+			},
 		}
 	});
 
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-symlink');
 	grunt.loadNpmTasks('grunt-sass');
 	grunt.loadNpmTasks('grunt-contrib-clean');

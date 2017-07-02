@@ -1,12 +1,13 @@
 .fir-PlainDatePicker {
+	&.e-block {
+		display: inline-block;
+	}
 	&.e-dayField {
 		width: 4rem;
 	}
-
 	&.e-yearField {
 		width: 6rem;
 	}
-
 	&.e-dayField,
 	&.e-monthField,
 	&.e-yearField {

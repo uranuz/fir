@@ -17,18 +17,18 @@ expr {=
 				'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
 			];
 		def.body {*
-			<span class="{=cls 'block'}" data-fir-module="{{moduleName}}">
+			<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
 				<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
-				<span class="{=cls 'row'}">
+				<div class="{=cls 'row'} form-inline">
 					<input type="text"
 						{=if not{=empty formField} {*name="{{formField ~ '__day'}}"*} }
-						class="{=cls 'dayField'}"
+						class="{=cls 'dayField'} form-control"
 						placeholder="{{dayPlaceholder}}"
 						value="{=if {=empty date} day else {=dtGet date 'day'} }"
 					/>
 					<select
 						{=if not{=empty formField} {*name="{{formField ~ '__month'}}"*} }
-						class="{=cls 'monthField'}">
+						class="{=cls 'monthField'} form-control">
 					<option class="{=cls 'monthItem'}">{{monthPlaceholder}}</option>
 					{= 
 						var index: 1;
@@ -46,12 +46,12 @@ expr {=
 					</select>
 					<input type="text"
 						{=if not{=empty formField} {*name="{{formField ~ '__year'}}"*} }
-						class="{=cls 'yearField'}"
+						class="{=cls 'yearField'} form-control"
 						placeholder="{{yearPlaceholder}}"
 						value="{=if {=empty date} year else {=dtGet date 'year'} }"
 					/>
-				</span>
-			</span>
+				</div>
+			</div>
 		*};
 	};
 	expr null;

@@ -3,7 +3,7 @@
  * @author Ur@nuz
  */
 define('fir/common/helpers', [], function() {
-	return {
+	var helpers = {
 		inherit: function (proto) {
 			function F() {}
 			F.prototype = proto;
@@ -19,13 +19,13 @@ define('fir/common/helpers', [], function() {
 			else if( o instanceof Array )
 			{	c = [];
 				for( i = 0; i < o.length; i++)
-					c.push( webtank.deepCopy(o[i]) );
+					c.push( helpers.deepCopy(o[i]) );
 			}
 			else
 			{	c = {};
 				for(p in o) {
 					if( o.hasOwnProperty(p) ) {
-						c[p] = webtank.deepCopy(o[p]);
+						c[p] = helpers.deepCopy(o[p]);
 					}
 				}
 			}
@@ -80,4 +80,5 @@ define('fir/common/helpers', [], function() {
 			);
 		}
 	};
+	return helpers;
 });

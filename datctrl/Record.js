@@ -1,4 +1,4 @@
-define('fir/controls/Record', [
+define('fir/datctrl/Record', [
 	'fir/common/helpers',
 	'fir/datctrl/RecordFormat'
 ], function(helpers, RecordFormat) {

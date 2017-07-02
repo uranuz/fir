@@ -58,7 +58,7 @@ define('fir/controls/FirControl', [
 		_elemFullClass: function(el) {
 			var cls = "e-" + el + " "
 			if( this._instanceName ) {
-				cls += "i-" + this._instanceName;
+				cls += "i-" + this._instanceName + " ";
 			}
 			if( this._cssBaseClass ) {
 				cls += this._cssBaseClass + " "
@@ -66,6 +66,7 @@ define('fir/controls/FirControl', [
 			if( this._cssClass ) {
 				cls += this._cssClass + " "
 			}
+			return cls;
 		},
 		/// Получить класс для выборки элемента по имени elemName
 		_elemClass: function(elemName) {
