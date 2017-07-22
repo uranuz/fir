@@ -8,6 +8,10 @@ define('fir/datctrl/helpers', [
 		fromJSON: function(json) {
 			var
 				jsonObj = json, fmt;
+			
+			if( !json || !json.t ) {
+				return null;
+			}
 
 			if( jsonObj.t === "record" || jsonObj.t === "recordset" )
 			{

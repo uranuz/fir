@@ -64,7 +64,7 @@ define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 								)
 							);
 							if( typeof(invokeArgs.error) === 'function' ) {
-								invokeArgs.error(responseJSON);
+								invokeArgs.error(responseJSON.error);
 							}
 						} else if( typeof(responseJSON.result) !== 'undefined' ) {
 							if( typeof(invokeArgs.success) === 'function' ) {
