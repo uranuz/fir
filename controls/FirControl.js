@@ -106,25 +106,36 @@ define('fir/controls/FirControl', [
 		},
 		_updateControlState: function(opts) {},
 
-		// Перезагрузка компонента для обновления содержащихся в нём данных и прочего отображения и состояния.
-		// Предполагается, что мы при этом не уничтожаем компонент полностью, а обновляем, например, вёрстку
-		// (либо какую-то часть её, которая может измениться), обновляем какие-то поля данных и т.п.
-		// Могут при этом полностью пересоздаваться дочерние компоненты, если это соответствует логике работы.
-		// При этом мы скорее всего должны сохранять подписки на события, публикуемые этим компонентом,
-		// однако подписки на события вёрстки и дочерних компонентов будут удаляться в "_unsubscribeInternal"
-		// и воссоздаваться заново (если это необходимо) в "_subscribeInternal"
-		_reloadControl: function() {
-			var self = this;
+		/**
+		 * Перезагрузка компонента для обновления отображения и внутреннего состояния.
+		 * Предполагается, что при этом компонент полностью не уничтожается, а обновляется, например, вёрстка
+		 * (либо какая-то её часть, которая может измениться), обновляются какие-то поля данных и т.п.
+		 * Могут при этом полностью пересоздаваться дочерние компоненты, если это соответствует логике работы.
+		 * При этом должны сохраняться внешние подписки на события, публикуемые этим компонентом,
+		 * однако подписки на события вёрстки и дочерних компонентов будут удаляться в "_unsubscribeInternal"
+		 * и воссоздаваться заново (если это необходимо) в "_subscribeInternal".
+		 * По сути механизм перезагрузки представляет собой каркас для реализации перезагрузки автором компонента
+		 * 
+		 * @param areaName {string|null|undefined} Название обновляемой области внутри компонента.
+		 * Если не указано, то предполагается полное обновление всего компонента
+		 */
+		_reloadControl: function(areaName) {
+			var
+				self = this,
+				queryParams = this._getQueryParams(areaName);
 			this._unsubscribeInternal();
-			$.ajax(this._getRequestURI() + this._getQueryParams(), {
+			$.ajax(this._getRequestURI(areaName) + (queryParams? '?' + queryParams: ''), {
 				success: function(html) {
 					var
 						newMarkup = $(html),
-						selector = '[data-fir-module].' + self.instanceHTMLClass();
+						selector = '.' + self.instanceHTMLClass();
 					self._initControlAndChildren({
-						controlTag: newMarkup.find(selector).addBack(selector),
+						controlTag: newMarkup.find(selector).addBack(selector).filter(function(index, childTag) {
+							return $(childTag).parentsUntil(newMarkup, selector).length == 0
+						}),
 						control: self,
-						replaceMarkup: true
+						replaceMarkup: true,
+						areaName: areaName
 					});
 				},
 				error: function(error) {
@@ -132,34 +143,6 @@ define('fir/controls/FirControl', [
 				}
 			});
 		},
-
-		// Инициализировать компоненты, начиная с тега startTag, назначив родителем компонентов parentCTrl
-		// После инициализации всех компонентов будет вызвана функция loadCallback, если передана
-		/*
-		initControlsFrom: function(startTag, parentCtrl, loadCallback) {
-			var
-				self = this,
-				rootTags = $(startTag).find('[data-fir-module]').filter(function(index, childTag) {
-					return $(childTag).parentsUntil($(startTag), '[data-fir-module]').length == 0;
-				}),
-				currentOpts = {
-					childControls: [], // Список дочерних компонентов
-					childLoadCounter: rootTags.length,
-					initThis: function() {
-						if( parentCtrl != null ) {
-							parentCtrl._childControls = parentCtrl._childControls.concat(currentOpts.childControls);
-						}
-						if( loadCallback ) {
-							loadCallback();
-						}
-					}
-				};
-			
-			rootTags.each(function(index, controlTag) {
-				self._initControlImpl(controlTag, currentOpts);
-			});
-		},
-		*/
 
 		_onControlModuleLoaded: function(state, ControlClass) {
 			var
@@ -170,6 +153,7 @@ define('fir/controls/FirControl', [
 				state.opts.container = $(state.controlTag); // Устанавливаем корневой тэг для компонента
 				state.opts.childControls = state.childControls; // Прописываем контролы всей пачкой (**)
 				state.control = new ControlClass(state.opts);
+				state.control._subscribeInternal();
 				updateControl = false;
 			}
 
@@ -190,7 +174,11 @@ define('fir/controls/FirControl', [
 
 			if( updateControl ) {
 				// Выполняем обновление состояния, когда уже добавили к родителю (на всякий случай)
-				state.control._container = $(state.controlTag);
+				if (!state.areaName) {
+					// Если название области для обновления не указано, то обновлялась вся вёрстка компонента,
+					// поэтому прописываем новый корневой тег в _container
+					state.control._container = $(state.controlTag);
+				}
 				state.control._updateControlState(state.opts);
 				state.control._subscribeInternal();
 			}
@@ -213,8 +201,8 @@ define('fir/controls/FirControl', [
 			return {};
 		},
 
-		_initCurrentControl: function(currentState) {
-			require([currentState.moduleName], this._onControlModuleLoaded.bind(this, currentState));
+		_initCurrentControl: function(state) {
+			require([state.moduleName], this._onControlModuleLoaded.bind(this, state));
 		},
 
 		_getChildControlTags: function(controlTag) {
@@ -245,22 +233,29 @@ define('fir/controls/FirControl', [
 			}
 			return state;
 		},
+		/** Обновление вёрстки компонента при его перезагрузке */
+		_updateControlMarkup: function(state) {
+			// Замена старой верстки компонента на новую
+			// TODO: Нужно проверить, что это не дочерний компонент внутри новой вёрстки,
+			// которую не нужно заменять, поскольку она уже будет заменена
+			state.control._container.replaceWith(state.controlTag);
+		},
 
-		_initControlAndChildren: function(currentState) {
+		_initControlAndChildren: function(state) {
 			var
 				self = this,
 				childStates = [],
 				childrenExist = {};
-			this._fillControlStateFromMarkup(currentState);
-			currentState.childControlTags.each(function(index, childTag) {
+			this._fillControlStateFromMarkup(state);
+			state.childControlTags.each(function(index, childTag) {
 				childStates.push(self._fillControlStateFromMarkup({
 					controlTag: $(childTag),
-					parentState: currentState
+					parentState: state
 				}));
 				childrenExist[childStates[index].opts.instanceName] = true;
 			});
-			if( currentState.control ) {
-				var childControls = currentState.control._childControls;
+			if( state.control ) {
+				var childControls = state.control._childControls;
 				// Лучше будем удалять с конца, чтобы не было проблем с возможным смещением индексов
 				for( var j = childControls.length - 1; j > 0; --j ) {
 					if( !childrenExist[ childControls[j] ] ) {
@@ -271,15 +266,12 @@ define('fir/controls/FirControl', [
 					}
 				}
 			}
-			if( currentState.control && currentState.replaceMarkup ) {
-				// Замена старой верстки компонента на новую
-				// TODO: Нужно проверить, что это не дочерний компонент внутри новой вёрстки,
-				// которую не нужно заменять, поскольку она уже будет заменена
-				currentState.control._container.replaceWith(currentState.controlTag);
+			if( state.control && state.replaceMarkup ) {
+				this._updateControlMarkup(state);
 			}
-			if( currentState.childLoadCounter === 0 ) {
+			if( state.childLoadCounter === 0 ) {
 				// Нет дочерних компонентов - инициализируем сразу, иначе асинхронно
-				this._initCurrentControl(currentState);
+				this._initCurrentControl(state);
 			}
 			for( var i = 0; i < childStates.length; ++i ) {
 				self._initControlAndChildren(childStates[i]); // Инициализируем дочерние компоненты
@@ -304,12 +296,13 @@ define('fir/controls/FirControl', [
 		},
 		// Уничтожить компонент
 		destroy: function() {
+			// TODO: Отписаться от всяческих событий
+			this._unsubscribeInternal();
+
 			// Прибить дочерние компоненты
 			for( var i = 0; i < this._childControls.length; ++i ) {
 				this._childControls[i].destroy();
 			}
-			
-			// TODO: Отписаться от всяческих событий
 
 			// Удалить вёрстку этого компонента
 			if( this._container ) {
