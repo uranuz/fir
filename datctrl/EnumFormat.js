@@ -1,4 +1,4 @@
-define('fir/datctrl/EnumFormat/EnumFormat', [], function(EnumFormat) {
+define('fir/datctrl/EnumFormat', [], function(EnumFormat) {
 	//TODO: Please, implement me;)
 	return __mixinProto(function EnumFormat(opts) {
 		this._items = opts.items || [];

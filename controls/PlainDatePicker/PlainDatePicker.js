@@ -11,13 +11,13 @@ define('fir/controls/PlainDatePicker/PlainDatePicker', [
 
 	return __mixinProto(PlainDatePicker, {
 		rawDay: function() {
-			return this._elems().filter('.e-day_field').val();
+			return this._elems('dayField').val();
 		},
 		rawMonth: function() {
-			return this._elems().filter('.e-month_field').val();
+			return this._elems('monthField').val();
 		},
 		rawYear: function() {
-			return this._elems().filter('.e-year_field').val();
+			return this._elems('yearField').val();
 		}
 	});
 });

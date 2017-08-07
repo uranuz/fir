@@ -1,8 +1,9 @@
 define('fir/datctrl/helpers', [
 	'fir/datctrl/RecordFormat',
 	'fir/datctrl/Record',
-	'fir/datctrl/RecordSet'
-], function(RecordFormat, Record, RecordSet) {
+	'fir/datctrl/RecordSet',
+	'fir/datctrl/EnumFormat'
+], function(RecordFormat, Record, RecordSet, EnumFormat) {
 	var helpers = {
 		//трансформирует JSON в Record или RecordSet
 		fromJSON: function(json) {
