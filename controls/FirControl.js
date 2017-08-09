@@ -131,7 +131,7 @@ define('fir/controls/FirControl', [
 						selector = '.' + self.instanceHTMLClass();
 					self._initControlAndChildren({
 						controlTag: newMarkup.find(selector).addBack(selector).filter(function(index, childTag) {
-							return $(childTag).parentsUntil(newMarkup, selector).length == 0
+							return $(childTag).parents(newMarkup, selector).length == 0
 						}),
 						control: self,
 						replaceMarkup: true,
