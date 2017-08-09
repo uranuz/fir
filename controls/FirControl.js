@@ -104,7 +104,13 @@ define('fir/controls/FirControl', [
 		_getBodyParams: function() {
 			return '';
 		},
+		/** Обработчик обновления внутреннего состояния компонента при завершении перезвгрузки */
 		_updateControlState: function(opts) {},
+		/** Обработчик завершения загрузки компонента для переопределения наследниками */
+		_onAfterLoad: function() {
+			// Публикуем событие о завершении загрузки компонента
+			this._notify('onAfterLoad');
+		},
 
 		/**
 		 * Перезагрузка компонента для обновления отображения и внутреннего состояния.
@@ -183,8 +189,7 @@ define('fir/controls/FirControl', [
 				state.control._subscribeInternal();
 			}
 
-			// Публикуем событие о завершении загрузки компонента
-			state.control._notify('onAfterLoad');
+			state.control._onAfterLoad();
 
 			if( parentState != null && --(parentState.childLoadCounter) === 0 ) {
 				// Все компоненты родителя подгрузились - инициализируем его
