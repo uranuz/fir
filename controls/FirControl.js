@@ -53,7 +53,7 @@ define('fir/controls/FirControl', [
 		},
 		/// Оповестить подписчиков о срабатывании события с именем ev
 		_notify: function(ev) {
-			return $(this).triggerHandler.apply($(this), arguments);
+			return $(this).triggerHandler.call($(this), ev, Array.prototype.slice.call(arguments, 1));
 		},
 		_elemFullClass: function(el) {
 			var cls = "e-" + el + " "
