@@ -18,11 +18,9 @@ def PlainListBox {=
 			<select class="{=cls "listContainer"} form-control" name="{{formField}}">{=
 				repeat item in items {*
 				<option class="{=cls "listItem"}"
-					value="{=at item idField }"
+					value="{=at item idField}"
 					{=if selectedId == {=at item idField} "selected"}
-					>
-					{=at item captionField}
-				</option>
+					>{=at item captionField}</option>
 				*}
 			}
 			</select>

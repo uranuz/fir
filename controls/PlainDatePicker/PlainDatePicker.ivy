@@ -6,6 +6,9 @@ expr {=
 			moduleName: "fir/controls/PlainDatePicker/PlainDatePicker"
 			cssBaseClass: "fir-PlainDatePicker"
 			formField: null
+			dayFormField: null
+			monthFormField: null
+			yearFormField: null
 			date: null
 			day: null
 			month: null
@@ -17,20 +20,25 @@ expr {=
 				'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
 			];
 		def.body {*
+			{=
+				if {=empty dayFormField} and not{=empty formField} {=set dayFormField: formField ~ '__day'};
+				if {=empty monthFormField} and not{=empty formField} {=set monthFormField: formField ~ '__month'};
+				if {=empty yearFormField} and not{=empty formField} {=set yearFormField: formField ~ '__year'};
+			}
 			<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
 				<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
 				<div class="{=cls 'row'} form-inline">
 					<input type="text"
-						{=if not{=empty formField} {*name="{{formField ~ '__day'}}"*} }
+						{=if not{=empty dayFormField} {*name="{{dayFormField}}"*} }
 						class="{=cls 'dayField'} form-control"
 						placeholder="{{dayPlaceholder}}"
 						value="{=if {=empty date} day else {=dtGet date 'day'} }"
 					/>
 					<select
-						{=if not{=empty formField} {*name="{{formField ~ '__month'}}"*} }
+						{=if not{=empty monthFormField} {*name="{{monthFormField}}"*} }
 						class="{=cls 'monthField'} form-control">
 					<option class="{=cls 'monthItem'}">{{monthPlaceholder}}</option>
-					{= 
+					{=
 						var index: 1;
 						repeat item in monthItems {*
 							<option
@@ -45,7 +53,7 @@ expr {=
 					}
 					</select>
 					<input type="text"
-						{=if not{=empty formField} {*name="{{formField ~ '__year'}}"*} }
+						{=if not{=empty yearFormField} {*name="{{yearFormField}}"*} }
 						class="{=cls 'yearField'} form-control"
 						placeholder="{{yearPlaceholder}}"
 						value="{=if {=empty date} year else {=dtGet date 'year'} }"
