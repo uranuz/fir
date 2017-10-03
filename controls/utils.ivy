@@ -52,4 +52,14 @@ expr {=
 			expr result;
 		}
 	};
+
+	def enumWithNull {
+		def.pos
+			list: null
+			nullName: ''
+			nullValue: null;
+		def.body {=
+			insert list {'n': nullName, 'v': nullValue} 0
+		}
+	}
 }
