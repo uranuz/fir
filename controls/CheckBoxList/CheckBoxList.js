@@ -5,7 +5,6 @@ define('fir/controls/CheckBoxList/CheckBoxList', [
 	__extends(CheckBoxList, FirControl);
 
 	function CheckBoxList(opts) {
-		opts = opts || {};
 		FirControl.call(this, opts);
 
 		this._block = this._elems('block');

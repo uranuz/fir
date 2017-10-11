@@ -5,7 +5,6 @@ define('fir/controls/PlainDatePicker/PlainDatePicker', [
 	__extends(PlainDatePicker, FirControl);
 
 	function PlainDatePicker(opts) {
-		opts = opts || {};
 		FirControl.call(this, opts);
 	}
 

@@ -37,7 +37,7 @@ expr {=
 					<select
 						{=if not{=empty monthFormField} {*name="{{monthFormField}}"*} }
 						class="{=cls 'monthField'} form-control">
-					<option class="{=cls 'monthItem'}">{{monthPlaceholder}}</option>
+					<option class="{=cls 'monthItem'}" value="">{{monthPlaceholder}}</option>
 					{=
 						var index: 1;
 						repeat item in monthItems {*
