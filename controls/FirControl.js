@@ -278,9 +278,13 @@ define('fir/controls/FirControl', [
 				// Нет дочерних компонентов - инициализируем сразу, иначе асинхронно
 				this._initCurrentControl(state);
 			}
-			for( var i = 0; i < childStates.length; ++i ) {
-				self._initControlAndChildren(childStates[i]); // Инициализируем дочерние компоненты
-			}
+			// require нужен, т.к. при использовании сборок дочерние модули часто находятся в родителе,
+			// и нужно подгрузить родителя первым
+			require([state.moduleName], function() {
+				for( var i = 0; i < childStates.length; ++i ) {
+					self._initControlAndChildren(childStates[i]); // Инициализируем дочерние компоненты
+				}
+			});
 		},
 		_registerControl: function(control) {
 			if( controlRegistry[control.instanceName()] ) {
