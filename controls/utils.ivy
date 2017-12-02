@@ -9,6 +9,34 @@ expr {=
 		}
 	};
 
+	def firScopeOpts {=
+		def.kv
+			fields: [
+				'instanceName', 'cssBaseClass', 'cssClass'
+			];
+		def.body noscope {=
+			var
+				result: {}
+				allScope: {=scope};
+			for name in fields {=
+				if {=has allScope name} {=
+					setat result {=at allScope name} name;
+				}
+			};
+			expr result;
+		}
+	};
+
+	def firScopeOptsEnc {=
+		def.kv
+			fields: [
+				'instanceName', 'cssBaseClass', 'cssClass'
+			];
+		def.body noscope {=
+			toJSONBase64 {=firScopeOpts fields: fields}
+		}
+	};
+
 	def rsFieldFormat {=
 		def.pos rsOrRec, fieldName;
 		def.body {=

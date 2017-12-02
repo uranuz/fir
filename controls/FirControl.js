@@ -134,11 +134,18 @@ define('fir/controls/FirControl', [
 				success: function(html) {
 					var
 						newMarkup = $(html),
-						selector = '.' + self.instanceHTMLClass();
-					self._initControlAndChildren({
-						controlTag: newMarkup.find(selector).addBack(selector).filter(function(index, childTag) {
+						selector = '.' + self.instanceHTMLClass(),
+						controlTag = newMarkup.find(selector).addBack(selector).filter(function(index, childTag) {
 							return $(childTag).parents(newMarkup, selector).length == 0
-						}),
+						});
+						if( !controlTag || controlTag.length !== 1 ) {
+							throw new Error(
+								'Expected exactly 1 element as control tag!!! '
+								+ 'Check if matching instance class is present on control root element '
+								+ 'and there is no multiple root control elements in markup.');
+						}
+					self._initControlAndChildren({
+						controlTag: controlTag,
 						control: self,
 						replaceMarkup: true,
 						areaName: areaName
@@ -230,7 +237,11 @@ define('fir/controls/FirControl', [
 				throw new Error('Multiple "opts" tags found for control!!!');
 			}
 			state.moduleName = $(state.controlTag).attr('data-fir-module');
-			state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
+			try {
+				state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
+			} catch (ex) {
+				throw new Error('Failed to parse control options from markup!!!');
+			}
 			state.childControlTags = this._getChildControlTags(state.controlTag);
 			state.childLoadCounter = state.childControlTags.length;
 			if( state.control == null ) {
@@ -243,7 +254,12 @@ define('fir/controls/FirControl', [
 			// Замена старой верстки компонента на новую
 			// TODO: Нужно проверить, что это не дочерний компонент внутри новой вёрстки,
 			// которую не нужно заменять, поскольку она уже будет заменена
-			state.control._container.replaceWith(state.controlTag);
+			if( state.control._container.length && state.controlTag.length ) {
+				// Обходим баг в jQuery  replaceWith через родной replaceChild
+				// Проблема в том, что jQuery вместо родителя заменяемого элемента берет родителя передаваемого на замену
+				$.cleanData(state.control._container); // Почистим jQuery данные старого контейнера, т.к. это делает jQuery
+				state.control._container[0].parentNode.replaceChild(state.controlTag[0], state.control._container[0]);
+			}
 		},
 
 		_initControlAndChildren: function(state) {
