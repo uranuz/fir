@@ -8,16 +8,22 @@ expr {=
 			if {=has {=scope} "cssClass"} and not{=empty cssClass} cssClass ~ " ";
 		}
 	};
+	var firScopeFields: [
+		'instanceName',
+		'cssBaseClass',
+		'cssClass',
+		'__scopeName__',
+		'moduleName'
+	];
 
 	def firScopeOpts {=
 		def.kv
-			fields: [
-				'instanceName', 'cssBaseClass', 'cssClass'
-			];
+			fields: null;
 		def.body noscope {=
 			var
 				result: {}
 				allScope: {=scope};
+			if fields == null {=set fields: firScopeFields};
 			for name in fields {=
 				if {=has allScope name} {=
 					setat result {=at allScope name} name;
@@ -29,10 +35,9 @@ expr {=
 
 	def firScopeOptsEnc {=
 		def.kv
-			fields: [
-				'instanceName', 'cssBaseClass', 'cssClass'
-			];
+			fields: null;
 		def.body noscope {=
+			if fields == null {=set fields: firScopeFields};
 			toJSONBase64 {=firScopeOpts fields: fields}
 		}
 	};
