@@ -1,5 +1,5 @@
 expr {=
-	from fir.controls.utils import cls;
+	from fir.controls.utils import cls, firScopeOptsEnc;
 	def PlainDatePicker {=
 		def.kv
 			instanceName: undef
@@ -28,8 +28,10 @@ expr {=
 				if {=empty yearFormField} and not{=empty formField} {=set yearFormField: formField ~ '__year'};
 			}
 			<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
-				<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
-				<div class="{=cls 'row' 'form-inline'}">
+				<input type="hidden" data-fir-opts="{=firScopeOptsEnc
+					fields: ['dayInvalidMessage', 'yearInvalidMessage']
+				}"/>
+				<div class="{=cls 'row' 'form-inline flex-sm-nowrap'}">
 					<input type="text"
 						{=if not{=empty dayFormField} {*name="{{dayFormField}}"*} }
 						class="{=cls 'dayField' 'form-control'}"
@@ -46,9 +48,7 @@ expr {=
 							<option
 								class="{=cls 'monthItem' 'form-control'}"
 								value="{{index}}"
-								{=if index == {=if {=empty date} month else {=dtGet date 'month'} }
-									"selected"
-								}
+								{=if index == {=if {=empty date} month else {=dtGet date 'month'} } "selected"}
 								>{{item}}</option>
 							{=set index: index + 1}
 						*}

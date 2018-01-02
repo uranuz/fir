@@ -21,4 +21,10 @@
 		vertical-align: top;
 		margin-top: 6px;
 	}
+	&.e-itemLabel {
+		white-space: nowrap;
+	}
+	&.e-itemText {
+		white-space: normal;
+	}
 }

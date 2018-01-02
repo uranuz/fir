@@ -19,6 +19,21 @@ expr {=
 		'moduleName'
 	];
 
+	def _addValues {=
+		def.kv
+			result
+			fields;
+		def.body {=
+			if not{=empty fields} {=
+				for name in fields {=
+					if {=has allScope name} {=
+						setat result {=at allScope name} name;
+					}
+				};
+			}
+		}
+	};
+
 	def firScopeOpts {=
 		def.kv
 			fields: null;
@@ -26,12 +41,8 @@ expr {=
 			var
 				result: {}
 				allScope: {=scope};
-			if fields == null {=set fields: firScopeFields};
-			for name in fields {=
-				if {=has allScope name} {=
-					setat result {=at allScope name} name;
-				}
-			};
+			_addValues result: result fields: fields;
+			_addValues result: result fields: firScopeFields;
 			expr result;
 		}
 	};
@@ -40,7 +51,6 @@ expr {=
 		def.kv
 			fields: null;
 		def.body noscope {=
-			if fields == null {=set fields: firScopeFields};
 			toJSONBase64 {=firScopeOpts fields: fields}
 		}
 	};
