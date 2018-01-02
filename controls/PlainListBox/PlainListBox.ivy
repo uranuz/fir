@@ -1,5 +1,5 @@
 expr {=
-from fir.controls.utils import cls;
+from fir.controls.utils import cls, firScopeOptsEnc;
 def PlainListBox {=
 	def.kv
 		moduleName: "fir/controls/PlainListBox/PlainListBox"
@@ -13,7 +13,7 @@ def PlainListBox {=
 		selectedId: undef;
 	def.body {*
 	<div data-fir-module="{{moduleName}}">
-		<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
+		<input type="hidden" data-fir-opts="{=firScopeOptsEnc}"/>
 		<div class="{=cls "listScroller"}">
 			<select class="{=cls "listContainer"} form-control" name="{{formField}}">{=
 				repeat item in items {*

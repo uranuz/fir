@@ -1,11 +1,14 @@
 expr {=
 	def cls {=
-		def.pos el;
+		def.pos el, baseClass: null;
 		def.body noscope {%
 			expr "e-" ~ el ~ " ";
 			if not{=empty instanceName} "i-" ~ instanceName ~ " ";
 			if not{=empty cssBaseClass} cssBaseClass ~ " ";
 			if {=has {=scope} "cssClass"} and not{=empty cssClass} cssClass ~ " ";
+			if {=has {=scope} "cssBaseElemClass"} and not{=empty cssBaseElemClass} and {=has cssBaseElemClass el} {=at cssBaseElemClass el} ~ " ";
+			if {=has {=scope} "cssElemClass"} and not{=empty cssElemClass} and {=has cssElemClass el} {=at cssElemClass el} ~ " " 
+			elif not{=empty baseClass} baseClass ~ " ";
 		}
 	};
 	var firScopeFields: [

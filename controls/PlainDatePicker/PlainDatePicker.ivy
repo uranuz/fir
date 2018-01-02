@@ -18,7 +18,9 @@ expr {=
 			yearPlaceholder: null
 			monthItems: [
 				'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
-			];
+			]
+			dayInvalidMessage: 'Введите корректный день месяца в интервале от 1 до 31'
+			yearInvalidMessage: 'Введите корректный год в виде целого числа';
 		def.body {*
 			{=
 				if {=empty dayFormField} and not{=empty formField} {=set dayFormField: formField ~ '__day'};
@@ -27,22 +29,22 @@ expr {=
 			}
 			<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
 				<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
-				<div class="{=cls 'row'} form-inline">
+				<div class="{=cls 'row' 'form-inline'}">
 					<input type="text"
 						{=if not{=empty dayFormField} {*name="{{dayFormField}}"*} }
-						class="{=cls 'dayField'} form-control"
+						class="{=cls 'dayField' 'form-control'}"
 						placeholder="{{dayPlaceholder}}"
 						value="{=if {=empty date} day else {=dtGet date 'day'} }"
 					/>
 					<select
 						{=if not{=empty monthFormField} {*name="{{monthFormField}}"*} }
-						class="{=cls 'monthField'} form-control">
+						class="{=cls 'monthField' 'form-control'}">
 					<option class="{=cls 'monthItem'}" value="">{{monthPlaceholder}}</option>
 					{=
 						var index: 1;
 						repeat item in monthItems {*
 							<option
-								class="{=cls 'monthItem'}"
+								class="{=cls 'monthItem' 'form-control'}"
 								value="{{index}}"
 								{=if index == {=if {=empty date} month else {=dtGet date 'month'} }
 									"selected"
@@ -54,7 +56,7 @@ expr {=
 					</select>
 					<input type="text"
 						{=if not{=empty yearFormField} {*name="{{yearFormField}}"*} }
-						class="{=cls 'yearField'} form-control"
+						class="{=cls 'yearField' 'form-control'}"
 						placeholder="{{yearPlaceholder}}"
 						value="{=if {=empty date} year else {=dtGet date 'year'} }"
 					/>

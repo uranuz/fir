@@ -1,0 +1,24 @@
+.fir-Validation {
+	&.e-popup {
+		position: absolute;
+		padding: 8px 16px 16px 16px;
+		border: 1px solid rgb(150, 50, 50);
+		background: white;
+		border-radius: 4px;
+	}
+	&.e-topRow {
+		text-align: right;
+		font-size: 12px;
+	}
+	&.e-closeBtn {
+		display: inline-block;
+		cursor: pointer;
+		border: 1px solid rgb(150, 50, 50);
+		border-radius: 2px;
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+}
+.fir-IsInvalidField {
+	border: 1px solid rgb(150, 50, 50);
+}
