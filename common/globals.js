@@ -43,7 +43,7 @@ define("fir/common/globals", [], function() {
 		return child;
 	}
 
-	function __mixinProto(dst, src) {
+	function __mixinProtoSingle(dst, src) {
 		for( key in src ) {
 			//Don't copy Object's built in properties
 			if( (typeof {}[key] == "undefined") || ({}[key] != src[key]) )
