@@ -52,6 +52,19 @@ define("fir/common/globals", [], function() {
 
 		return dst;
 	}
+	function __mixinProto(dst, src) {
+		if( src == null )
+			return dst;
+
+		if( src instanceof Array ) {
+			for( var i = 0; i < src.length; ++i ) {
+				__mixinProtoSingle(dst, src[i]);
+			}
+		} else {
+			__mixinProtoSingle(dst, src);
+		}
+		return dst;
+	}
 	window.__extends = __extends;
 	window.__mixinProto = __mixinProto;
 });
