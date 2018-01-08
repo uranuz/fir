@@ -36,9 +36,8 @@ define("fir/common/globals", [], function() {
 		}
 
 		ctor.prototype = parent.prototype || Object.getPrototypeOf(parent);
-
 		child.prototype = new ctor();
-		child.__super__ = parent.prototype || Object.getPrototypeOf(parent);
+		child.prototype.superproto = ctor.prototype;
 
 		return child;
 	}
@@ -46,8 +45,10 @@ define("fir/common/globals", [], function() {
 	function __mixinProtoSingle(dst, src) {
 		for( key in src ) {
 			//Don't copy Object's built in properties
-			if( (typeof {}[key] == "undefined") || ({}[key] != src[key]) )
-				dst.prototype[key] = src[key];
+			if(
+				((typeof {}[key] == "undefined") || ({}[key] != src[key]))
+				&& key != 'constructor' && key != 'superproto'
+			) dst.prototype[key] = src[key];
 		}
 
 		return dst;
