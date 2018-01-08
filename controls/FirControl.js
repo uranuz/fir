@@ -269,11 +269,17 @@ define('fir/controls/FirControl', [
 				childrenExist = {};
 			this._fillControlStateFromMarkup(state);
 			state.childControlTags.each(function(index, childTag) {
-				childStates.push(self._fillControlStateFromMarkup({
+				var childState = self._fillControlStateFromMarkup({
 					controlTag: $(childTag),
 					parentState: state
-				}));
-				childrenExist[childStates[index].opts.instanceName] = true;
+				});
+				if( state.control ) {
+					// Если дочерний контрол уже существует в текущем,
+					// то сохраняем ссылку на него, чтобы он не был создан заново
+					childState.control = state.control.getChildInstanceByName(childState.opts.instanceName);
+				}
+				childStates.push(childState);
+				childrenExist[childState.opts.instanceName] = true;
 			});
 			if( state.control ) {
 				var childControls = state.control._childControls;
