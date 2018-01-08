@@ -35,10 +35,10 @@ define("fir/common/globals", [], function() {
 			this.constructor = child;
 		}
 
-		ctor.prototype = parent.prototype;
+		ctor.prototype = parent.prototype || Object.getPrototypeOf(parent);
 
 		child.prototype = new ctor();
-		child.__super__ = parent.prototype;
+		child.__super__ = parent.prototype || Object.getPrototypeOf(parent);
 
 		return child;
 	}
