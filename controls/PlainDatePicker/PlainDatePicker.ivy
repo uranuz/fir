@@ -31,7 +31,7 @@ expr {=
 				<input type="hidden" data-fir-opts="{=firScopeOptsEnc
 					fields: ['dayInvalidMessage', 'yearInvalidMessage']
 				}"/>
-				<div class="{=cls 'row' 'form-inline flex-sm-nowrap'}">
+				<div class="{=cls 'row' 'form-inline flex-nowrap'}">
 					<input type="text"
 						{=if not{=empty dayFormField} {*name="{{dayFormField}}"*} }
 						class="{=cls 'dayField' 'form-control'}"
