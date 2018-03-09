@@ -20,16 +20,14 @@ expr {=
 	];
 
 	def _addValues {=
-		def.kv
-			result
-			fields;
+		def.kv result fields allScope;
 		def.body {=
 			if not{=empty fields} {=
 				for name in fields {=
 					if {=has allScope name} {=
 						setat result {=at allScope name} name;
 					}
-				};
+				}
 			}
 		}
 	};
@@ -41,8 +39,8 @@ expr {=
 			var
 				result: {}
 				allScope: {=scope};
-			_addValues result: result fields: fields;
-			_addValues result: result fields: firScopeFields;
+			_addValues result: result fields: fields allScope: allScope;
+			_addValues result: result fields: firScopeFields allScope: allScope;
 			expr result;
 		}
 	};
