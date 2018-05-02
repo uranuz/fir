@@ -105,5 +105,19 @@ expr {=
 		def.body {=
 			insert list {'n': nullName, 'v': nullValue} 0
 		}
+	};
+
+	def isAllowed {
+		def.kv
+			object: null
+			kind: null
+			data: null;
+		def.body {=
+			var copyRight: userRights;
+			set copyRight.object: object;
+			set copyRight.kind: kind;
+			set copyRight.data: data;
+			expr copyRight.isAllowed;
+		}
 	}
 }
