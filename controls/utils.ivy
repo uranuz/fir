@@ -107,17 +107,25 @@ expr {=
 		}
 	};
 
-	def isAllowed {
+	def hasRight {
 		def.kv
-			object: null
+			obj: null
+			subobj: null
 			kind: null
 			data: null;
-		def.body {=
+		def.body noscope {=
 			var copyRight: userRights;
-			set copyRight.object: object;
+			set copyRight.object: {=
+				if not{=empty obj}
+					obj
+				elif not{=empty subobj} and {=has {=scope} 'accessObject'}
+					accessObject ~ '.' ~ subobj
+				elif {=has {=scope} 'accessObject'}
+					accessObject;
+			};
 			set copyRight.kind: kind;
 			set copyRight.data: data;
-			expr copyRight.isAllowed;
+			expr copyRight.hasRight;
 		}
-	}
+	};
 }
