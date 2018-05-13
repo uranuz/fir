@@ -128,4 +128,20 @@ expr {=
 			expr copyRight.hasRight;
 		}
 	};
+
+	def isInRoles {=
+		def.pos
+			roles;
+		def.body {=
+			var result: false;
+			for role in roles {=
+				for userRole in userIdentity.accessRoles {=
+					if role == userRole {=
+						set result: true
+					}
+				}
+			};
+			expr result;
+		}
+	};
 }

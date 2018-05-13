@@ -20,7 +20,8 @@ expr {=
 				'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
 			]
 			dayInvalidMessage: 'Введите корректный день месяца в интервале от 1 до 31'
-			yearInvalidMessage: 'Введите корректный год в виде целого числа';
+			yearInvalidMessage: 'Введите корректный год в виде целого числа'
+			disabled: null;
 		def.body {*
 			{=
 				if {=empty dayFormField} and not{=empty formField} {=set dayFormField: formField ~ '__day'};
@@ -37,10 +38,13 @@ expr {=
 						class="{=cls 'dayField' 'form-control'}"
 						placeholder="{{dayPlaceholder}}"
 						value="{=if {=empty date} day else {=dtGet date 'day'} }"
+						{=if disabled 'disabled'}
 					/>
 					<select
 						{=if not{=empty monthFormField} {*name="{{monthFormField}}"*} }
-						class="{=cls 'monthField' 'form-control'}">
+						class="{=cls 'monthField' 'form-control'}"
+						{=if disabled 'disabled'}
+						>
 					<option class="{=cls 'monthItem'}" value="">{{monthPlaceholder}}</option>
 					{=
 						var index: 1;
@@ -59,6 +63,7 @@ expr {=
 						class="{=cls 'yearField' 'form-control'}"
 						placeholder="{{yearPlaceholder}}"
 						value="{=if {=empty date} year else {=dtGet date 'year'} }"
+						{=if disabled 'disabled'}
 					/>
 				</div>
 			</div>

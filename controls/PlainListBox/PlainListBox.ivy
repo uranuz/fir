@@ -10,12 +10,17 @@ def PlainListBox {=
 		items: []
 		idField: "value"
 		captionField: "caption"
-		selectedId: undef;
+		selectedId: undef
+		disabled: null;
 	def.body {*
 	<div data-fir-module="{{moduleName}}">
 		<input type="hidden" data-fir-opts="{=firScopeOptsEnc}"/>
 		<div class="{=cls "listScroller"}">
-			<select class="{=cls "listContainer"} form-control" name="{{formField}}">{=
+			<select
+				class="{=cls "listContainer"} form-control"
+				name="{{formField}}"
+				{=if disabled 'disabled'}
+				>{=
 				repeat item in items {*
 				<option class="{=cls "listItem"}"
 					value="{=at item idField}"
