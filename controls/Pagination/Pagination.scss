@@ -1,0 +1,15 @@
+.fir-Pagination {
+	&.e-block {
+		display: inline-block;
+		position: relative;
+	}
+	&.e-pageCountBlock {
+		display: inline-block;
+	}
+	&.e-nearPageBtnWrapper, &.e-boundaryPageBtnWrapper {
+		border-radius: 4px;
+	}
+	&.e-gotoPageBtnWrapper {
+		display: inline-block;
+	}
+}
