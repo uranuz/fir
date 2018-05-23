@@ -20,22 +20,24 @@ def Pagination {=
 		<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
 		<div class="form-inline">
 			<div class="{=cls 'formRow'} form-group input-group">
-				<span class="{=cls 'titleRow'} input-group-addon border-secondary d-none d-sm-flex"
-					>{{title}}</span>
-				<span class="{=cls 'boundaryPageBtnWrapper'} input-group-btn bg-secondary">
-					<a class="{=cls 'firstBtn'} btn btn-secondary"
-						href="javascript:void(0)"
-						title="Перейти на первую страницу"
-						>&lt;&lt;</a>
-				</span>
-				<span class="{=cls 'nearPageBtnWrapper'} input-group-btn bg-secondary">
-					<a class="{=cls 'prevBtn'} btn btn-secondary"
-						href="javascript:void(0)"
-						title="Перейти на предыдущую страницу"
-						>&lt;</a>
-				</span>
+				<div class="input-group-prepend bg-secondary">
+					<span class="{=cls 'titleRow'} input-group-text border-secondary d-none d-sm-flex"
+						>{{title}}</span>
+					<span class="{=cls 'boundaryPageBtnWrapper'} input-group-btn">
+						<a class="{=cls 'firstBtn'} btn btn-secondary"
+							href="javascript:void(0)"
+							title="Перейти на первую страницу"
+							>&lt;&lt;</a>
+					</span>
+					<span class="{=cls 'nearPageBtnWrapper'} input-group-btn">
+						<a class="{=cls 'prevBtn'} btn btn-secondary"
+							href="javascript:void(0)"
+							title="Перейти на предыдущую страницу"
+							>&lt;</a>
+					</span>
+				</div>
 				<input type="text"
-					class="{=cls 'currentPageField'} form-control"
+					class="{=cls 'currentPageField'} form-control border-secondary"
 					size="5"
 					maxlength="5"
 					value="{=if not{=empty currentPage}	currentPage + 1
@@ -43,32 +45,34 @@ def Pagination {=
 						else 1
 					}"
 					/>
-				<span class="{=cls 'pageCountBlock'} input-group-btn">
-					из &nbsp;<span class="{=cls 'pageCount'}">
-						{=if not{=empty pageCount} pageCount
-							elif not{=empty recordCount} and not{=empty pageSize} recordCount / pageSize + 1
-						}
+				<div class="input-group-append bg-secondary">
+					<span class="{=cls 'pageCountBlock'} input-group-text border-secondary">
+						из &nbsp;<span class="{=cls 'pageCount'}">
+							{=if not{=empty pageCount} pageCount
+								elif not{=empty recordCount} and not{=empty pageSize} recordCount / pageSize + 1
+							}
+						</span>
 					</span>
-				</span>
 
-				<span class="{=cls 'gotoPageBtnWrapper'} input-group-btn">
-					<button type="button"
-						class="{=cls 'gotoPageBtn'} btn btn-secondary"
-						>Перейти</button>
-				</span>
+					<span class="{=cls 'gotoPageBtnWrapper'} input-group-btn">
+						<button type="button"
+							class="{=cls 'gotoPageBtn'} btn btn-secondary"
+							>Перейти</button>
+					</span>
 
-				<span class="{=cls 'nearPageBtnWrapper'} input-group-btn bg-secondary">
-					<a class="{=cls 'nextBtn'} btn btn-secondary"
-						href="javascript:void(0)"
-						title="Перейти на следующую страницу"
-						>&gt;</a>
-				</span>
-				<span class="{=cls 'boundaryPageBtnWrapper'} input-group-btn ">
-					<a class="{=cls 'lastBtn'} btn btn-secondary"
-						href="javascript:void(0)"
-						title="Перейти на последнюю страницу"
-						>&gt;&gt;</a>
-				</span>
+					<span class="{=cls 'nearPageBtnWrapper'} input-group-btn">
+						<a class="{=cls 'nextBtn'} btn btn-secondary"
+							href="javascript:void(0)"
+							title="Перейти на следующую страницу"
+							>&gt;</a>
+					</span>
+					<span class="{=cls 'boundaryPageBtnWrapper'} input-group-btn ">
+						<a class="{=cls 'lastBtn'} btn btn-secondary"
+							href="javascript:void(0)"
+							title="Перейти на последнюю страницу"
+							>&gt;&gt;</a>
+					</span>
+				</div>
 			</div>
 		</div>
 		<div class="{=cls 'notFoundMsg'}" style="display: none;">{{notFoundMsg}}</div>
