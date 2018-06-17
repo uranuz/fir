@@ -82,18 +82,13 @@ expr {=
 				result: null;
 			if {=has fmt "enum" } {=
 				for enumPair in fmt.enum {=
-					if enumPair.v == value {=
-						if {=has enumPair "n"} {=
-							set result: enumPair.n;
-						} else {=
-							set result: enumPair.v;
-						}
-					}
+					if enumPair.v != value {=continue};
+					if {=has enumPair "n"} {=return enumPair.n}
+					else {=return enumPair.v}
 				}
 			} else {=
-				set result: value;
+				return value;
 			};
-			expr result;
 		}
 	};
 
@@ -133,15 +128,12 @@ expr {=
 		def.pos
 			roles;
 		def.body {=
-			var result: false;
 			for role in roles {=
 				for userRole in userIdentity.accessRoles {=
-					if role == userRole {=
-						set result: true
-					}
+					if role == userRole {=return true}
 				}
 			};
-			expr result;
+			return false
 		}
 	};
 }
