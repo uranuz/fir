@@ -125,6 +125,7 @@ define('fir/common/base64', ['fir/common/text_encoder'], function (TextEncoder) 
 		byteLength: byteLength,
 		toByteArray: toByteArray,
 		fromByteArray: fromByteArray,
-		decodeUTF8: decodeUTF8
+		decodeUTF8: decodeUTF8,
+		encodeUTF8: encodeUTF8
 	};
 });
