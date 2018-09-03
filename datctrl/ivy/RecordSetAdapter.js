@@ -17,7 +17,7 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 	};
 	__extends(RecordSetAdapter, ClassNode);
 	return __mixinProto(RecordSetAdapter, {
-		/** Analogue to IDataNodeRange opSlice(); in D impl */
+		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			return new RecordSetRange(this);
 		},
@@ -26,8 +26,8 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 			throw new Error('Not implemented!');
 		},
 		/** Analogue to:
-		 * TDataNode opIndex(string);
-		 * TDataNode opIndex(size_t);
+		 * IvyData opIndex(string);
+		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
 			if( typeof(index) === 'number' ) {
@@ -36,7 +36,7 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 				return this._rs.getRecord(index);
 			}
 		},
-		/** Analogue to TDataNode __getAttr__(string); in D impl */
+		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
 			switch(name) {
 				case 'format': new RecordFormatAdapter(this._rec.getFormat()); break;
@@ -46,11 +46,11 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 				default: throw new Error('Property is undefined!');
 			}
 		},
-		/** Analogue to void __setAttr__(TDataNode, string); in D impl */
+		/** Analogue to void __setAttr__(IvyData, string); in D impl */
 		setAttr: function(value, name) {
 			throw new Error('Not implemented!');
 		},
-		/** Analogue to TDataNode __serialize__(); in D impl */
+		/** Analogue to IvyData __serialize__(); in D impl */
 		serialize: function() {
 			throw new Error('Not implemented!');
 		},

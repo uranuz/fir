@@ -19,7 +19,7 @@ exports._isContainerRawData = function(node) {
 };
 
 /*
-auto tryExtractRecordSet(ref TDataNode srcNode)
+auto tryExtractRecordSet(ref IvyData srcNode)
 {
 	if( !_isContainerRawData(srcNode) && srcNode["t"].str != "recordset" ) {
 		return null;
@@ -27,7 +27,7 @@ auto tryExtractRecordSet(ref TDataNode srcNode)
 	return new RecordSetAdapter(srcNode);
 }
 
-auto tryExtractRecord(ref TDataNode srcNode)
+auto tryExtractRecord(ref IvyData srcNode)
 {
 	if( !_isContainerRawData(srcNode) && srcNode["t"].str != "record" ) {
 		return null;

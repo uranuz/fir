@@ -8,7 +8,7 @@ define('fir/datctrl/ivy/UserRights', [
 	};
 	__extends(IvyUserRights, ClassNode);
 	return __mixinProto(IvyUserRights, {
-		/** Analogue to IDataNodeRange opSlice(); in D impl */
+		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
 		},
@@ -17,13 +17,13 @@ define('fir/datctrl/ivy/UserRights', [
 			throw new Error('Not implemented!');
 		},
 		/** Analogue to:
-		 * TDataNode opIndex(string);
-		 * TDataNode opIndex(size_t);
+		 * IvyData opIndex(string);
+		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
 			throw new Error('Not implemented!');
 		},
-		/** Analogue to TDataNode __getAttr__(string); in D impl */
+		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
 			switch( name ) {
 				case 'object': return this._accessObject;
@@ -33,7 +33,7 @@ define('fir/datctrl/ivy/UserRights', [
 				default: throw new Error('Unexpected IvyUserRights attribute: ' + name);
 			}
 		},
-		/** Analogue to void __setAttr__(TDataNode, string); in D impl */
+		/** Analogue to void __setAttr__(IvyData, string); in D impl */
 		setAttr: function(value, name) {
 			switch( name ) {
 				case 'object': this._accessObject = value; break;
@@ -42,7 +42,7 @@ define('fir/datctrl/ivy/UserRights', [
 				default: throw new Error('Unexpected IvyUserRights attribute: ' + name);
 			}
 		},
-		/** Analogue to TDataNode __serialize__(); in D impl */
+		/** Analogue to IvyData __serialize__(); in D impl */
 		serialize: function() {
 			throw new Error('Not implemented!');
 		},
