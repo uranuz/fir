@@ -1,8 +1,9 @@
 define('fir/datctrl/RecordSet', [
 	'fir/common/helpers',
 	'fir/datctrl/RecordFormat',
-	'fir/datctrl/Record'
-], function(helpers, RecordFormat, Record) {
+	'fir/datctrl/Record',
+	'fir/datctrl/Deserializer'
+], function(helpers, RecordFormat, Record, Deserializer) {
 	var RecordSet = __mixinProto(function RecordSet(opts) {
 		opts = opts || {}
 		if( opts.format != null && opts.fields != null ) {
@@ -15,10 +16,13 @@ define('fir/datctrl/RecordSet', [
 			this._fmt = new RecordFormat({fields: opts.fields});
 		}
 
-		if( opts.data instanceof Array )
+		if( opts.data instanceof Array ) {
 			this._d = opts.data;
-		else
+		} else if( opts.rawData instanceof Array ) {
+			this._d = Deserializer.deserializeRecordSet(opts.rawData, this._fmt);
+		} else {
 			this._d = []; //Данные (массив)
+		}
 
 		this._recIndex = 0;
 		this._reindex(); //Строим индекс
@@ -37,8 +41,11 @@ define('fir/datctrl/RecordSet', [
 		rewind: function() {
 			this._recIndex = 0;
 		},
-		copyFormat: function()
-		{	return this._fmt.copy();
+		getFormat: function() {
+			return this._fmt;
+		},
+		copyFormat: function() {
+			return this._fmt.copy();
 		},
 		//Возвращает количество записей в наборе
 		getLength: function() {

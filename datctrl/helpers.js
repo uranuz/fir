@@ -18,16 +18,16 @@ define('fir/datctrl/helpers', [
 			{
 				fmt = helpers.recordFormatFromJSON(jsonObj);
 
-				if( jsonObj.t === "record" )
-				{	return new Record({
+				if( jsonObj.t === "record" ) {
+					return new Record({
 						format: fmt,
-						data: jsonObj.d
+						rawData: jsonObj.d
 					});
 				}
-				else if( jsonObj.t === "recordset" )
-				{	return new RecordSet({
+				else if( jsonObj.t === "recordset" ) {
+					return new RecordSet({
 						format: fmt,
-						data: jsonObj.d
+						rawData: jsonObj.d
 					});
 				}
 			}

@@ -1,8 +1,14 @@
 define('fir/datctrl/ivy/RecordFormatAdapter', [
-	'ivy/ClassNode'
-], function(ClassNode) {
-	function RecordFormatAdapter(rec) {
-		this._rec = rec;
+	'ivy/ClassNode',
+	'fir/common/helpers',
+	'fir/datctrl/RecordFormat'
+], function(ClassNode, helpers, RecordFormat) {
+	function RecordFormatAdapter(fmt) {
+		if( !(fmt instanceof RecordFormat) ) {
+			throw new Error('Expected RecordFormat');
+		}
+
+		this._fmt = fmt;
 	};
 	__extends(RecordFormatAdapter, ClassNode);
 	return __mixinProto(RecordFormatAdapter, {
@@ -19,7 +25,7 @@ define('fir/datctrl/ivy/RecordFormatAdapter', [
 		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
-			return this._rec.get(index);
+			return this._fmt.getRawFormat(index);
 		},
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {

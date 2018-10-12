@@ -1,7 +1,8 @@
 define('fir/datctrl/Record', [
 	'fir/common/helpers',
+	'fir/datctrl/Deserializer',
 	'fir/datctrl/RecordFormat'
-], function(helpers, RecordFormat) {
+], function(helpers, Deserializer, RecordFormat) {
 	var Record = __mixinProto(function Record(opts) {
 		opts = opts || {};
 		if( opts.format != null && opts.fields != null ) {
@@ -14,10 +15,13 @@ define('fir/datctrl/Record', [
 			this._fmt = new RecordFormat({fields: opts.fields});
 		}
 
-		if( opts.data instanceof Array )
+		if( opts.data instanceof Array ) {
 			this._d = opts.data;
-		else
+		} else if( opts.rawData instanceof Array ) {
+			opts._d = Deserializer.deserializeRecord(opts.rawData, this._fmt);
+		} else {
 			this._d = []; //Данные (массив)
+		}
 	}, {
 		//Метод получения значения из записи по имени поля
 		get: function(index, defaultValue) {
@@ -37,6 +41,9 @@ define('fir/datctrl/Record', [
 		},
 		getLength: function() {
 			return this._d.length;
+		},
+		getFormat: function() {
+			return this._fmt;
 		},
 		copyFormat: function() {
 			return this._fmt.copy();

@@ -34,18 +34,28 @@ define('fir/datctrl/RecordFormat', ['fir/common/helpers'], function(helpers) {
 		},
 		//Получить индекс поля по имени
 		getIndex: function(name) {
+			if( !this._indexes.hasOwnProperty(name) ) {
+				throw new Error('No field with name in format');
+			}
 			return this._indexes[name];
 		},
 		//Получить имя поля по индексу
 		getName: function(index) {
-			return this._f[ index ].n;
+			return this.getRawFormat(index).n;
 		},
 		//Получить тип поля по имени или индексу
 		getType: function(index) {
-			if( helpers.isUnsigned(index) )
-				return this._f[ index ].t;
-			else
-				return this._f[ this.getFieldIndex(index) ].t;
+			return this.getRawFormat(index).t;
+		},
+		getRawFormat: function(index) {
+			if( helpers.isUnsigned(index) ) {
+				if( index >= this._f.length ) {
+					throw new Error('No field by index in format');
+				}
+				return this._f[index];
+			} else {
+				return this._f[this.getIndex(index)];
+			}
 		},
 		getKeyFieldIndex: function() {
 			return this._keyFieldIndex;
@@ -61,6 +71,9 @@ define('fir/datctrl/RecordFormat', ['fir/common/helpers'], function(helpers) {
 				fields: helpers.deepCopy( this._f ),
 				keyFieldIndex: this._keyFieldIndex
 			});
+		},
+		getLength: function() {
+			return this._f.length;
 		}
 	});
 	return RecordFormat;

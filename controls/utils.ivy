@@ -53,13 +53,6 @@ expr {=
 		}
 	};
 
-	def rsFieldFormat {=
-		def.pos rsOrRec, fieldName;
-		def.body {=
-			at rsOrRec.format {=at rsOrRec.namesMapping fieldName}
-		}
-	};
-
 	def rsGet {=
 		def.pos rs, fieldName, rowIndex;
 		def.body {=
@@ -77,8 +70,8 @@ expr {=
 		def.pos record, fieldName;
 		def.body {=
 			var
-				fmt: {=rsFieldFormat record fieldName},
-				value: {=recGet record fieldName },
+				fmt: {=at record.format fieldName},
+				value: {=recGet record fieldName},
 				result: null;
 			if {=has fmt "enum" } {=
 				for enumPair in fmt.enum {=

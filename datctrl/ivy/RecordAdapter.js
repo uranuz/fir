@@ -3,11 +3,16 @@ define('fir/datctrl/ivy/RecordAdapter', [
 	'fir/datctrl/Record',
 	'fir/datctrl/ivy/RecordFormatAdapter'
 ], function(ClassNode, Record, RecordFormatAdapter) {
-	function RecordAdapter(rec) {
+	function RecordAdapter(rec, fmt) {
 		if( !(rec instanceof Record) ) {
 			throw new Error('Expected Record');
 		}
 		this._rec = rec;
+		if( fmt instanceof RecordFormatAdapter ) {
+			this._fmt = fmt;
+		} else{
+			this._fmt = new RecordFormatAdapter(this._rec.getFormat());
+		}
 	};
 	__extends(RecordAdapter, ClassNode);
 	return __mixinProto(RecordAdapter, {
@@ -29,12 +34,10 @@ define('fir/datctrl/ivy/RecordAdapter', [
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
 			switch(name) {
-				case 'format': new RecordFormatAdapter(this._rec.getFormat()); break;
-				case 'namesMapping':
-					throw new Error('Not implemented!');
-				break;
-				default: throw new Error('Property is undefined!');;
+				case 'format': return this._fmt;
+				default: break;
 			}
+			return undefined;
 		},
 		/** Analogue to void __setAttr__(IvyData, string); in D impl */
 		setAttr: function(value, name) {

@@ -14,6 +14,12 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 			throw new Error('Expected RecordSet');
 		}
 		this._rs = rs;
+
+		this._namesMapping = {};
+		var fmt = this._rs.getFormat();
+		for( var i = 0; i < fmt.getLength(); ++i ) {
+			this._namesMapping[fmt.getName(i)] = i;
+		}
 	};
 	__extends(RecordSetAdapter, ClassNode);
 	return __mixinProto(RecordSetAdapter, {
@@ -39,10 +45,8 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
 			switch(name) {
-				case 'format': new RecordFormatAdapter(this._rec.getFormat()); break;
-				case 'namesMapping':
-					throw new Error('Not implemented!');
-				break;
+				case 'format': return new RecordFormatAdapter(this._rec.getFormat());
+				case 'namesMapping': return this._namesMapping;
 				default: throw new Error('Property is undefined!');
 			}
 		},

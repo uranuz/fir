@@ -6,6 +6,20 @@ define('fir/controls/FirControl', [
 	var
 		controlCounter = 0, // Variable used to generate control names
 		controlRegistry = {};
+
+	function ControlLoadState() {
+		this.controlTag = null; // This control (or area) root tag
+		this.configTag = null; // Configuration tag 'data-fir-opts' inside control tag
+		this.opts = null; // Parsed options
+		this.moduleName = null; // Path to module of this control
+		this.control = null; // This control instance
+		this.childControlTags = null; // Root tags of child controls
+		this.childControls = null; // Child control instances
+		this.childLoadCounter = null; // Count of remaining child controls that need to be loaded
+		this.parentState = null; // Instance of ControlLoadState for parent control
+		this.replaceMarkup = null;
+		this.areaName = null;
+	}
 	return __mixinProto(function FirControl(opts) {
 		if (opts.instanceName) {
 			this._instanceName = opts.instanceName;
@@ -88,9 +102,9 @@ define('fir/controls/FirControl', [
 				return $(tag).parents('[data-fir-module]').length === 0;
 			})
 			.each(function(index, controlTag) {
-				self._initControlAndChildren({
-					controlTag: $(controlTag)
-				});
+				var state = new ControlLoadState();
+				state.controlTag = $(controlTag);
+				self._initControlAndChildren(state);
 			});
 		},
 		_unsubscribeInternal: function() {},
@@ -137,19 +151,19 @@ define('fir/controls/FirControl', [
 						selector = '.' + self.instanceHTMLClass(),
 						controlTag = newMarkup.find(selector).addBack(selector).filter(function(index, childTag) {
 							return $(childTag).parents(newMarkup, selector).length == 0
-						});
+						}),
+						state = new ControlLoadState();
 						if( !controlTag || controlTag.length !== 1 ) {
 							throw new Error(
 								'Expected exactly 1 element as control tag!!! '
 								+ 'Check if matching instance class is present on control root element '
 								+ 'and there is no multiple root control elements in markup.');
 						}
-					self._initControlAndChildren({
-						controlTag: controlTag,
-						control: self,
-						replaceMarkup: true,
-						areaName: areaName
-					});
+					state.controlTag = controlTag;
+					state.control = self;
+					state.replaceMarkup = true;
+					state.areaName = areaName;
+					self._initControlAndChildren(state);
 				},
 				error: function(error) {
 					console.error(error);
@@ -269,10 +283,10 @@ define('fir/controls/FirControl', [
 				childrenExist = {};
 			this._fillControlStateFromMarkup(state);
 			state.childControlTags.each(function(index, childTag) {
-				var childState = self._fillControlStateFromMarkup({
-					controlTag: $(childTag),
-					parentState: state
-				});
+				var childState = new ControlLoadState();
+				childState.controlTag = $(childTag);
+				childState.parentState = state;
+				self._fillControlStateFromMarkup(childState);
 				if( state.control ) {
 					// Если дочерний контрол уже существует в текущем,
 					// то сохраняем ссылку на него, чтобы он не был создан заново
