@@ -26,13 +26,10 @@ define('fir/datctrl/Record', [
 		//Метод получения значения из записи по имени поля
 		get: function(index, defaultValue) {
 			var val;
-			if( helpers.isUnsigned(index) )
-			{	//Вдруг там массив - лучше выдать копию
-				val = helpers.deepCopy( this._d[ index ] );
-			}
-			else
-			{	//Вдруг там массив - лучше выдать копию
-				val = helpers.deepCopy( this._d[ this._fmt.getIndex(index) ] );
+			if( helpers.isUnsigned(index) ) {
+				val = this._d[index];
+			} else {
+				val = this._d[this._fmt.getIndex(index)];
 			}
 			if( val == null )
 				return defaultValue;
