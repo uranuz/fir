@@ -21,6 +21,7 @@ define('fir/controls/ControlManager', [
 		this._controlRegistry = {};
 		this._controlCounter = 0; // Variable used to generate control names
 	}, {
+		ControlLoadState: ControlLoadState,
 		/**
 		 * Получает осуществляет "рекурсивный" поиск узлов по списку изначальных узлов roots (по селектору).
 		 * Выибирает только "наименее вложенные" элементы подходящие по селектору.

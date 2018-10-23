@@ -71,8 +71,15 @@ define('fir/controls/FirControl', [
 			return '.' + this.instanceHTMLClass() + '.e-' + elemName;
 		},
 		/// Получить jQuery элемент этого компонента по имени elemName
-		_elems: function(elemName) {
-			return this._container.find(this._elemClass(elemName)).addBack(this._elemClass(elemName));
+		_elems: function(elemName, optional) {
+			var
+				elemClass = this._elemClass(elemName),
+				res = this._container.find(elemClass).addBack(elemClass);
+			if( res.length === 0 && !optional ) {
+				// Не выбрано элементов по классу. Это нехорошо, если только явно не указано, что они необязательые
+				console.log('No elements found by element class: ' + elemClass);
+			}
+			return res;
 		},
 		//Возвращает jQuery-список всех элементов компонента
 		_allElems: function() {
@@ -118,7 +125,7 @@ define('fir/controls/FirControl', [
 			this._unsubscribeInternal();
 			$.ajax(this._getRequestURI(areaName) + (queryParams? '?' + queryParams: ''), {
 				success: function(html) {
-					var state = new ControlLoadState();
+					var state = new ControlManager.ControlLoadState();
 					state.control = self;
 					state.replaceMarkup = true;
 					state.areaName = areaName;
