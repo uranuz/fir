@@ -72,7 +72,7 @@ define('fir/controls/ControlManager', [
 					self._initControlAndChildren(newState);
 				});
 			} else {
-				state.controlTag = this._getOuterMost(newMarkup, '.' + state.instanceHTMLClass());
+				state.controlTag = this._getOuterMost(newMarkup, '.' + state.control.instanceHTMLClass());
 				if( !state.controlTag || state.controlTag.length !== 1 ) {
 					throw new Error(
 						'Expected exactly 1 element as control tag!!! '
