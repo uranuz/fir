@@ -10,7 +10,7 @@ define('fir/datctrl/Deserializer', [
 				throw new Error('Record raw data field count must match field count of record format!')
 			}
 			for( var i = 0; i < data.length; ++i ) {
-				data[i] = this.deserializeValue(data[i], fmt.getType(j));
+				data[i] = this.deserializeValue(data[i], fmt.getType(i));
 			}
 			return data;
 		},

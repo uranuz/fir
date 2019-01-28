@@ -18,7 +18,7 @@ define('fir/datctrl/Record', [
 		if( opts.data instanceof Array ) {
 			this._d = opts.data;
 		} else if( opts.rawData instanceof Array ) {
-			opts._d = Deserializer.deserializeRecord(opts.rawData, this._fmt);
+			this._d = Deserializer.deserializeRecord(opts.rawData, this._fmt);
 		} else {
 			this._d = []; //Данные (массив)
 		}
