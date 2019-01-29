@@ -227,19 +227,55 @@ define('fir/controls/ControlManager', [
 			});
 		},
 		registerControl: function(control) {
-			if( this._controlRegistry[control.instanceName()] ) {
-				throw Error('Control with name "' + control.instanceName() + '" already registered!');
+			var
+				name = control.instanceName(),
+				already = false;
+			if( !this._controlRegistry.hasOwnProperty(name) ) {
+				this._controlRegistry[name] = [];
+			} else if( this._controlRegistry[name].length ) {
+				console.warn('Control with name "' + name + '" already registered!');
 			}
-			this._controlRegistry[control.instanceName()] = control;
+			for(var i = 0; i < this._controlRegistry[name].length; ++i ) {
+				var testControl = this._controlRegistry[name][i];
+				if( testControl === control ) {
+					already = true;
+					console.warn('Duplicate registration of the same control with name: ' + name);
+					break;
+				}
+			}
+			if( !already ) {
+				this._controlRegistry[name].push(control);
+			}
 		},
 		unregisterControl: function(control) {
-			// Дерегистрировать компонент из реестра
-			if( this._controlRegistry[control.instanceName()] === control ) {
-				delete this._controlRegistry[control.instanceName()];
+			var
+				name = control.instanceName(),
+				candidates = this._controlRegistry[name];
+			if( !candidates || candidates.length === 0 ) {
+				return;
+			}
+			for( var i = 0; i < candidates.length; ++i ) {
+				// Дерегистрировать компонент из реестра
+				if( candidates[i] !== control ) {
+					continue;
+				}
+				if( candidates.length === 1 ) {
+					// Если это последний элемент, то удаляем всю "корзину"
+					delete this._controlRegistry[name];
+				} else {
+					candidates.splice(i, 1); // Удаляем с заданной позиции
+				}
 			}
 		},
 		findInstanceByName: function(instanceName) {
-			return this._controlRegistry[instanceName];
+			var candidates = this._controlRegistry[instanceName];
+			if( !candidates || candidates.length === 0 ) {
+				return null;
+			}
+			if( candidates.length > 1 ) {
+				console.warn('There are ' + candidates.length + ' controls with name "' + instanceName + '" in registry');
+			}
+			return candidates[0];
 		},
 		getNextNameIndex: function() {
 			return ++this._controlCounter;
