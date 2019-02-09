@@ -5,7 +5,7 @@ define('fir/controls/PlainDatePicker/PlainDatePicker', [
 ], function(FirControl, Validation) {
 return FirClass(
 	function PlainDatePicker(opts) {
-		FirControl.call(this, opts);
+		this.superproto.constructor.call(this, opts);
 		this._validators = [
 			{ elem: 'dayField', fn: this._checkDayField.bind(this) },
 			{ elem: 'yearField', fn: this._checkYearField.bind(this) }

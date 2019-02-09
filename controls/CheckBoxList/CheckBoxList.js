@@ -4,7 +4,7 @@ define('fir/controls/CheckBoxList/CheckBoxList', [
 ], function(FirControl) {
 return FirClass(
 	function CheckBoxList(opts) {
-		FirControl.call(this, opts);
+		this.superproto.constructor.call(this, opts);
 
 		this._block = this._elems('block');
 		this._masterSwitchLabel = this._elems('masterSwitchLabel')

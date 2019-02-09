@@ -8,7 +8,7 @@ define('fir/controls/Pagination/Pagination', [
 	};
 return FirClass(
 	function Pagination(opts) {
-		FirControl.call(this, opts);
+		this.superproto.constructor.call(this, opts);
 		this._formField = opts.formField;
 		this._pageSizeFormField = opts.pageSizeFormField;
 

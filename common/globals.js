@@ -108,7 +108,7 @@ define("fir/common/globals", [], function() {
 				throw new Error('Duplicate mixins');
 			}
 			mixins = maybeMixins;
-		} else if( maybeMixins instanceof Object ) {
+		} else if( maybeMixins instanceof Object && typeof(maybeMixins) !== 'function' ) {
 			if( props ) {
 				throw new Error('Duplicate props');
 			}
@@ -117,7 +117,7 @@ define("fir/common/globals", [], function() {
 			throw new Error('Unexpected type of "maybeMixins" argument');
 		}
 
-		if( maybeProps instanceof Object ) {
+		if( maybeProps instanceof Object && typeof(maybeMixins) !== 'function' ) {
 			if( props ) {
 				throw new Error('Duplicate props');
 			}
