@@ -3,7 +3,8 @@ define('fir/datctrl/Record', [
 	'fir/datctrl/Deserializer',
 	'fir/datctrl/RecordFormat'
 ], function(helpers, Deserializer, RecordFormat) {
-	var Record = __mixinProto(function Record(opts) {
+return FirClass(
+	function Record(opts) {
 		opts = opts || {};
 		if( opts.format != null && opts.fields != null ) {
 			console.error('Format or fields option should be provided but not both!!! Still format is priorite option..');
@@ -64,6 +65,5 @@ define('fir/datctrl/Record', [
 				data: helpers.deepCopy( this._d )
 			});
 		}
-	});
-	return Record;
+});
 });

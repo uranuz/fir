@@ -1,15 +1,14 @@
 define('fir/datctrl/ivy/UserIdentity', [
 	'ivy/ClassNode'
 ], function(ClassNode) {
+return FirClass(
 	function IvyUserIdentity() {
 		this._sessionId = null; 
 		this._login = null;
 		this._accessRoles = [];
 		this._name = null;
 		this._data = {};
-	};
-	__extends(IvyUserIdentity, ClassNode);
-	return __mixinProto(IvyUserIdentity, {
+	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -48,5 +47,5 @@ define('fir/datctrl/ivy/UserIdentity', [
 		getLength: function() {
 			throw new Error('Not implemented!');
 		}
-	});
+});
 });

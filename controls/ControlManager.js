@@ -17,7 +17,9 @@ define('fir/controls/ControlManager', [
 		this.areaName = null;
 	}
 
-	var Manager = __mixinProto(function ControlManager() {
+// ControlManger is singleton. So module returns instance of class
+return new (FirClass(
+	function ControlManager() {
 		this._controlRegistry = {};
 		this._controlCounter = 0; // Variable used to generate control names
 	}, {
@@ -113,12 +115,19 @@ define('fir/controls/ControlManager', [
 
 			if( updateControl ) {
 				// Выполняем обновление состояния, когда уже добавили к родителю (на всякий случай)
-				if (!state.areaName) {
+				//if (!state.areaName) {
 					// Если название области для обновления не указано, то обновлялась вся вёрстка компонента,
 					// поэтому прописываем новый корневой тег в _container
 					state.control._container = $(state.controlTag);
-				}
+				//}
 				state.control._updateControlState(state.opts);
+				if( state.control._container[0].parentNode == null ) {
+					console.warn(
+						'Container for control ' + state.control.instanceName() + ' has no link to parent node. '
+						+ 'Old container might been removed from document during update, '
+						+ 'but _container property has not been changed properly!'
+					);
+				}
 				state.control._subscribeInternal();
 			}
 
@@ -280,7 +289,5 @@ define('fir/controls/ControlManager', [
 		getNextNameIndex: function() {
 			return ++this._controlCounter;
 		}
-	});
-
-	return new Manager();
+}));
 });

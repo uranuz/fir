@@ -2,8 +2,7 @@ define('fir/controls/CheckBoxList/CheckBoxList', [
 	'fir/controls/FirControl',
 	'css!fir/controls/CheckBoxList/CheckBoxList'
 ], function(FirControl) {
-	__extends(CheckBoxList, FirControl);
-
+return FirClass(
 	function CheckBoxList(opts) {
 		FirControl.call(this, opts);
 
@@ -14,9 +13,7 @@ define('fir/controls/CheckBoxList/CheckBoxList', [
 		this._itemLabels = this._elems('itemLabel')
 			.on('click', this.onItem_Click.bind(this));
 		this._inputs = this._elems('itemInput');
-	}
-
-	return __mixinProto(CheckBoxList, {
+	}, FirControl, {
 		onMasterSwitch_Click: function() {
 			for( var i = 0; i < this._inputs.length; ++i ) {
 				var input = $(this._inputs[i]);
@@ -54,5 +51,5 @@ define('fir/controls/CheckBoxList/CheckBoxList', [
 				}
 			}
 		}
-	});
+});
 });

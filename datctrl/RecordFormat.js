@@ -1,5 +1,6 @@
 define('fir/datctrl/RecordFormat', ['fir/common/helpers'], function(helpers) {
-	var RecordFormat = __mixinProto(function RecordFormat(opts) {
+return FirClass(
+	function RecordFormat(opts) {
 		opts = opts || {}
 		if( opts.fields instanceof Array ) {
 			this._f = opts.fields;
@@ -75,6 +76,5 @@ define('fir/datctrl/RecordFormat', ['fir/common/helpers'], function(helpers) {
 		getLength: function() {
 			return this._f.length;
 		}
-	});
-	return RecordFormat;
+});
 });

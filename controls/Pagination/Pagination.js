@@ -2,12 +2,11 @@ define('fir/controls/Pagination/Pagination', [
 	'fir/controls/FirControl',
 	'css!fir/controls/Pagination/Pagination'
 ], function(FirControl) {
-	__extends(Pagination, FirControl);
 	var PaginationMode = {
 		Offset: 0,
 		Page: 1
 	};
-
+return FirClass(
 	function Pagination(opts) {
 		FirControl.call(this, opts);
 		this._formField = opts.formField;
@@ -29,9 +28,7 @@ define('fir/controls/Pagination/Pagination', [
 		this._elems('gotoPageBtn').on('click', this.gotoPage.bind(this));
 
 		this._setButtonsVisibility();
-	}
-
-	return __mixinProto(Pagination, {
+	}, FirControl, {
 		/** Переход на первую страницу */
 		gotoFirst: function() {
 			this.setCurrentPage(0);
@@ -199,5 +196,5 @@ define('fir/controls/Pagination/Pagination', [
 				this._elems('recordCountMsg').hide();
 			}
 		}
-	});
+});
 });

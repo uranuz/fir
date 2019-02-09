@@ -1,13 +1,12 @@
 define('fir/datctrl/ivy/UserRights', [
 	'ivy/ClassNode'
 ], function(ClassNode) {
+return FirClass(
 	function IvyUserRights() {
 		this._accessObject = null;
 		this._accessKind = null;
 		this._data = null;
-	};
-	__extends(IvyUserRights, ClassNode);
-	return __mixinProto(IvyUserRights, {
+	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');

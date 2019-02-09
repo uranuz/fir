@@ -3,8 +3,7 @@ define('fir/controls/PlainDatePicker/PlainDatePicker', [
 	'fir/controls/Mixins/Validation/Validation',
 	'css!fir/controls/PlainDatePicker/PlainDatePicker'
 ], function(FirControl, Validation) {
-	__extends(PlainDatePicker, FirControl);
-
+return FirClass(
 	function PlainDatePicker(opts) {
 		FirControl.call(this, opts);
 		this._validators = [
@@ -13,9 +12,7 @@ define('fir/controls/PlainDatePicker/PlainDatePicker', [
 		];
 		this._opts = opts;
 		this.initValidation();
-	}
-
-	var pdp = __mixinProto(PlainDatePicker, {
+	}, FirControl, [Validation], {
 		rawDay: function() {
 			return this._elems('dayField').val();
 		},
@@ -45,6 +42,5 @@ define('fir/controls/PlainDatePicker/PlainDatePicker', [
 				return this._opts.yearInvalidMessage;
 			}
 		}
-	});
-	return __mixinProto(pdp, Validation);
+});
 });

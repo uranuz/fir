@@ -1,6 +1,7 @@
 define('fir/datctrl/EnumFormat', [], function(EnumFormat) {
 	//TODO: Please, implement me;)
-	return __mixinProto(function EnumFormat(opts) {
+return FirClass(
+	function EnumFormat(opts) {
 		this._items = opts.items || [];
 		this._names = {};
 		this._reindex();
@@ -27,5 +28,5 @@ define('fir/datctrl/EnumFormat', [], function(EnumFormat) {
 				this._names[ curItem.v ] = curItem.n;
 			}
 		}
-	});
+});
 });

@@ -3,6 +3,7 @@ define('fir/datctrl/ivy/RecordAdapter', [
 	'fir/datctrl/Record',
 	'fir/datctrl/ivy/RecordFormatAdapter'
 ], function(ClassNode, Record, RecordFormatAdapter) {
+return FirClass(
 	function RecordAdapter(rec, fmt) {
 		if( !(rec instanceof Record) ) {
 			throw new Error('Expected Record');
@@ -13,9 +14,7 @@ define('fir/datctrl/ivy/RecordAdapter', [
 		} else{
 			this._fmt = new RecordFormatAdapter(this._rec.getFormat());
 		}
-	};
-	__extends(RecordAdapter, ClassNode);
-	return __mixinProto(RecordAdapter, {
+	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -51,5 +50,5 @@ define('fir/datctrl/ivy/RecordAdapter', [
 		getLength: function() {
 			return this._rec.getLength();
 		}
-	});
+});
 });

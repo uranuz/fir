@@ -4,7 +4,8 @@ define('fir/datctrl/RecordSet', [
 	'fir/datctrl/Record',
 	'fir/datctrl/Deserializer'
 ], function(helpers, RecordFormat, Record, Deserializer) {
-	var RecordSet = __mixinProto(function RecordSet(opts) {
+return FirClass(
+	function RecordSet(opts) {
 		opts = opts || {}
 		if( opts.format != null && opts.fields != null ) {
 			console.error('Format or fields option should be provided but not both!!! Still format is priorite option..');
@@ -126,6 +127,5 @@ define('fir/datctrl/RecordSet', [
 				keyFieldIndex: this._keyFieldIndex
 			});
 		}
-	});
-	return RecordSet;
+});
 });

@@ -4,7 +4,8 @@ define('fir/controls/FirControl', [
 	'fir/common/base64',
 	'fir/common/text_encoder',
 ], function(ControlManager, globals, Base64, TextEncoder) {
-	return __mixinProto(function FirControl(opts) {
+return FirClass(
+	function FirControl(opts) {
 		if (opts.instanceName) {
 			this._instanceName = opts.instanceName;
 		} else {
@@ -88,14 +89,17 @@ define('fir/controls/FirControl', [
 
 		_unsubscribeInternal: function() {},
 		_subscribeInternal: function() {},
-		_getRequestURI: function() {
-			return '';
+		_getHTTPMethod: function(areaName) {
+			return 'get';
 		},
-		_getQueryParams: function() {
-			return '';
+		_getRequestURI: function(areaName) {
+			return {};
 		},
-		_getBodyParams: function() {
-			return '';
+		_getQueryParams: function(areaName) {
+			return {};
+		},
+		_getBodyParams: function(areaName) {
+			return {};
 		},
 		/** Обработчик обновления внутреннего состояния компонента при завершении перезагрузки */
 		_updateControlState: function(opts) {},
@@ -121,9 +125,23 @@ define('fir/controls/FirControl', [
 		_reloadControl: function(areaName) {
 			var
 				self = this,
-				queryParams = this._getQueryParams(areaName);
+				HTTPMethod = this._getHTTPMethod(areaName).toLowerCase(),
+				queryParams = this._getQueryParams(areaName) || {},
+				bodyParams,
+				queryParamsStr = '';
+
+			if( typeof(queryParams) !== 'object' ) {
+				throw new Error('Object expected as query params');
+			}
+			if( HTTPMethod === 'post' ) {
+				bodyParams = this._getBodyParams(areaName) || {};
+				if( typeof(bodyParams) !== 'object' ) {
+					throw new Error('Object expected as body params');
+				}
+			}
+
 			this._unsubscribeInternal();
-			$.ajax(this._getRequestURI(areaName) + (queryParams? '?' + queryParams: ''), {
+			$.ajax(this._getRequestURI(areaName) + (HTTPMethod === 'post'? '?' + $.param(queryParams): ''), {
 				success: function(html) {
 					var state = new ControlManager.ControlLoadState();
 					state.control = self;
@@ -133,7 +151,9 @@ define('fir/controls/FirControl', [
 				},
 				error: function(error) {
 					console.error(error);
-				}
+				},
+				type: HTTPMethod,
+				data: (HTTPMethod === 'post'? bodyParams: queryParams)
 			});
 		},
 
@@ -166,5 +186,5 @@ define('fir/controls/FirControl', [
 			// Дерегистрировать компонент из реестра
 			ControlManager.unregisterControl(this);
 		}
-	});
+});
 });

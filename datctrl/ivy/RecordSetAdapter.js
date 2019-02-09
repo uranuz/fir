@@ -9,6 +9,7 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 	RecordSetRange,
 	RecordFormatAdapter
 ) {
+return FirClass(
 	function RecordSetAdapter(rs) {
 		if( !(rs instanceof RecordSet) ) {
 			throw new Error('Expected RecordSet');
@@ -20,9 +21,7 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 		for( var i = 0; i < fmt.getLength(); ++i ) {
 			this._namesMapping[fmt.getName(i)] = i;
 		}
-	};
-	__extends(RecordSetAdapter, ClassNode);
-	return __mixinProto(RecordSetAdapter, {
+	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			return new RecordSetRange(this);
@@ -62,5 +61,5 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 		getLength: function() {
 			return this._rs.getLength();
 		}
-	});
+});
 });
