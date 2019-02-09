@@ -43,6 +43,11 @@ define("fir/common/globals", [], function() {
 	}
 
 	function __mixinProtoSingle(dst, src) {
+		if( src == null ) {
+			return dst;
+		} else if( !(src instanceof Object) ) {
+			throw new Error('Expected object as class mixin');
+		}
 		for( key in src ) {
 			//Don't copy Object's built in properties
 			if(
@@ -66,6 +71,70 @@ define("fir/common/globals", [], function() {
 		}
 		return dst;
 	}
+
+	/**
+	 * Helper used to generate class emulation. Could be used in one of forms
+	 * 1. FirClass(ctor, base, mixins, props)
+	 * 2. FirClass(ctor, base, mixins)
+	 * 3. FirClass(ctor, base)
+	 * 4. FirClass(ctor, mixins)
+	 * 5. FirClass(ctor, props)
+	 * 
+	 * Where:
+	 * 	ctor - class constructor function
+	 * 	base - base class constructor function
+	 * 	mixins - array of mixins (mixins are objects). Mixins will be added to class prototype.
+	 * 		So they are intended to be used to add methods and static propertied (not instance fields)
+	 * 	props - single mixin that will me added to mixins. Used for convenience
+	 * Returns original ctor argument, but modified by setting base class and properties from mixins
+	 */
+	function FirClass(ctor, maybeBase, maybeMixins, maybeProps) {
+		var base, mixins, props;
+		if( typeof(ctor) !== 'function' ) {
+			throw new Error('Expected function as class constructor!');
+		}
+		if( typeof(maybeBase) === 'function' ) {
+			base = maybeBase;
+		} else if( maybeBase instanceof Array ) {
+			mixins = maybeBase;
+		} else if( maybeBase instanceof Object ) {
+			props = maybeBase;
+		} else if( maybeBase != null ) {
+			throw new Error('Unexpected type of "maybeBase" argument');
+		}
+
+		if( maybeMixins instanceof Array ) {
+			if( mixins ) {
+				throw new Error('Duplicate mixins');
+			}
+			mixins = maybeMixins;
+		} else if( maybeMixins instanceof Object ) {
+			if( props ) {
+				throw new Error('Duplicate props');
+			}
+			props = maybeMixins;
+		} else if( maybeMixins != null ) {
+			throw new Error('Unexpected type of "maybeMixins" argument');
+		}
+
+		if( maybeProps instanceof Object ) {
+			if( props ) {
+				throw new Error('Duplicate props');
+			}
+			props = maybeProps;
+		} else if( maybeProps != null ) {
+			throw new Error('Unexpected type of "maybeProps" argument');
+		}
+		
+		if( base ) {
+			__extends(ctor, base);
+		}
+
+		mixins = mixins || [];
+		mixins.push(props);
+		return __mixinProto(ctor, mixins);
+	}
 	window.__extends = __extends;
 	window.__mixinProto = __mixinProto;
+	window.FirClass = FirClass;
 });
