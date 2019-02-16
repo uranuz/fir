@@ -1,9 +1,8 @@
 define('fir/controls/FirControl', [
-	'fir/controls/ControlManager',
 	'fir/common/globals',
-	'fir/common/base64',
-	'fir/common/text_encoder',
-], function(ControlManager, globals, Base64, TextEncoder) {
+	'fir/controls/ControlManager',
+	'fir/controls/Loader/Manager'
+], function(globals, ControlManager, LoaderManager) {
 return FirClass(
 	function FirControl(opts) {
 		if (opts.instanceName) {
@@ -16,6 +15,8 @@ return FirClass(
 		this._childControls = opts.childControls;
 		this._cssBaseClass = opts.cssBaseClass;
 		this._cssClass = opts.cssClass;
+		this._ivyModule = opts.__moduleName__;
+		this._ivyMethod = opts.__scopeName__;
 		ControlManager.registerControl(this); // Компонент сам себя регистрирует
 	}, {
 		/// Возвращает имя экземпляра компонента интерфейса
@@ -93,6 +94,12 @@ return FirClass(
 			return 'get';
 		},
 		_getRequestURI: function(areaName) {
+			return '';
+		},
+		_getRPCMethodName: function(areaName) {
+			return null;
+		},
+		_getRPCParams: function(areaName) {
 			return {};
 		},
 		_getQueryParams: function(areaName) {
@@ -141,7 +148,9 @@ return FirClass(
 			}
 
 			this._unsubscribeInternal();
-			$.ajax(this._getRequestURI(areaName) + (HTTPMethod === 'post'? '?' + $.param(queryParams): ''), {
+
+			LoaderManager.load({
+				URI: this._getRequestURI(areaName),
 				success: function(html) {
 					var state = new ControlManager.ControlLoadState();
 					state.control = self;
@@ -152,8 +161,13 @@ return FirClass(
 				error: function(error) {
 					console.error(error);
 				},
+				method: this._getRPCMethodName(areaName),
 				type: HTTPMethod,
-				data: (HTTPMethod === 'post'? bodyParams: queryParams)
+				queryParams: queryParams,
+				bodyParams: bodyParams,
+				params: this._getRPCParams(areaName),
+				ivyModule: this._ivyModule,
+				ivyMethod: this._ivyMethod
 			});
 		},
 

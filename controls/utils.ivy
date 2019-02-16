@@ -16,6 +16,7 @@ expr {=
 		'cssBaseClass',
 		'cssClass',
 		'__scopeName__',
+		'__moduleName__',
 		'moduleName'
 	];
 

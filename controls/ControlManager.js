@@ -1,8 +1,7 @@
 define('fir/controls/ControlManager', [
 	'fir/common/globals',
-	'fir/common/base64',
-	'fir/common/text_encoder',
-], function(globals, Base64, TextEncoder) {
+	'fir/common/base64'
+], function(globals, Base64) {
 	function ControlLoadState() {
 		this.controlTag = null; // This control (or area) root tag
 		this.configTag = null; // Configuration tag 'data-fir-opts' inside control tag
