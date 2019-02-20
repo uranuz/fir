@@ -15,8 +15,8 @@ return FirClass(
 		this._childControls = opts.childControls;
 		this._cssBaseClass = opts.cssBaseClass;
 		this._cssClass = opts.cssClass;
-		this._ivyModule = opts.__moduleName__;
-		this._ivyMethod = opts.__scopeName__;
+		this._viewModule = opts.__moduleName__;
+		this._viewMethod = opts.__scopeName__;
 		ControlManager.registerControl(this); // Компонент сам себя регистрирует
 	}, {
 		/// Возвращает имя экземпляра компонента интерфейса
@@ -90,26 +90,86 @@ return FirClass(
 
 		_unsubscribeInternal: function() {},
 		_subscribeInternal: function() {},
-		_getHTTPMethod: function(areaName) {
-			return 'get';
-		},
+
+		/**
+		 * Адрес для отправки запроса. Если не указано, то используется текущий URI (для REST-запросов).
+		 * Либо точка доступа по умолчанию для RPC-запросов
+		 */
 		_getRequestURI: function(areaName) {
 			return '';
 		},
-		_getRPCMethodName: function(areaName) {
+		
+		/** Предпочитаемый HTTP-метод. Для RPC-запросов не действует */
+		_getHTTPMethod: function(areaName) {
+			return 'GET';
+		},
+		
+		/** Имя RPC-метода. Если указано, то запрос идет через RPC-протокол */
+		_getRPCMethod: function(areaName) {
 			return null;
 		},
-		_getRPCParams: function(areaName) {
-			return {};
-		},
+
+		/** Параметры передаваемые в отображение, но не на основной сервис */
+		_getViewParams: function(areaName) {
+			return {
+				instanceName: this.instanceName()
+			};
+		}, 
+		/**
+		 * Параметры, передаваемые на основной сервис, предпочтительно через адресную строку (для REST-запросов)
+		 * Но для RPC-вызовов эти параметры добавляются к параметрам метода
+		 */
 		_getQueryParams: function(areaName) {
 			return {};
 		},
+
+		/**
+		 * Параметры, передаваемые на основной сервис, предпочтительно через тело запроса (для REST-запросов)
+		 * Но для RPC-вызовов эти параметры добавляются к параметрам метода
+		 */
 		_getBodyParams: function(areaName) {
 			return {};
 		},
+
+		/** Имя модуля (шаблона) интерфейса */
+		_getViewModule: function(areaName) {
+			return this._viewModule;
+		},
+
+		/** Имя метода (компонента) интерфейса */
+		_getViewMethod: function(areaName) {
+			return this._viewMethod;
+		},
+
+		_getReloadOpts: function(areaName) {
+			return {
+				URI: this._getRequestURI(areaName),
+				HTTPMethod: this._getHTTPMethod(areaName),
+				RPCMethod: this._getRPCMethod(areaName),
+				viewParams: this._getViewParams(areaName),
+				queryParams: this._getQueryParams(areaName),
+				bodyParams: this._getBodyParams(areaName),
+				viewModule: this._getViewModule(areaName),
+				viewMethod: this._getViewMethod(areaName),
+				// Add success/ error handlers
+				success: this._onMarkupLoad.bind(this, areaName),
+				error: this._onMarkupLoadError.bind(this, areaName)
+			};
+		},
+
 		/** Обработчик обновления внутреннего состояния компонента при завершении перезагрузки */
 		_updateControlState: function(opts) {},
+		_onMarkupLoad: function(areaName, html) {
+			var state = new ControlManager.ControlLoadState();
+			state.control = this;
+			state.replaceMarkup = true;
+			state.areaName = areaName;
+			ControlManager.launchMarkup($(html), state);
+		},
+		_onMarkupLoadError: function(areaName, error) {
+			console.error(error);
+		},
+
 		/** Обработчик завершения загрузки компонента для переопределения наследниками */
 		_onAfterLoad: function() {
 			// Публикуем событие о завершении загрузки компонента
@@ -131,7 +191,6 @@ return FirClass(
 		 */
 		_reloadControl: function(areaName) {
 			var
-				self = this,
 				HTTPMethod = this._getHTTPMethod(areaName).toLowerCase(),
 				queryParams = this._getQueryParams(areaName) || {},
 				bodyParams,
@@ -149,26 +208,7 @@ return FirClass(
 
 			this._unsubscribeInternal();
 
-			LoaderManager.load({
-				URI: this._getRequestURI(areaName),
-				success: function(html) {
-					var state = new ControlManager.ControlLoadState();
-					state.control = self;
-					state.replaceMarkup = true;
-					state.areaName = areaName;
-					ControlManager.launchMarkup($(html), state);
-				},
-				error: function(error) {
-					console.error(error);
-				},
-				method: this._getRPCMethodName(areaName),
-				type: HTTPMethod,
-				queryParams: queryParams,
-				bodyParams: bodyParams,
-				params: this._getRPCParams(areaName),
-				ivyModule: this._ivyModule,
-				ivyMethod: this._ivyMethod
-			});
+			LoaderManager.load(this._getReloadOpts(areaName));
 		},
 
 		findInstanceByName: function(instanceName) {
