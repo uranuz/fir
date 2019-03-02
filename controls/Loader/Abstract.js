@@ -1,4 +1,4 @@
-define('fir/controls/Loader/Abstract', ["fir/common/globals"], function(globals) {
+define('fir/controls/Loader/Abstract', [], function() {
 return FirClass(
 	function LoaderAbstract() {
 		throw new Error('Unable to create instance of abstract class!');

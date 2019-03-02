@@ -1,7 +1,6 @@
 define('fir/controls/Loader/IvyServerRender', [
-	"fir/common/globals",
 	'fir/controls/Loader/Abstract'
-], function(globals, LoaderAbstract) {
+], function(LoaderAbstract) {
 /**
  * Class of control loader that creates request to Ivy view service to render control markup and returns it back
  */

@@ -1,7 +1,6 @@
 define('fir/controls/ControlManager', [
-	'fir/common/globals',
 	'fir/common/base64'
-], function(globals, Base64) {
+], function(Base64) {
 	function ControlLoadState() {
 		this.controlTag = null; // This control (or area) root tag
 		this.configTag = null; // Configuration tag 'data-fir-opts' inside control tag
@@ -177,14 +176,15 @@ return new (FirClass(
 		},
 		/** Обновление вёрстки компонента при его перезагрузке */
 		_updateControlMarkup: function(state) {
+			var jAreaNode = state.control._getAreaNode(state.areaName);
 			// Замена старой верстки компонента на новую
 			// TODO: Нужно проверить, что это не дочерний компонент внутри новой вёрстки,
 			// которую не нужно заменять, поскольку она уже будет заменена
-			if( state.control._container.length && state.controlTag.length ) {
+			if( jAreaNode.length && state.controlTag.length ) {
 				// Обходим баг в jQuery  replaceWith через родной replaceChild
 				// Проблема в том, что jQuery вместо родителя заменяемого элемента берет родителя передаваемого на замену
-				$.cleanData(state.control._container); // Почистим jQuery данные старого контейнера, т.к. это делает jQuery
-				state.control._container[0].parentNode.replaceChild(state.controlTag[0], state.control._container[0]);
+				$.cleanData(jAreaNode); // Почистим jQuery данные старого контейнера, т.к. это делает jQuery
+				jAreaNode[0].parentNode.replaceChild(state.controlTag[0], jAreaNode[0]);
 			}
 		},
 

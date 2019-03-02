@@ -1,8 +1,13 @@
 define('fir/datctrl/ivy/UserRights', [
-	'ivy/ClassNode'
-], function(ClassNode) {
+	'ivy/ClassNode',
+	'fir/security/right/UserRights'
+], function(ClassNode, UserRights) {
 return FirClass(
-	function IvyUserRights() {
+	function IvyUserRights(rights) {
+		if( !(rights instanceof UserRights) ) {
+			throw new Error('Expected UserRights');
+		}
+		this._rights = rights;
 		this._accessObject = null;
 		this._accessKind = null;
 		this._data = null;
@@ -28,7 +33,7 @@ return FirClass(
 				case 'object': return this._accessObject;
 				case 'kind': return this._accessKind;
 				case 'data': return this._data;
-				case 'hasRight': return true; // TODO: Do actual rights check
+				case 'hasRight': return this._rights.hasRight(this._accessObject, this._accessKind, this._data);
 				default: throw new Error('Unexpected IvyUserRights attribute: ' + name);
 			}
 		},

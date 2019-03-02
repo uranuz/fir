@@ -1,8 +1,7 @@
 define('fir/controls/FirControl', [
-	'fir/common/globals',
 	'fir/controls/ControlManager',
 	'fir/controls/Loader/Manager'
-], function(globals, ControlManager, LoaderManager) {
+], function(ControlManager, LoaderManager) {
 return FirClass(
 	function FirControl(opts) {
 		if (opts.instanceName) {
@@ -138,7 +137,7 @@ return FirClass(
 
 		/** Имя метода (компонента) интерфейса */
 		_getViewMethod: function(areaName) {
-			return this._viewMethod;
+			return areaName? areaName: this._viewMethod;
 		},
 
 		_getReloadOpts: function(areaName) {
@@ -155,6 +154,10 @@ return FirClass(
 				success: this._onMarkupLoad.bind(this, areaName),
 				error: this._onMarkupLoadError.bind(this, areaName)
 			};
+		},
+
+		_getAreaNode: function(areaName) {
+			return state.control._container;
 		},
 
 		/** Обработчик обновления внутреннего состояния компонента при завершении перезагрузки */

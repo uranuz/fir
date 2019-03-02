@@ -1,13 +1,13 @@
 define('fir/datctrl/ivy/UserIdentity', [
-	'ivy/ClassNode'
-], function(ClassNode) {
+	'ivy/ClassNode',
+	'fir/security/right/UserIdentity'
+], function(ClassNode, UserIdentity) {
 return FirClass(
-	function IvyUserIdentity() {
-		this._sessionId = null; 
-		this._login = null;
-		this._accessRoles = [];
-		this._name = null;
-		this._data = {};
+	function IvyUserIdentity(userIdentity) {
+		if( !(userIdentity instanceof UserIdentity) ) {
+			throw new Error('Expected UserIdentity');
+		}
+		this._userIdentity = userIdentity;
 	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
@@ -27,11 +27,11 @@ return FirClass(
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
 			switch( name ) {
-				case `id`: return this._sessionId;
-				case `name`: return this._name;
-				case `data`: return this._data;
-				case `isAuthenticated`: return true;
-				case `accessRoles`: return this._accessRoles;
+				case `id`: return this._userIdentity.id();
+				case `name`: return this._userIdentity.name();
+				case `data`: return this._userIdentity.data();
+				case `isAuthenticated`: return this._userIdentity.isAuthenticated();
+				case `accessRoles`: return this._userIdentity.accessRoles();
 				default: throw new Error('Unexpected IvyUserIdentity attribute: ' + name);
 			}
 		},

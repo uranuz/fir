@@ -1,20 +1,18 @@
 define('fir/controls/Loader/IvyServerFactory', [
-	"fir/common/globals",
 	'fir/controls/Loader/Abstract',
 	'ivy/Engine',
-	'ivy/EngineConfig',
-	'ivy/RemoteModuleLoader',
+	'fir/security/right/UserIdentity',
+	'fir/security/right/UserRights',
 	'fir/network/json_rpc',
 	'fir/datctrl/ivy/helpers',
 	'fir/datctrl/ivy/UserRights',
 	'fir/datctrl/ivy/UserIdentity',
 	'ivy/utils'
 ], function(
-	globals,
 	LoaderAbstract,
 	IvyEngine,
-	IvyEngineConfig,
-	RemoteModuleLoader,
+	UserIdentity,
+	UserRights,
 	json_rpc,
 	FirIvyHelpers,
 	IvyUserRights,
@@ -22,11 +20,19 @@ define('fir/controls/Loader/IvyServerFactory', [
 	iu
 ) {
 return FirClass(
-	function IvyServerFactory() {
-		this._ivyEngine = new IvyEngine(
-			new IvyEngineConfig(),
-			new RemoteModuleLoader('/dyn/server/template')
-		);
+	function IvyServerFactory(engine, userIdentity, userRights) {
+		if( !(engine instanceof IvyEngine) ) {
+			throw new Error('Expected instance of IvyEngine');
+		}
+		if( !(userIdentity instanceof UserIdentity) ) {
+			throw new Error('Expected instance of UserIdentity');
+		}
+		if( !(userRights instanceof UserRights) ) {
+			throw new Error('Expected instance of UserRights');
+		}
+		this._ivyEngine = engine;
+		this._userIdentity = userIdentity;
+		this._userRights = userRights;
 	}, LoaderAbstract, {
 		canLoad: function(opts) {
 			return !!opts.RPCMethod;
@@ -38,8 +44,8 @@ return FirClass(
 				RPCParams = {},
 				progData = {},
 				extraGlobals = {
-					userRights: new IvyUserRights(),
-					userIdentity: new IvyUserIdentity()
+					userIdentity: new IvyUserIdentity(this._userIdentity),
+					userRights: new IvyUserRights(this._userRights)
 				},
 				// List of sources that should be retrieved before rendering
 				// First source in template itself. The second is data from remote method.

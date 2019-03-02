@@ -1,7 +1,6 @@
 define('fir/controls/Loader/Manager', [
-	"fir/common/globals",
 	'fir/controls/Loader/Abstract'
-], function(globals, LoaderAbstract) {
+], function(LoaderAbstract) {
 // This is singleton class
 return new (FirClass(
 	function LoadManager() {

@@ -22,7 +22,8 @@
 					'common/**/*.js',
 					'datctrl/**/*.js',
 					'network/**/*.js',
-					'controls/**/*.js'
+					'controls/**/*.js',
+					'security/**/*.js'
 				],
 				dest: '<%= deployPath %>/pub/fir/',
 				filter: 'isFile',
