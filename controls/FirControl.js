@@ -157,7 +157,7 @@ return FirClass(
 		},
 
 		_getAreaNode: function(areaName) {
-			return state.control._container;
+			return this._container;
 		},
 
 		/** Обработчик обновления внутреннего состояния компонента при завершении перезагрузки */

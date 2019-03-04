@@ -164,6 +164,9 @@ return FirClass(
 	loadAccessRules: function() {
 		var ruleRS = this._dataSource.getRules();
 		this._allRules = {};
+		if( ruleRS == null ) {
+			return;
+		}
 		for( var i = 0; i < ruleRS.getLength(); ++i ) {
 			this._loadRuleWithChildren(ruleRS.getRecordAt(i), ruleRS);
 		}
@@ -203,10 +206,17 @@ return FirClass(
 	},
 
 	loadAccessObjects: function() {
-		var objRS = this._dataSource.getObjects();
+		var
+			objRS = this._dataSource.getObjects(),
+			childKeys = {};
+
+		this._allObjects = {};
+		this._objectNumByFullName = {};
+		if( objRS == null ) {
+			return;
+		}
 
 		// For each item get list of children keys
-		var childKeys = {};
 		for( var i = 0; i < objRS.getLength(); ++i ) {
 			var
 				objRec = objRS.getRecordAt(i),
@@ -222,8 +232,6 @@ return FirClass(
 			}
 		}
 
-		this._allObjects = {};
-		this._objectNumByFullName = {};
 		for( var i = 0; i < objRS.getLength(); ++i ) {
 			this._loadObjectWithChildren(objRS.getRecordAt(i), objRS, childKeys);
 		}
@@ -296,6 +304,10 @@ return FirClass(
 
 		this._allRoles = {};
 		this._roleNumByName = {};
+
+		if( roleRS == null ) {
+			return;
+		}
 		for( var i = 0; i < roleRS.getLength(); ++i ) {
 			var roleRec = roleRS.getRecordAt(i);
 			this._allRoles[roleRec.get("num")] = roleRec.get("name");
@@ -310,6 +322,9 @@ return FirClass(
 		var rightRS = this._dataSource.getRights();
 
 		this._rulesByRightKey = {};
+		if( rightRS == null ) {
+			return;
+		}
 		for( var i = 0; i < rightRS.getLength(); ++i ) {
 			var rightRec = rightRS.getRecordAt(i);
 			// Currently skip rights without role, or object, or rule specification
@@ -374,6 +389,9 @@ return FirClass(
 		var groupObjRS = this._dataSource.getGroupObjects();
 
 		this._groupObjKeys = {};
+		if( groupObjRS == null ) {
+			return;
+		}
 		for( var i = 0; groupObjRS.getLength(); ++i ) {
 			var groupObj = groupObjRS.getRecordAt(i), it;
 			if( groupObj.get("group_num") == null || groupObj.get("object_num") == null )
