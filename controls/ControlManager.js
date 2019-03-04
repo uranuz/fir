@@ -113,11 +113,11 @@ return new (FirClass(
 
 			if( updateControl ) {
 				// Выполняем обновление состояния, когда уже добавили к родителю (на всякий случай)
-				//if (!state.areaName) {
+				if (!state.areaName) {
 					// Если название области для обновления не указано, то обновлялась вся вёрстка компонента,
 					// поэтому прописываем новый корневой тег в _container
 					state.control._container = $(state.controlTag);
-				//}
+				}
 				state.control._updateControlState(state.opts);
 				if( state.control._container[0].parentNode == null ) {
 					console.warn(
