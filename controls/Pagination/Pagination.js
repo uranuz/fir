@@ -29,6 +29,8 @@ return FirClass(
 
 		this._setButtonsVisibility();
 	}, FirControl, {
+		PagingMode: PagingMode,
+
 		/** Переход на первую страницу */
 		gotoFirst: function() {
 			this.setCurrentPage(0);
