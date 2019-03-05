@@ -2,7 +2,7 @@ define('fir/controls/Pagination/Pagination', [
 	'fir/controls/FirControl',
 	'css!fir/controls/Pagination/Pagination'
 ], function(FirControl) {
-	var PaginationMode = {
+	var PagingMode = {
 		Offset: 0,
 		Page: 1
 	};
@@ -15,9 +15,9 @@ return FirClass(
 		// Пытаемся определить тип постраничной нафигации на основе того, какая опция задана.
 		// По-умолчанию предполагаем режим с использованием offset (сдвига по записям)
 		if( opts.currentPage != null ) {
-			this.setPaginationMode(PaginationMode.Page);
+			this.setPagingMode(PagingMode.Page);
 		} else {
-			this.setPaginationMode(PaginationMode.Offset);
+			this.setPagingMode(PagingMode.Offset);
 		}
 		this.setPageSize(opts.pageSize);
 
@@ -74,7 +74,7 @@ return FirClass(
 		/** Получить номер текущей страницы (начинаются с 0)*/
 		getCurrentPage: function() {
 			var page;
-			if( this._mode == PaginationMode.Page ) {
+			if( this._mode == PagingMode.Page ) {
 				page = parseInt(this._elems('pageHiddenField').val(), 10);
 			} else {
 				page = Math.floor(parseInt(this._elems('offsetField').val(), 10) / this.getPageSize());
@@ -83,7 +83,7 @@ return FirClass(
 		},
 		getOffset: function() {
 			var offset;
-			if( this._mode == PaginationMode.Page ) {
+			if( this._mode == PagingMode.Page ) {
 				offset = parseInt(this._elems('pageHiddenField').val()) * this.getPageSize();
 			} else {
 				offset = parseInt(this._elems('offsetField').val(), 10);
@@ -103,24 +103,28 @@ return FirClass(
 			var pageSize = parseInt(this._elems('pageSizeField').val(), 10);
 			return isNaN(pageSize)? null: pageSize;
 		},
-		setPaginationMode: function(mode) {
-			if( [PaginationMode.Page, PaginationMode.Offset].indexOf(mode) < 0 ) {
+		setPagingMode: function(mode) {
+			if( [PagingMode.Page, PagingMode.Offset].indexOf(mode) < 0 ) {
 				throw new Error('Invalid navigation mode: ' + mode);
 			}
 			this._mode = mode;
 			switch(this._mode) {
-				case PaginationMode.Offset: {
+				case PagingMode.Offset: {
 					this._elems('pageHiddenField').attr('name', null);
 					this._elems('offsetField').attr('name', this._formField);
 					break;
 				}
-				case PaginationMode.Page: {
+				case PagingMode.Page: {
 					this._elems('pageHiddenField').attr('name', this._formField);
 					this._elems('offsetField').attr('name', null);
 					break;
 				}
 				default: break;
 			}
+		},
+		/** Возвращает используемый способ постраничной навигации */
+		getPagingMode: function() {
+			return this._mode;
 		},
 		setPageSize: function(pageSize) {
 			if( pageSize === null ) {
@@ -144,9 +148,9 @@ return FirClass(
 
 			// Пытаемся уточнить режим постраничной навигации по возвращённой структуре
 			if( nav.currentPage != null && nav.offset == null ) {
-				this.setPaginationMode(PaginationMode.Page);
+				this.setPagingMode(PagingMode.Page);
 			} else if( nav.offset != null ) {
-				this.setPaginationMode(PaginationMode.Offset);
+				this.setPagingMode(PagingMode.Offset);
 			} // else: Режим навигации не изменился
 
 			// Обновляем значения основных полей изходя из полученной стуктуры навигации,
@@ -168,8 +172,8 @@ return FirClass(
 		getNavigation: function() {
 			var nav = {};
 			switch(this._mode) {
-				case PaginationMode.Offset: nav.offset = this.getOffset(); break;
-				case PaginationMode.Page: nav.currentPage = this.getCurrentPage(); break;
+				case PagingMode.Offset: nav.offset = this.getOffset(); break;
+				case PagingMode.Page: nav.currentPage = this.getCurrentPage(); break;
 				default: break;
 			}
 			nav.pageSize = this.getPageSize();
