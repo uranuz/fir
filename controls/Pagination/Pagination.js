@@ -61,9 +61,11 @@ return FirClass(
 			var closestForm = this._container.closest('form');
 			this._elems('pageHiddenField').val(parseInt(pageNum, 10) || 0);
 			this._elems('offsetField').val(parseInt(pageNum, 10) * this.getPageSize() || 0);
-
 			// Хотя роботам это не понять, но пользователи привыкли, что номера страниц начинаются с 1
 			this._elems('currentPageField').val(this.getCurrentPage() + 1);
+
+			this._renderNavData(this.getNavigation());
+			this._setButtonsVisibility();
 			this._notify('onSetCurrentPage', this.getCurrentPage());
 			if( this._formField && closestForm.length ) {
 				closestForm[0].submit();
@@ -92,6 +94,10 @@ return FirClass(
 		getPageCount: function() {
 			var page = parseInt(this._elems('pageCount').text(), 10);
 			return isNaN(page)? null: page;
+		},
+		getRecordCount: function() {
+			var count = parseInt(this._elems('recordCount').text(), 10);
+			return isNaN(count)? null: count;
 		},
 		getPageSize: function() {
 			var pageSize = parseInt(this._elems('pageSizeField').val(), 10);
@@ -158,6 +164,18 @@ return FirClass(
 
 			this._renderNavData(nav);
 			this._setButtonsVisibility();
+		},
+		getNavigation: function() {
+			var nav = {};
+			switch(this._mode) {
+				case PaginationMode.Offset: nav.offset = this.getOffset(); break;
+				case PaginationMode.Page: nav.currentPage = this.getCurrentPage(); break;
+				default: break;
+			}
+			nav.pageSize = this.getPageSize();
+			nav.recordCount = this.getRecordCount();
+			nav.pageCount = this.getPageCount();
+			return nav;
 		},
 		_renderNavData: function(nav) {
 			var
