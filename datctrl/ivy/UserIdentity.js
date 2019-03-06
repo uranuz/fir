@@ -31,7 +31,7 @@ return FirClass(
 				case `name`: return this._userIdentity.name();
 				case `data`: return this._userIdentity.data();
 				case `isAuthenticated`: return this._userIdentity.isAuthenticated();
-				case `accessRoles`: return this._userIdentity.accessRoles();
+				case `accessRoles`: return this._userIdentity._accessRoles;
 				default: throw new Error('Unexpected IvyUserIdentity attribute: ' + name);
 			}
 		},

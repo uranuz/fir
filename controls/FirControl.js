@@ -137,7 +137,29 @@ return FirClass(
 
 		/** Имя метода (компонента) интерфейса */
 		_getViewMethod: function(areaName) {
-			return areaName? areaName: this._viewMethod;
+			if( !areaName ) {
+				return this._viewMethod;
+			}
+			var viewMethod = this._getAreaElement(areaName).data('fir-method');
+			if( !viewMethod ) {
+				throw new Error(
+					'Unable to get view method for area: ' + areaName 
+					+ '. Maybe "data-fir-method" attribute is missing or area element does not exist');
+			}
+			return viewMethod;
+		},
+
+		_getAreaElement: function(areaName) {
+			if( !areaName ) {
+				return this._container;
+			}
+			var areaElement = this._elems(areaName)
+			if( !areaElement || !areaElement.length ) {
+				throw new Error('Unable to find area element with name: ' + areaName);
+			} else if( areaElement.length > 1 ) {
+				throw new Error('More than one area element found');
+			}
+			return areaElement;
 		},
 
 		_getReloadOpts: function(areaName) {
@@ -156,8 +178,19 @@ return FirClass(
 			};
 		},
 
-		_getAreaNode: function(areaName) {
-			return this._container;
+		/** Обновление вёрстки компонента при его перезагрузке */
+		_updateControlMarkup: function(state) {
+			var jAreaNode = this._getAreaElement(state.areaName);
+
+			// Замена старой верстки компонента на новую
+			// TODO: Нужно проверить, что это не дочерний компонент внутри новой вёрстки,
+			// которую не нужно заменять, поскольку она уже будет заменена
+			if( jAreaNode.length && state.controlTag.length ) {
+				// Обходим баг в jQuery  replaceWith через родной replaceChild
+				// Проблема в том, что jQuery вместо родителя заменяемого элемента берет родителя передаваемого на замену
+				$.cleanData(jAreaNode); // Почистим jQuery данные старого контейнера, т.к. это делает jQuery
+				jAreaNode[0].parentNode.replaceChild(state.controlTag[0], jAreaNode[0]);
+			}
 		},
 
 		/** Обработчик обновления внутреннего состояния компонента при завершении перезагрузки */

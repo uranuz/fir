@@ -24,7 +24,7 @@ return new (FirClass(
 		ControlLoadState: ControlLoadState,
 		/**
 		 * Получает осуществляет "рекурсивный" поиск узлов по списку изначальных узлов roots (по селектору).
-		 * Выибирает только "наименее вложенные" элементы подходящие по селектору.
+		 * Выбирает только "наименее вложенные" элементы подходящие по селектору.
 		 * Т.е. если внутри подходящего элемента есть еще подходящие, то они уже не будут выбраны.
 		 * Элементы из корневого списка (если подходят под селектор) тоже попадут в результат.
 		 */
@@ -174,19 +174,6 @@ return new (FirClass(
 			}
 			return state;
 		},
-		/** Обновление вёрстки компонента при его перезагрузке */
-		_updateControlMarkup: function(state) {
-			var jAreaNode = state.control._getAreaNode(state.areaName);
-			// Замена старой верстки компонента на новую
-			// TODO: Нужно проверить, что это не дочерний компонент внутри новой вёрстки,
-			// которую не нужно заменять, поскольку она уже будет заменена
-			if( jAreaNode.length && state.controlTag.length ) {
-				// Обходим баг в jQuery  replaceWith через родной replaceChild
-				// Проблема в том, что jQuery вместо родителя заменяемого элемента берет родителя передаваемого на замену
-				$.cleanData(jAreaNode); // Почистим jQuery данные старого контейнера, т.к. это делает jQuery
-				jAreaNode[0].parentNode.replaceChild(state.controlTag[0], jAreaNode[0]);
-			}
-		},
 
 		_initControlAndChildren: function(state) {
 			var
@@ -220,7 +207,7 @@ return new (FirClass(
 				}
 			}
 			if( state.control && state.replaceMarkup ) {
-				this._updateControlMarkup(state);
+				state.control._updateControlMarkup(state);
 			}
 			if( state.childLoadCounter === 0 ) {
 				// Нет дочерних компонентов - инициализируем сразу, иначе асинхронно
