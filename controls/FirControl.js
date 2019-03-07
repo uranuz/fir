@@ -136,12 +136,7 @@ return FirClass(
 				return this._viewModule;
 			}
 			var viewModule = this._getAreaElement(areaName).data('fir-view-module');
-			if( !viewModule ) {
-				throw new Error(
-					'Unable to get view module for area: ' + areaName 
-					+ '. Maybe "data-fir-view-module" attribute is missing or area element does not exist');
-			}
-			return viewModule;
+			return viewModule || this._viewModule;
 		},
 
 		/** Имя метода (компонента) интерфейса */
