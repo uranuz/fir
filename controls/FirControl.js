@@ -132,7 +132,16 @@ return FirClass(
 
 		/** Имя модуля (шаблона) интерфейса */
 		_getViewModule: function(areaName) {
-			return this._viewModule;
+			if( !areaName ) {
+				return this._viewModule;
+			}
+			var viewModule = this._getAreaElement(areaName).data('fir-view-module');
+			if( !viewModule ) {
+				throw new Error(
+					'Unable to get view module for area: ' + areaName 
+					+ '. Maybe "data-fir-view-module" attribute is missing or area element does not exist');
+			}
+			return viewModule;
 		},
 
 		/** Имя метода (компонента) интерфейса */
@@ -140,11 +149,11 @@ return FirClass(
 			if( !areaName ) {
 				return this._viewMethod;
 			}
-			var viewMethod = this._getAreaElement(areaName).data('fir-method');
+			var viewMethod = this._getAreaElement(areaName).data('fir-view-method');
 			if( !viewMethod ) {
 				throw new Error(
 					'Unable to get view method for area: ' + areaName 
-					+ '. Maybe "data-fir-method" attribute is missing or area element does not exist');
+					+ '. Maybe "data-fir-view-method" attribute is missing or area element does not exist');
 			}
 			return viewMethod;
 		},
