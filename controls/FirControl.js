@@ -87,8 +87,8 @@ return FirClass(
 			return this._container.find('.' + this.instanceHTMLClass());
 		},
 
-		_unsubscribeInternal: function() {},
-		_subscribeInternal: function() {},
+		_onUnsubscribe: function() {},
+		_onSubscribe: function() {},
 
 		/**
 		 * Адрес для отправки запроса. Если не указано, то используется текущий URI (для REST-запросов).
@@ -222,8 +222,8 @@ return FirClass(
 		 * (либо какая-то её часть, которая может измениться), обновляются какие-то поля данных и т.п.
 		 * Могут при этом полностью пересоздаваться дочерние компоненты, если это соответствует логике работы.
 		 * При этом должны сохраняться внешние подписки на события, публикуемые этим компонентом,
-		 * однако подписки на события вёрстки и дочерних компонентов будут удаляться в "_unsubscribeInternal"
-		 * и воссоздаваться заново (если это необходимо) в "_subscribeInternal".
+		 * однако подписки на события вёрстки и дочерних компонентов будут удаляться в "_onUnsubscribe"
+		 * и воссоздаваться заново (если это необходимо) в "_onSubscribe".
 		 * По сути механизм перезагрузки представляет собой каркас для реализации перезагрузки автором компонента
 		 * 
 		 * @param areaName {string|null|undefined} Название обновляемой области внутри компонента.
@@ -246,7 +246,7 @@ return FirClass(
 				}
 			}
 
-			this._unsubscribeInternal();
+			this._onUnsubscribe();
 
 			LoaderManager.load(this._getReloadOpts(areaName));
 		},
@@ -265,7 +265,7 @@ return FirClass(
 		// Уничтожить компонент
 		destroy: function() {
 			// TODO: Отписаться от всяческих событий
-			this._unsubscribeInternal();
+			this._onUnsubscribe();
 
 			// Прибить дочерние компоненты
 			for( var i = 0; i < this._childControls.length; ++i ) {

@@ -92,7 +92,7 @@ return new (FirClass(
 				state.opts.container = $(state.controlTag); // Устанавливаем корневой тэг для компонента
 				state.opts.childControls = state.childControls; // Прописываем контролы всей пачкой (**)
 				state.control = new ControlClass(state.opts);
-				state.control._subscribeInternal();
+				state.control._onSubscribe();
 				updateControl = false;
 			}
 
@@ -126,7 +126,7 @@ return new (FirClass(
 						+ 'but _container property has not been changed properly!'
 					);
 				}
-				state.control._subscribeInternal();
+				state.control._onSubscribe();
 			}
 
 			state.control._onAfterLoad();
