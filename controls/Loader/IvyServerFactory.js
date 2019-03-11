@@ -45,7 +45,8 @@ return FirClass(
 				progData = {},
 				extraGlobals = {
 					userIdentity: new IvyUserIdentity(this._userIdentity),
-					userRights: new IvyUserRights(this._userRights)
+					userRights: new IvyUserRights(this._userRights),
+					vpaths: {}
 				},
 				// List of sources that should be retrieved before rendering
 				// First source in template itself. The second is data from remote method.

@@ -211,7 +211,7 @@ return FirClass(
 		},
 
 		/** Обработчик завершения загрузки компонента для переопределения наследниками */
-		_onAfterLoad: function() {
+		_onAfterLoad: function(state) {
 			// Публикуем событие о завершении загрузки компонента
 			this._notify('onAfterLoad');
 		},

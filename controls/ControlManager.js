@@ -129,7 +129,7 @@ return new (FirClass(
 				state.control._onSubscribe();
 			}
 
-			state.control._onAfterLoad();
+			state.control._onAfterLoad(state);
 
 			if( parentState != null && --(parentState.childLoadCounter) === 0 ) {
 				// Все компоненты родителя подгрузились - инициализируем его
