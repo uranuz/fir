@@ -24,8 +24,22 @@ define("fir/common/globals", [], function() {
 		};
 	}
 
+	/**
+	 * Special method that could be used to call constructors of the base class and mixins
+	 */
+	function __superctor() {
+		this.superproto.constructor.apply(this, arguments);
+		for( var i = 0; i < this.mixins.length; ++i ) {
+			var mixin = this.mixins[i];
+			if( typeof mixin === 'function' ) {
+				mixin.apply(this, arguments);
+			}
+		}
+	}
+
 	var __hasProp = {}.hasOwnProperty;
 	function __extends(child, parent) {
+		parent = parent || Object; // By default base is Object
 		for (var key in parent) {
 			if (__hasProp.call(parent, key))
 				child[key] = parent[key];
@@ -38,10 +52,16 @@ define("fir/common/globals", [], function() {
 		ctor.prototype = parent.prototype || Object.getPrototypeOf(parent);
 		child.prototype = new ctor();
 		child.prototype.superproto = ctor.prototype;
+		child.prototype.superctor = __superctor;
 
 		return child;
 	}
 
+	var SPECIAL_FIELDS = [
+		'constructor',
+		'superproto',
+		'superctor'
+	];
 	function __mixinProtoSingle(dst, src) {
 		if( src == null ) {
 			return dst;
@@ -49,12 +69,16 @@ define("fir/common/globals", [], function() {
 			throw new Error('Expected object as class mixin');
 		}
 		for( key in src ) {
-			//Don't copy Object's built in properties
+			// Don't copy Object's built in properties
 			if(
 				((typeof {}[key] == "undefined") || ({}[key] != src[key]))
-				&& key != 'constructor' && key != 'superproto'
-			) dst.prototype[key] = src[key];
+				&& SPECIAL_FIELDS.indexOf(key) < 0
+			) {
+				dst.prototype[key] = src[key];
+			}
 		}
+		dst.prototype.mixins = dst.prototype.mixins || [];
+		dst.prototype.mixins.push(src);
 
 		return dst;
 	}
@@ -125,10 +149,8 @@ define("fir/common/globals", [], function() {
 		} else if( maybeProps != null ) {
 			throw new Error('Unexpected type of "maybeProps" argument');
 		}
-		
-		if( base ) {
-			__extends(ctor, base);
-		}
+
+		__extends(ctor, base);
 
 		mixins = mixins || [];
 		mixins.push(props);
