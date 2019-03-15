@@ -20,7 +20,7 @@ define('fir/controls/Loader/IvyServerFactory', [
 	iu
 ) {
 return FirClass(
-	function IvyServerFactory(engine, userIdentity, userRights) {
+	function IvyServerFactory(engine, userIdentity, userRights, vpaths) {
 		if( !(engine instanceof IvyEngine) ) {
 			throw new Error('Expected instance of IvyEngine');
 		}
@@ -33,6 +33,7 @@ return FirClass(
 		this._ivyEngine = engine;
 		this._userIdentity = userIdentity;
 		this._userRights = userRights;
+		this._vpaths = vpaths;
 	}, LoaderAbstract, {
 		canLoad: function(opts) {
 			return !!opts.RPCMethod;
@@ -46,7 +47,7 @@ return FirClass(
 				extraGlobals = {
 					userIdentity: new IvyUserIdentity(this._userIdentity),
 					userRights: new IvyUserRights(this._userRights),
-					vpaths: {}
+					vpaths: this._vpaths
 				},
 				// List of sources that should be retrieved before rendering
 				// First source in template itself. The second is data from remote method.
