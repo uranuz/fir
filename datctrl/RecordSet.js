@@ -4,6 +4,7 @@ define('fir/datctrl/RecordSet', [
 	'fir/datctrl/Record',
 	'fir/datctrl/Deserializer'
 ], function(helpers, RecordFormat, Record, Deserializer) {
+	"use strict";
 return FirClass(
 	function RecordSet(opts) {
 		opts = opts || {}
@@ -25,23 +26,8 @@ return FirClass(
 			this._d = []; //Данные (массив)
 		}
 
-		this._recIndex = 0;
 		this._reindex(); //Строим индекс
 	}, {
-		//Возращает след. запись или null, если их больше нет
-		next: function() {
-			var rec = this.getRecordAt(this._recIndex);
-			this._recIndex++;
-			return rec;
-		},
-		//Возвращает true, если есть ещё записи, иначе - false
-		hasNext: function() {
-			return (this._recIndex < this._d.length);
-		},
-		//Сброс итератора на начало
-		rewind: function() {
-			this._recIndex = 0;
-		},
 		getFormat: function() {
 			return this._fmt;
 		},
@@ -115,7 +101,7 @@ return FirClass(
 			this._indexes = {};
 
 			for( ; i < this._d.length ; i++ )
-				this._indexes[ this._d[i][ kfi ] ] = i;
+				this._indexes[ this._d[i][kfi] ] = i;
 		},
 		getIsEmpty: function() {
 			return !this._d.length && this._fmt.getIsEmpty();
@@ -126,6 +112,15 @@ return FirClass(
 				data: helpers.deepCopy( this._d ),
 				keyFieldIndex: this._keyFieldIndex
 			});
+		},
+		getKeys: function() {
+			var
+				keys = [],
+				kfi = this.getKeyFieldIndex();
+			for( var i = 0; i < this._d.length; ++i ) {
+				keys.push(this._d[i][kfi]);
+			}
+			return keys;
 		}
 });
 });
