@@ -104,9 +104,9 @@ return new (FirClass(
 					parentState.childControls.push(state.control);
 				} else {
 					// Есть родительский контрол - добавляем ещё не существующие дочерние к нему
-					var existingInst = parentState.control.getChildInstanceByName(state.opts.instanceName);
+					var existingInst = parentState.control.getChildByName(state.opts.instanceName);
 					if( !existingInst ) {
-						parentState.control._childControls.push(existingInst);
+						parentState.control._childControls.push(state.control);
 					}
 				}
 			}
@@ -179,7 +179,7 @@ return new (FirClass(
 			var
 				self = this,
 				childStates = [],
-				childrenExist = {};
+				existingChildren = {};
 			this._fillControlStateFromMarkup(state);
 			state.childControlTags.each(function(index, childTag) {
 				var childState = new ControlLoadState();
@@ -189,22 +189,13 @@ return new (FirClass(
 				if( state.control ) {
 					// Если дочерний контрол уже существует в текущем,
 					// то сохраняем ссылку на него, чтобы он не был создан заново
-					childState.control = state.control.getChildInstanceByName(childState.opts.instanceName);
+					childState.control = state.control.getChildByName(childState.opts.instanceName);
 				}
 				childStates.push(childState);
-				childrenExist[childState.opts.instanceName] = true;
+				existingChildren[childState.opts.instanceName] = true;
 			});
 			if( state.control ) {
-				var childControls = state.control._childControls;
-				// Лучше будем удалять с конца, чтобы не было проблем с возможным смещением индексов
-				for( var j = childControls.length - 1; j > 0; --j ) {
-					if( !childrenExist[ childControls[j] ] ) {
-						// При перезагрузке компонентов вызываем уничтожение тех компонентов в старой верстке,
-						// которых нет в новой верстке.
-						childControls[j].destroy();
-						childControls.splice(j, 1); // Нужно убрать пустые элементы из массива дочерних
-					}
-				}
+				state.control._destroyNonExisentChildControls(state, existingChildren);
 			}
 			if( state.control && state.replaceMarkup ) {
 				state.control._updateControlMarkup(state);

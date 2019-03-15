@@ -254,7 +254,7 @@ return FirClass(
 		findInstanceByName: function(instanceName) {
 			return ControlManager.findInstanceByName(instanceName);
 		},
-		getChildInstanceByName: function(name) {
+		getChildByName: function(name) {
 			for( var i = 0; i < this._childControls.length; ++i ) {
 				if( this._childControls[i].instanceName() === name ) {
 					return this._childControls[i];
@@ -262,6 +262,29 @@ return FirClass(
 			}
 			return null;
 		},
+		/**
+		 * Реализует логику удаления контролов, которые есть в старой верстке, но отстутствуют в новой
+		 */
+		_destroyNonExisentChildControls: function(state, existingChildren) {
+			var
+				childControls = state.control._childControls,
+				areaElement = (state.areaName && state.replaceMarkup? this._getAreaElement(state.areaName): null);
+			if( areaElement && areaElement.length != 1 ) {
+				console.warn('Method _getAreaElement probably works wrong!');
+			}
+			// Будем удалять с конца, чтобы не было проблем со смещением индексов
+			for( var j = childControls.length - 1; j > 0; --j ) {
+				if( existingChildren[ childControls[j].instanceName() ] ) {
+					continue; // Контрол есть в новой верстке
+				}
+				if( areaElement != null && !areaElement[0].contains(childControls[j]._container[0]) ) {
+					continue; // Мы не должны удалять контролы, корневой тег которых находится вне перезагружаемой области
+				}
+				childControls[j].destroy();
+				childControls.splice(j, 1); // Нужно убрать пустые элементы из массива дочерних
+			}
+		},
+
 		// Уничтожить компонент
 		destroy: function() {
 			// TODO: Отписаться от всяческих событий
