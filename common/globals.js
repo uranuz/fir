@@ -42,7 +42,7 @@ define("fir/common/globals", [], function() {
 	};
 
 	function __checkOwnProp(obj, prop) {
-		if( !__hasProp.call(obj, 'mixins') ) {
+		if( !__hasProp.call(obj, prop) && obj[prop] != null ) {
 			throw new Error('Expected own property');
 		}
 	}
@@ -51,6 +51,7 @@ define("fir/common/globals", [], function() {
 		__hasProp = {}.hasOwnProperty,
 		SPECIAL_FIELDS = [
 			'constructor',
+			'prototype',
 			'superproto',
 			'superctor',
 			'mixins'
@@ -78,11 +79,9 @@ define("fir/common/globals", [], function() {
 		proto.mixins = mixins;
 
 		// Check if they are all own properties
-		__checkOwnProp(proto, 'constructor');
-		__checkOwnProp(proto, 'prototype');
-		__checkOwnProp(proto, 'superproto');
-		__checkOwnProp(proto, 'superctor');
-		__checkOwnProp(proto, 'mixins');
+		for( var i = 0; i < SPECIAL_FIELDS.length; ++i ) {
+			__checkOwnProp(proto, SPECIAL_FIELDS[i]);
+		}
 
 		child.prototype = proto;
 
