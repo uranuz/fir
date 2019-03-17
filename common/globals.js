@@ -37,63 +37,90 @@ define("fir/common/globals", [], function() {
 		}
 	}
 
-	var __hasProp = {}.hasOwnProperty;
-	function __extends(child, parent) {
+	function __getPrototype(obj) {
+		return obj.prototype || Object.getPrototypeOf(obj)
+	};
+
+	function __checkOwnProp(obj, prop) {
+		if( !__hasProp.call(obj, 'mixins') ) {
+			throw new Error('Expected own property');
+		}
+	}
+
+	var
+		__hasProp = {}.hasOwnProperty,
+		SPECIAL_FIELDS = [
+			'constructor',
+			'superproto',
+			'superctor',
+			'mixins'
+		];
+	function __extends(child, parent, mixins) {
 		parent = parent || Object; // By default base is Object
-		for (var key in parent) {
-			if (__hasProp.call(parent, key))
-				child[key] = parent[key];
-		}
 
-		function ctor() {
-			this.constructor = child;
-		}
+		function classCtor() {} // Define prototype for class
+		var parentProto = __getPrototype(parent); // Set up parent's class prototype as constructor's prototype
 
-		ctor.prototype = parent.prototype || Object.getPrototypeOf(parent);
-		child.prototype = new ctor();
-		child.prototype.superproto = ctor.prototype;
-		child.prototype.superctor = __superctor;
+		classCtor.prototype = parentProto;
+
+		var proto = new classCtor();
+
+		__mixinProto(proto, mixins); // Mixin all properties into ctor
+
+		proto.constructor = child; // Set up constructor function
+
+		// Extra fields are: link to class parent's prototype
+		proto.superproto = parentProto;
+		// ... and special function to call parent's and all mixins constructors (if they are classes)
+		proto.superctor = __superctor;
+
+		// If prototype has its own mixin property then use it. If not then create it
+		proto.mixins = mixins;
+
+		// Check if they are all own properties
+		__checkOwnProp(proto, 'constructor');
+		__checkOwnProp(proto, 'prototype');
+		__checkOwnProp(proto, 'superproto');
+		__checkOwnProp(proto, 'superctor');
+		__checkOwnProp(proto, 'mixins');
+
+		child.prototype = proto;
 
 		return child;
 	}
 
-	var SPECIAL_FIELDS = [
-		'constructor',
-		'superproto',
-		'superctor'
-	];
-	function __mixinProtoSingle(dst, src) {
+	function __mixinProtoSingle(proto, src) {
 		if( src == null ) {
-			return dst;
+			return proto;
 		} else if( !(src instanceof Object) ) {
 			throw new Error('Expected object as class mixin');
 		}
-		for( key in src ) {
-			// Don't copy Object's built in properties
+		var props = (typeof(src) === 'function'? __getPrototype(src): src);
+		for( key in props ) {
+			// Don't copy Object's built in properties and special properties
 			if(
-				((typeof {}[key] == "undefined") || ({}[key] != src[key]))
+				((typeof {}[key] == "undefined") || ({}[key] != props[key]))
 				&& SPECIAL_FIELDS.indexOf(key) < 0
 			) {
-				dst.prototype[key] = src[key];
+				proto[key] = props[key];
+				__checkOwnProp(proto, key);
 			}
 		}
-		dst.prototype.mixins = dst.prototype.mixins || [];
-		dst.prototype.mixins.push(src);
 
-		return dst;
+		return proto;
 	}
-	function __mixinProto(dst, src) {
+	function __mixinProto(proto, src) {
 		if( src == null )
-			return dst;
+			return proto;
 
 		if( src instanceof Array ) {
 			for( var i = 0; i < src.length; ++i ) {
-				__mixinProtoSingle(dst, src[i]);
+				__mixinProtoSingle(proto, src[i]);
 			}
 		} else {
-			__mixinProtoSingle(dst, src);
+			__mixinProtoSingle(proto, src);
 		}
-		return dst;
+		return proto;
 	}
 
 	/**
@@ -150,13 +177,11 @@ define("fir/common/globals", [], function() {
 			throw new Error('Unexpected type of "maybeProps" argument');
 		}
 
-		__extends(ctor, base);
-
 		mixins = mixins || [];
-		mixins.push(props);
-		return __mixinProto(ctor, mixins);
+		if( props != null ) {
+			mixins.push(props);
+		}
+		return __extends(ctor, base, mixins);
 	}
-	window.__extends = __extends;
-	window.__mixinProto = __mixinProto;
 	window.FirClass = FirClass;
 });
