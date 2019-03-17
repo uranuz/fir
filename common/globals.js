@@ -27,14 +27,32 @@ define("fir/common/globals", [], function() {
 	/**
 	 * Special method that could be used to call constructors of the base class and mixins
 	 */
-	function __superctor() {
-		this.superproto.constructor.apply(this, arguments);
-		for( var i = 0; i < this.mixins.length; ++i ) {
-			var mixin = this.mixins[i];
-			if( typeof mixin === 'function' ) {
-				mixin.apply(this, arguments);
-			}
+	function __superctor(ctor) {
+		if( typeof(ctor) != 'function' ) {
+			throw new Error('Expected class constructor function');
 		}
+		if( !(this instanceof ctor) ) {
+			throw new Error('"this" in not instance of specified class');
+		}
+		var proto = this;
+		while( proto ) {
+			if( proto.constructor !== ctor ) {
+				proto = proto.superproto;
+				continue;
+			}
+			// We shouldn't pass proto argument to contructors
+			var ctorArgs = Array.prototype.slice.call(arguments, 1); 
+			proto.superproto.constructor.apply(this, ctorArgs);
+			for( var i = 0; i < proto.mixins.length; ++i ) {
+				var mixin = proto.mixins[i];
+				if( typeof mixin === 'function' ) {
+					mixin.apply(this, ctorArgs);
+				}
+			}
+			return; // Constructor and mixins get called - so exit
+		}
+		// TODO: Implement calling constructors for class mixins
+		throw new Error('Unable to find class with such constructor in inheritance chain');
 	}
 
 	function __getPrototype(obj) {
