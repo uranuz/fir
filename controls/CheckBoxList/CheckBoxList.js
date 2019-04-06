@@ -1,29 +1,28 @@
 define('fir/controls/CheckBoxList/CheckBoxList', [
 	'fir/controls/FirControl',
+	'fir/controls/Mixins/MultiSelect',
 	'css!fir/controls/CheckBoxList/CheckBoxList'
-], function(FirControl) {
+], function(FirControl, MultiSelect) {
+'use strict';
 return FirClass(
 	function CheckBoxList(opts) {
-		this.superproto.constructor.call(this, opts);
+		this.superctor(CheckBoxList, opts);
 
 		this._block = this._elems('block');
 		this._masterSwitchLabel = this._elems('masterSwitchLabel')
-			.on('click', this.onMasterSwitch_Click.bind(this));
+			.on('click', this._onMasterSwitch_Click.bind(this));
 		this._masterSwitchInput = this._elems('masterSwitchInput');
 		this._itemLabels = this._elems('itemLabel')
-			.on('click', this.onItem_Click.bind(this));
+			.on('click', this._onItem_Click.bind(this));
 		this._inputs = this._elems('itemInput');
-	}, FirControl, {
-		onMasterSwitch_Click: function() {
+	}, FirControl, [MultiSelect], {
+		_onMasterSwitch_Click: function() {
 			for( var i = 0; i < this._inputs.length; ++i ) {
 				var input = $(this._inputs[i]);
 				input.prop('checked', this._masterSwitchInput.prop('checked'));
 			}
 		},
-		onResetItem_Click: function() {
-
-		},
-		onItem_Click: function(ev) {
+		_onItem_Click: function(ev) {
 			var
 				allChecked = true,
 				allUnchecked = true,
@@ -50,6 +49,17 @@ return FirClass(
 					this._masterSwitchInput.prop('checked', true);
 				}
 			}
+		},
+		_getRawSelectedKeys: function() {
+			var
+				inpElems = this._elems('itemInput'),
+				keys = [];
+			inpElems.each(function(i, inp) {
+				if( inp.checked ) {
+					keys.push(inp.value);
+				}
+			});
+			return keys;
 		}
 });
 });

@@ -1,8 +1,9 @@
 define('fir/datctrl/Record', [
+	'fir/datctrl/iface/Record',
 	'fir/common/helpers',
 	'fir/datctrl/Deserializer',
 	'fir/datctrl/RecordFormat'
-], function(helpers, Deserializer, RecordFormat) {
+], function(IRecord, helpers, Deserializer, RecordFormat) {
 return FirClass(
 	function Record(opts) {
 		opts = opts || {};
@@ -23,7 +24,7 @@ return FirClass(
 		} else {
 			this._d = []; //Данные (массив)
 		}
-	}, {
+	}, IRecord, {
 		//Метод получения значения из записи по имени поля
 		get: function(index, defaultValue) {
 			var val;
@@ -32,7 +33,7 @@ return FirClass(
 			} else {
 				val = this._d[this._fmt.getIndex(index)];
 			}
-			if( val == null )
+			if( val == null && typeof(defaultValue) !== 'undefined' )
 				return defaultValue;
 			else
 				return val;
@@ -55,9 +56,6 @@ return FirClass(
 		set: function() {
 			//Не используй меня. Я пустой!..
 			//...или реализуй меня и используй
-		},
-		getIsEmpty: function() {
-			return !this._d.length && this._fmt.getIsEmpty();
 		},
 		copy: function() {
 			return new Record({

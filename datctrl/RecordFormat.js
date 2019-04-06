@@ -1,4 +1,7 @@
-define('fir/datctrl/RecordFormat', ['fir/common/helpers'], function(helpers) {
+define('fir/datctrl/RecordFormat', [
+	'fir/datctrl/iface/RecordFormat',
+	'fir/common/helpers'
+], function(IRecordFormat, helpers) {
 return FirClass(
 	function RecordFormat(opts) {
 		opts = opts || {}
@@ -15,7 +18,7 @@ return FirClass(
 		this._enum = opts.enumFormats || {};
 
 		this._reindex();
-	}, {
+	}, IRecordFormat, {
 		_reindex: function() {
 			var key, i;
 			this._indexes = {}

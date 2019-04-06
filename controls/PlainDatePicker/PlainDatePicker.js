@@ -41,6 +41,27 @@ return FirClass(
 			if( yearText.length && (isNaN(year) || String(year) !== yearText) ) {
 				return this._opts.yearInvalidMessage;
 			}
+		},
+		_parseNum: function(val) {
+			var val = parseInt(val, 10);
+			return isNaN(val)? null: val;
+		},
+		getDay: function() {
+			return this._parseNum(this.rawDay());
+		},
+		getMonth: function() {
+			return this._parseNum(this.rawMonth());
+		},
+		getYear: function() {
+			return this._parseNum(this.rawYear());
+		},
+		getDate: function() {
+			var dd = this.getDay(), mm = this.getMonth(), yy = this.getYear();
+			if( dd == null || mm == null || yy == null ) {
+				return null;
+			}
+			// Control starts dates from 1, but JS starts from 0
+			return new Date(yy, mm - 1, dd, 0, 0, 0, 0);
 		}
 });
 });

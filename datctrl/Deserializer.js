@@ -1,6 +1,4 @@
-define('fir/datctrl/Deserializer', [
-
-], function(helpers, RecordFormat) {
+define('fir/datctrl/Deserializer', [], function() {
 	return {
 		deserializeRecord: function(data, fmt) {
 			if( !(data instanceof Array) ) {
@@ -21,6 +19,7 @@ define('fir/datctrl/Deserializer', [
 				case 'int':
 				case 'float':
 				case 'str':
+				case 'enum':
 				case 'array': {
 					// Do nothing here for now
 					return val;

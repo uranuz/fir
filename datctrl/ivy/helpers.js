@@ -2,65 +2,34 @@ define('fir/datctrl/ivy/helpers', [
 	'exports',
 	'fir/datctrl/helpers',
 	'fir/datctrl/ivy/RecordSetAdapter',
-	'fir/datctrl/ivy/RecordAdapter'
+	'fir/datctrl/ivy/RecordAdapter',
+	'fir/datctrl/ivy/EnumFormatAdapter',
+	'fir/datctrl/ivy/EnumAdapter'
 ], function(
 	exports,
 	DatctrlHelpers,
 	RecordSetAdapter,
-	RecordAdapter
+	RecordAdapter,
+	EnumFormatAdapter,
+	EnumAdapter
 ) {
-exports._isContainerRawData = function(node) {
-	return(
-		node != null
-		&& (node instanceof Object)
-		&& node.hasOwnProperty('t')
-		&& (typeof(node.t) === 'string' || node.t instanceof String)
-	);
-};
 
-/*
-auto tryExtractRecordSet(ref IvyData srcNode)
-{
-	if( !_isContainerRawData(srcNode) && srcNode["t"].str != "recordset" ) {
-		return null;
+exports.tryExtractContainer = function(node, emptyIfFailed) {
+	var container = DatctrlHelpers.fromJSON(node, emptyIfFailed);
+	if( container == null ) {
+		return emptyIfFailed? void(0): node;
 	}
-	return new RecordSetAdapter(srcNode);
-}
-
-auto tryExtractRecord(ref IvyData srcNode)
-{
-	if( !_isContainerRawData(srcNode) && srcNode["t"].str != "record" ) {
-		return null;
-	}
-	return new RecordAdapter(srcNode);
-}
-*/
-
-exports.tryExtractContainer = function(node) {
-	if( !this._isContainerRawData(node) ) {
-		return node;
-	}
-
 	switch( node.t ) {
 		case 'recordset':
-			return new RecordSetAdapter( DatctrlHelpers.fromJSON(node) );
+			return new RecordSetAdapter(container);
 		case 'record':
-			return new RecordAdapter( DatctrlHelpers.fromJSON(node) );
+			return new RecordAdapter(container);
+		case 'enum':
+			return node.hasOwnProperty("d")? new EnumAdapter(container): new EnumFormatAdapter(container);
 		default: break;
 	}
-	return node;
+	return emptyIfFailed? void(0): node;
 };
 
-exports.tryExtractLvlContainers = function(node) {
-	node = this.tryExtractContainer(node);
-	if( !(node instanceof Object) ) {
-		return node;
-	}
-
-	for( var key in node ) {
-		node[key] = this.tryExtractContainer(node[key]);
-	}
-	return node;
-}
-
+exports.tryExtractLvlContainers = DatctrlHelpers.extractorImpl.bind(null, exports.tryExtractContainer);
 });

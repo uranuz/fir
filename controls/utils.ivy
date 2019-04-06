@@ -67,25 +67,6 @@ expr {=
 		def.body {=at record fieldName}
 	};
 
-	def recGetStr {=
-		def.pos record, fieldName;
-		def.body {=
-			var
-				fmt: {=at record.format fieldName},
-				value: {=recGet record fieldName},
-				result: null;
-			if {=has fmt "enum" } {=
-				for enumPair in fmt.enum {=
-					if enumPair.v != value {=continue};
-					if {=has enumPair "n"} {=return enumPair.n}
-					else {=return enumPair.v}
-				}
-			} else {=
-				return value;
-			};
-		}
-	};
-
 	def enumWithNull {
 		def.pos
 			list: null

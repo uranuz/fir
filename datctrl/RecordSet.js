@@ -1,9 +1,10 @@
 define('fir/datctrl/RecordSet', [
-	'fir/common/helpers',
+	'fir/datctrl/iface/RecordSet',
+	'fir/datctrl/RecordSetMixin',
 	'fir/datctrl/RecordFormat',
-	'fir/datctrl/Record',
-	'fir/datctrl/Deserializer'
-], function(helpers, RecordFormat, Record, Deserializer) {
+	'fir/datctrl/Deserializer',
+	'fir/common/helpers'
+], function(IRecordSet, RecordSetMixin, RecordFormat, Deserializer, helpers) {
 	"use strict";
 return FirClass(
 	function RecordSet(opts) {
@@ -27,37 +28,13 @@ return FirClass(
 		}
 
 		this._reindex(); //Строим индекс
-	}, {
-		getFormat: function() {
-			return this._fmt;
-		},
-		copyFormat: function() {
-			return this._fmt.copy();
-		},
-		//Возвращает количество записей в наборе
-		getLength: function() {
-			return this._d.length;
-		},
+	}, IRecordSet, [RecordSetMixin], {
 		//Возвращает запись по ключу
 		getRecord: function(key) {
 			if( this._indexes[key] == null )
 				return null;
 			else
 				return this.getRecordAt( this._indexes[key] );
-		},
-		//Возвращает запись по порядковому номеру index
-		getRecordAt: function(index) {
-			if( index < this._d.length )
-				return new Record({
-					format: this._fmt,
-					data: this._d[index]
-				});
-			else
-				return null;
-		},
-		//Возвращает значение первичного ключа по порядковому номеру index
-		getKey: function(index) {
-			return this._d[ this._fmt.getKeyFieldIndex() ][index];
 		},
 		//Возвращает true, если в наборе имеется запись с ключом key, иначе - false
 		hasKey: function(key) {
@@ -66,15 +43,11 @@ return FirClass(
 			else
 				return true;
 		},
-		//Возвращает порядковый номер поля первичного ключа в наборе записей
-		getKeyFieldIndex: function() {
-			return this._fmt.getKeyFieldIndex();
-		},
 		//Добавление записи rec в набор записей
 		append: function(rec) {
-			if( this.getIsEmpty || this._fmt.equals(rec._fmt) )
+			if( this.getLength() > 0 || this._fmt.equals(rec._fmt) )
 			{
-				if( this._fmt.getIsEmpty() )
+				if( this._fmt.getLength() > 0 )
 					this._fmt = rec._fmt.copy();
 				this._indexes[ rec.getKey() ] = this._d.length;
 				this._d.push(rec._d);
@@ -86,8 +59,8 @@ return FirClass(
 			var
 				index = this._indexes[key];
 
-			if( index !== undefined )
-			{	this._d.splice(index, 1);
+			if( index !== undefined ) {
+				this._d.splice(index, 1);
 				this._reindex(index);
 			}
 			else
@@ -100,27 +73,15 @@ return FirClass(
 
 			this._indexes = {};
 
-			for( ; i < this._d.length ; i++ )
+			for( ; i < this._d.length ; i++ ) {
 				this._indexes[ this._d[i][kfi] ] = i;
-		},
-		getIsEmpty: function() {
-			return !this._d.length && this._fmt.getIsEmpty();
+			}
 		},
 		copy: function() {
 			return new RecordSet({
 				format: this._fmt.copy(),
-				data: helpers.deepCopy( this._d ),
-				keyFieldIndex: this._keyFieldIndex
+				data: helpers.deepCopy( this._d )
 			});
 		},
-		getKeys: function() {
-			var
-				keys = [],
-				kfi = this.getKeyFieldIndex();
-			for( var i = 0; i < this._d.length; ++i ) {
-				keys.push(this._d[i][kfi]);
-			}
-			return keys;
-		}
 });
 });

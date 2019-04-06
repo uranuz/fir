@@ -1,20 +1,13 @@
-define('fir/datctrl/ivy/RecordAdapter', [
-	'ivy/ClassNode',
-	'fir/datctrl/Record',
-	'fir/datctrl/ivy/RecordFormatAdapter'
-], function(ClassNode, Record, RecordFormatAdapter) {
+define('fir/datctrl/ivy/EnumAdapter', [
+	'fir/datctrl/Enum'
+], function(Enum) {
 return FirClass(
-	function RecordAdapter(rec, fmt) {
-		if( !(rec instanceof Record) ) {
-			throw new Error('Expected Record');
+	function EnumAdapter(en, val) {
+		if( !(en instanceof Enum) ) {
+			throw new Error('Expected Enum');
 		}
-		this._rec = rec;
-		if( fmt instanceof RecordFormatAdapter ) {
-			this._fmt = fmt;
-		} else{
-			this._fmt = new RecordFormatAdapter(this._rec.getFormat());
-		}
-	}, ClassNode, {
+		this._enum = en;
+	}, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -28,15 +21,18 @@ return FirClass(
 		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
-			return this._rec.get(index);
+			return this._enum.getName(index);
 		},
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
-			switch(name) {
-				case 'format': return this._fmt;
+			switch(name)
+			{
+				case "format": return this._enum.getFormat();
+				case "value": return this._enum.getValue();
+				case "name": return this._enum.getName();
 				default: break;
 			}
-			return this.at(name);
+			throw new Error('Unrecognized property!');
 		},
 		/** Analogue to void __setAttr__(IvyData, string); in D impl */
 		setAttr: function(value, name) {
@@ -48,7 +44,7 @@ return FirClass(
 		},
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
-			return this._rec.getLength();
+			throw new Error('Not implemented!');
 		}
 });
 });

@@ -11,12 +11,11 @@ expr {=
 			hasMasterSwitch: true
 			masterSwitchTitle: null
 			keyField: "value"
-			captionField: "caption"
+			captionField: "name"
 			selectedKeys: [];
 		def.body {*
-
 		<div data-fir-module="{{moduleName}}">
-			<input type="hidden" data-fir-opts="{=firScopeOptsEnc}"/>
+			<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: ['items', 'keyField']}"/>
 		{=if hasMasterSwitch {*
 			<div class="{=cls "masterSwitch"}">
 				<label class="{=cls "masterSwitchLabel"}">
