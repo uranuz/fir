@@ -1,13 +1,14 @@
 define('fir/datctrl/ivy/EnumFormatAdapter', [
+	'ivy/ClassNode',
 	'fir/datctrl/EnumFormat'
-], function(EnumFormat) {
+], function(ClassNode, EnumFormat) {
 return FirClass(
 	function EnumFormatAdapter(fmt) {
 		if( !(fmt instanceof EnumFormat) ) {
 			throw new Error('Expected EnumFormat');
 		}
 		this._fmt = fmt;
-	}, {
+	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');

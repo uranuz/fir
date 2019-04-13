@@ -4,7 +4,7 @@ define('fir/controls/Loader/IvyServerFactory', [
 	'fir/security/right/UserIdentity',
 	'fir/security/right/UserRights',
 	'fir/network/json_rpc',
-	'fir/datctrl/ivy/helpers',
+	'fir/datctrl/ivy/Deserializer',
 	'fir/datctrl/ivy/UserRights',
 	'fir/datctrl/ivy/UserIdentity',
 	'ivy/utils'
@@ -14,7 +14,7 @@ define('fir/controls/Loader/IvyServerFactory', [
 	UserIdentity,
 	UserRights,
 	json_rpc,
-	FirIvyHelpers,
+	IvyDeserializer,
 	IvyUserRights,
 	IvyUserIdentity,
 	iu
@@ -86,7 +86,7 @@ return FirClass(
 					method: opts.RPCMethod,
 					params: RPCParams,
 					success: function(data) {
-						progData = FirIvyHelpers.tryExtractLvlContainers(data);
+						progData = IvyDeserializer.tryExtractLvlContainers(data);
 						tryRunRender();
 					},
 					error: function(res) {

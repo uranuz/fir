@@ -1,8 +1,16 @@
 define('fir/datctrl/ivy/RecordAdapter', [
 	'ivy/ClassNode',
 	'fir/datctrl/Record',
-	'fir/datctrl/ivy/RecordFormatAdapter'
-], function(ClassNode, Record, RecordFormatAdapter) {
+	'fir/datctrl/ivy/RecordFormatAdapter',
+	'fir/datctrl/ivy/EnumAdapter',
+	'fir/datctrl/Enum'
+], function(
+	ClassNode,
+	Record,
+	RecordFormatAdapter,
+	EnumAdapter,
+	Enum
+) {
 return FirClass(
 	function RecordAdapter(rec, fmt) {
 		if( !(rec instanceof Record) ) {
@@ -28,7 +36,11 @@ return FirClass(
 		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
-			return this._rec.get(index);
+			var val = this._rec.get(index);
+			if( val instanceof Enum ) {
+				return new EnumAdapter(val);
+			}
+			return val;
 		},
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {

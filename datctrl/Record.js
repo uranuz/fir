@@ -33,10 +33,11 @@ return FirClass(
 			} else {
 				val = this._d[this._fmt.getIndex(index)];
 			}
-			if( val == null && typeof(defaultValue) !== 'undefined' )
+			if( val == null && typeof(defaultValue) !== 'undefined' ) {
 				return defaultValue;
-			else
+			} else {
 				return val;
+			}
 		},
 		getLength: function() {
 			return this._d.length;
@@ -44,14 +45,8 @@ return FirClass(
 		getFormat: function() {
 			return this._fmt;
 		},
-		copyFormat: function() {
-			return this._fmt.copy();
-		},
 		getKey: function() {
 			return this._d[ this._fmt._keyFieldIndex ];
-		},
-		getKeyFieldIndex: function() {
-			return this._fmt._keyFieldIndex;
 		},
 		set: function() {
 			//Не используй меня. Я пустой!..

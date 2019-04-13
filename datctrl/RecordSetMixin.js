@@ -8,9 +8,6 @@ return FirClass(
 		getFormat: function() {
 			return this._fmt;
 		},
-		copyFormat: function() {
-			return this._fmt.copy();
-		},
 		//Возвращает количество записей в наборе
 		getLength: function() {
 			return this._d.length;
@@ -36,7 +33,7 @@ return FirClass(
 		getKeys: function() {
 			var
 				keys = [],
-				kfi = this.getKeyFieldIndex();
+				kfi = this._fmt.getKeyFieldIndex();
 			for( var i = 0; i < this._d.length; ++i ) {
 				keys.push(this._d[i][kfi]);
 			}

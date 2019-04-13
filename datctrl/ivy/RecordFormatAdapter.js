@@ -24,7 +24,7 @@ return FirClass(
 		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
-			return this._fmt.getRawFormat(index);
+			return this._fmt.getFieldFormat(index);
 		},
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {

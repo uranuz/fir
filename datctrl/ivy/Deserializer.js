@@ -1,21 +1,21 @@
-define('fir/datctrl/ivy/helpers', [
+define('fir/datctrl/ivy/Deserializer', [
 	'exports',
-	'fir/datctrl/helpers',
+	'fir/datctrl/Deserializer',
 	'fir/datctrl/ivy/RecordSetAdapter',
 	'fir/datctrl/ivy/RecordAdapter',
 	'fir/datctrl/ivy/EnumFormatAdapter',
 	'fir/datctrl/ivy/EnumAdapter'
 ], function(
-	exports,
-	DatctrlHelpers,
+	mod,
+	Deserializer,
 	RecordSetAdapter,
 	RecordAdapter,
 	EnumFormatAdapter,
 	EnumAdapter
 ) {
 
-exports.tryExtractContainer = function(node, emptyIfFailed) {
-	var container = DatctrlHelpers.fromJSON(node, emptyIfFailed);
+mod.tryExtractContainer = function(node, emptyIfFailed) {
+	var container = Deserializer.fromJSON(node, emptyIfFailed);
 	if( container == null ) {
 		return emptyIfFailed? void(0): node;
 	}
@@ -31,5 +31,5 @@ exports.tryExtractContainer = function(node, emptyIfFailed) {
 	return emptyIfFailed? void(0): node;
 };
 
-exports.tryExtractLvlContainers = DatctrlHelpers.extractorImpl.bind(null, exports.tryExtractContainer);
+mod.tryExtractLvlContainers = Deserializer.extractorImpl.bind(null, mod.tryExtractContainer);
 });

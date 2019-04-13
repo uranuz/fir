@@ -1,7 +1,7 @@
 define('fir/security/right/GlobalVarSource', [
 	'fir/security/right/iface/DataSource',
-	'fir/datctrl/helpers'
-], function(DataSource, DataHelpers) {
+	'fir/datctrl/Deserializer'
+], function(DataSource, Deserializer) {
 return FirClass(
 	function GlobalVarSource() {
 		var
@@ -9,7 +9,7 @@ return FirClass(
 			fields = ['rules', 'objects', 'roles', 'rights', 'groupObjects'];
 		
 		for( var i = 0; i < fields.length; ++i ) {
-			this['_' + fields[i]] = (right != null? DataHelpers.fromJSON(right[fields[i]]): null);
+			this['_' + fields[i]] = (right != null? Deserializer.fromJSON(right[fields[i]]): null);
 		}
 	}, DataSource, {
 		getRules: function() {

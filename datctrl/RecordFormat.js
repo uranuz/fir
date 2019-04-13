@@ -1,39 +1,54 @@
 define('fir/datctrl/RecordFormat', [
 	'fir/datctrl/iface/RecordFormat',
-	'fir/common/helpers'
-], function(IRecordFormat, helpers) {
-return FirClass(
+	'fir/datctrl/iface/FieldFormat',
+	'fir/common/helpers',
+	'fir/datctrl/Deserializer'
+], function(
+	IRecordFormat,
+	IFieldFormat,
+	helpers,
+	Deserializer
+) {
+var module = FirClass(
 	function RecordFormat(opts) {
 		opts = opts || {}
 		if( opts.fields instanceof Array ) {
+			// Check that we got correct arguments
+			for( var i = 0; i < opts.fields.length; ++i ) {
+				if( !opts.fields[i].isInstanceOf(IFieldFormat) ) {
+					throw new Error('Expected instance of IFieldFormat or EnumFormat');
+				}
+			}
 			this._f = opts.fields;
-			this._keyFieldIndex = opts.keyFieldIndex? opts.keyFieldIndex : 0;
-		}
-		else {
+		} else if(opts.rawFields instanceof Array) {
+			this._f = Deserializer.recordFormatFieldsFromJSON(opts.rawFields);
+		} else {
 			this._f = [];
-			this._keyFieldIndex = 0;
 		}
 
-		//Expected to be mapping from field index to enum format
-		this._enum = opts.enumFormats || {};
+		if( opts.keyFieldIndex == null || typeof(opts.keyFieldIndex) == 'number' || opts.keyFieldIndex instanceof Number ) {
+			this._keyFieldIndex = opts.keyFieldIndex || 0;
+		} else {
+			throw new Error('Key field index must be integer');
+		}
 
 		this._reindex();
 	}, IRecordFormat, {
 		_reindex: function() {
 			var key, i;
 			this._indexes = {}
-			for( i = 0; i < this._f.length; i++ )
-			{
-				key = this._f[i].n;
+			for( i = 0; i < this._f.length; i++ ) {
+				key = this._f[i].getFieldName();
 				if( key != null )
 					this._indexes[key] = i;
 			}
 		},
 		//Функция расширяет текущий формат, добавляя к нему format
 		extend: function(format) {
-			for( var i = 0; i < format._f.length; i++ )
-			{	this._f.push(format._f[i]);
-				this._indexes[format.n] = format._f.length;
+			for( var i = 0; i < format._f.length; i++ ) {
+				var fmt = format._f[i];
+				this._f.push(fmt);
+				this._indexes[fmt.getFieldName()] = format._f.length;
 			}
 		},
 		//Получить индекс поля по имени
@@ -45,13 +60,9 @@ return FirClass(
 		},
 		//Получить имя поля по индексу
 		getName: function(index) {
-			return this.getRawFormat(index).n;
+			return this.getFieldFormat(index).getFieldName();
 		},
-		//Получить тип поля по имени или индексу
-		getType: function(index) {
-			return this.getRawFormat(index).t;
-		},
-		getRawFormat: function(index) {
+		getFieldFormat: function(index) {
 			if( helpers.isUnsigned(index) ) {
 				if( index >= this._f.length ) {
 					throw new Error('No field by index in format');
@@ -72,7 +83,7 @@ return FirClass(
 		},
 		copy: function() {
 			return new RecordFormat({
-				fields: helpers.deepCopy( this._f ),
+				fields: helpers.deepCopy(this._f),
 				keyFieldIndex: this._keyFieldIndex
 			});
 		},
@@ -80,4 +91,5 @@ return FirClass(
 			return this._f.length;
 		}
 });
+return module;
 });

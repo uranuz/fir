@@ -6,7 +6,7 @@ return FirClass(
 		if( opts.format instanceof EnumFormat ) {
 			this._fmt = opts.format; //Формат перечисления (EnumFormat)
 		} else if( opts.rawData instanceof Array ) {
-			this._fmt = new EnumFormat({rawData: opts.rawData});
+			this._fmt = new EnumFormat(opts);
 		} else {
 			throw new Error('Expected EnumFormat or list of items');
 		}

@@ -1,13 +1,14 @@
 define('fir/datctrl/ivy/EnumAdapter', [
+	'ivy/ClassNode',
 	'fir/datctrl/Enum'
-], function(Enum) {
+], function(ClassNode, Enum) {
 return FirClass(
-	function EnumAdapter(en, val) {
+	function EnumAdapter(en) {
 		if( !(en instanceof Enum) ) {
 			throw new Error('Expected Enum');
 		}
 		this._enum = en;
-	}, {
+	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');

@@ -55,6 +55,31 @@ define("fir/common/globals", [], function() {
 		throw new Error('Unable to find class with such constructor in inheritance chain');
 	}
 
+	function __isInstanceOf(classOrMixin, thisCtor) {
+		thisCtor = thisCtor || __getPrototype(this);
+		if( typeof(classOrMixin) !== 'function' ) {
+			throw new Error('Expected class or mixin constructor function');
+		}
+		if( typeof(thisCtor.constructor) !== 'function' ) {
+			throw new Error('This class or mixin constructor function');
+		}
+		if( this instanceof classOrMixin || thisCtor === classOrMixin || thisCtor instanceof classOrMixin ) {
+			return true;
+		}
+		if( thisCtor.mixins == null ) {
+			return false;
+		}
+		for( var i = 0; i < thisCtor.mixins.length; ++i ) {
+			var mixin = thisCtor.mixins[i];
+			if( typeof mixin === 'function' ) {
+				if( this.isInstanceOf(classOrMixin, mixin) ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	function __getPrototype(obj) {
 		return obj.prototype || Object.getPrototypeOf(obj)
 	};
@@ -72,7 +97,8 @@ define("fir/common/globals", [], function() {
 			'prototype',
 			'superproto',
 			'superctor',
-			'mixins'
+			'mixins',
+			'isInstanceOf'
 		];
 	function __extends(child, parent, mixins) {
 		parent = parent || Object; // By default base is Object
@@ -95,6 +121,8 @@ define("fir/common/globals", [], function() {
 
 		// If prototype has its own mixin property then use it. If not then create it
 		proto.mixins = mixins;
+
+		proto.isInstanceOf = __isInstanceOf;
 
 		// Check if they are all own properties
 		for( var i = 0; i < SPECIAL_FIELDS.length; ++i ) {

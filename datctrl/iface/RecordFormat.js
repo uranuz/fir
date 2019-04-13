@@ -16,11 +16,7 @@ return FirClass(
 		getName: function(index) {
 			throw new Error('Not implemented yet!');
 		},
-		//Получить тип поля по имени или индексу
-		getType: function(index) {
-			throw new Error('Not implemented yet!');
-		},
-		getRawFormat: function(index) {
+		getFieldFormat: function(index) {
 			throw new Error('Not implemented yet!');
 		},
 		getKeyFieldIndex: function() {

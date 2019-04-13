@@ -69,7 +69,7 @@ return FirClass(
 		_reindex: function(startIndex) {
 			var
 				i = 0,
-				kfi = this.getKeyFieldIndex();
+				kfi = this._fmt.getKeyFieldIndex();
 
 			this._indexes = {};
 

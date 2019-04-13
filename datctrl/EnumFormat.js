@@ -1,27 +1,47 @@
 define('fir/datctrl/EnumFormat', [
 	'fir/datctrl/iface/RecordSet',
 	'fir/datctrl/RecordSetMixin',
-	'fir/datctrl/RecordFormat',
-	'fir/common/helpers'
-], function(IRecordSet, RecordSetMixin, RecordFormat, helpers) {
+	'fir/datctrl/iface/FieldFormat',
+	'fir/common/helpers',
+	'fir/datctrl/Deserializer'
+], function(
+	IRecordSet,
+	RecordSetMixin,
+	IFieldFormat,
+	helpers,
+	Deserializer
+) {
 return FirClass(
 	function EnumFormat(opts) {
 		opts = opts || {};
 		if( !(opts.rawData instanceof Array)  ) {
 			throw new Error('Expected enum items option');
 		}
+		if( opts.name != null && typeof(opts.name) !== 'string' && !(opts.name instanceof String) ) {
+			throw new Error('Expected string of null as enum field name');
+		}
 		this._d = opts.rawData || [];
+		this._n = opts.name;
 		this._names = {};
-		this._fmt = new RecordFormat({
-			fields: [
+		this._fmt = Deserializer.recordFormatFromJSON({
+			f: [
 				{"n": 'value', t: "str"},
 				{"n": 'name', t: "str"}
 			],
-			keyFieldIndex: 0
+			kfi: 0
 		});
 		this._reindex();
-	}, IRecordSet, [RecordSetMixin], {
+	}, IRecordSet, [RecordSetMixin, IFieldFormat], {
+		getFieldName: function() {
+			return this._n;
+		},
+		getType: function() {
+			return 'enum';
+		},
 		getName: function(value) {
+			if( !this._names.hasOwnProperty(value) && value == null ) {
+				return null; // Special case for empty value
+			}
 			if( !this._names.hasOwnProperty(value) ) {
 				throw new Error('No item with specified value in enum');
 			}
@@ -50,21 +70,12 @@ return FirClass(
 				this._names[curItem[0]] = [i, curItem[1]];
 			}
 		},
-		//Возвращает запись по ключу
 		getRecord: function(key) {
-			if( this._names[key] == null )
-				return null;
-			else
-				return this.getRecordAt( this._names[key][0] );
+			return this._names[key] == null? null: this.getRecordAt( this._names[key][0] );
 		},
-		//Возвращает true, если в наборе имеется запись с ключом key, иначе - false
 		hasKey: function(key) {
-			if( this._names[key] == null )
-				return false;
-			else
-				return true;
+			return this._names[key] != null;
 		},
-		//Добавление записи rec в набор записей
 		append: function(rec) {
 			throw new Error('Not implemented yet!');
 		},
@@ -73,8 +84,8 @@ return FirClass(
 		},
 		copy: function() {
 			return new EnumFormat({
-				format: this._fmt.copy(),
-				rawData: helpers.deepCopy(this._d)
+				rawData: helpers.deepCopy(this._d),
+				name: this._name
 			});
 		}
 });

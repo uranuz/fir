@@ -15,12 +15,7 @@ return FirClass(
 			throw new Error('Expected RecordSet');
 		}
 		this._rs = rs;
-
-		this._namesMapping = {};
-		var fmt = this._rs.getFormat();
-		for( var i = 0; i < fmt.getLength(); ++i ) {
-			this._namesMapping[fmt.getName(i)] = i;
-		}
+		this._fmt = new RecordFormatAdapter(this._rs.getFormat());
 	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
@@ -44,8 +39,7 @@ return FirClass(
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
 			switch(name) {
-				case 'format': return new RecordFormatAdapter(this._rec.getFormat());
-				case 'namesMapping': return this._namesMapping;
+				case 'format': return this._fmt;
 				default: throw new Error('Property is undefined!');
 			}
 		},

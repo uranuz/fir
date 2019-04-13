@@ -13,16 +13,14 @@ define('fir/common/helpers', [], function() {
 		//Глубокая копия объекта
 		deepCopy: function(o) {
 			var i, c, p, v;
-			if( !o || "object" !== typeof o )
-			{	return o;
-			}
-			else if( o instanceof Array )
-			{	c = [];
+			if( !o || "object" !== typeof o ) {
+				return o;
+			} else if( o instanceof Array ) {
+				c = [];
 				for( i = 0; i < o.length; i++)
 					c.push( helpers.deepCopy(o[i]) );
-			}
-			else
-			{	c = {};
+			} else {
+				c = {};
 				for(p in o) {
 					if( o.hasOwnProperty(p) ) {
 						c[p] = helpers.deepCopy(o[p]);

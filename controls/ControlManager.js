@@ -1,7 +1,7 @@
 define('fir/controls/ControlManager', [
 	'fir/common/base64',
-	'fir/datctrl/helpers'
-], function(Base64, DatctrlHelpers) {
+	'fir/datctrl/Deserializer'
+], function(Base64, Deserializer) {
 	function ControlLoadState() {
 		this.controlTag = null; // This control (or area) root tag
 		this.configTag = null; // Configuration tag 'data-fir-opts' inside control tag
@@ -167,7 +167,7 @@ return new (FirClass(
 			state.moduleName = $(state.controlTag).attr('data-fir-module');
 			try {
 				state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
-				state.opts = DatctrlHelpers.tryExtractLvlContainers(state.opts);
+				state.opts = Deserializer.tryExtractLvlContainers(state.opts);
 			} catch (ex) {
 				throw new Error('Failed to parse control options from markup!!!');
 			}
