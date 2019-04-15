@@ -54,19 +54,6 @@ expr {=
 		}
 	};
 
-	def rsGet {=
-		def.pos rs, fieldName, rowIndex;
-		def.body {=
-			var record: {=at rs rowIndex};
-			at record fieldName;
-		}
-	};
-
-	def recGet {=
-		def.pos record, fieldName;
-		def.body {=at record fieldName}
-	};
-
 	def enumWithNull {
 		def.pos
 			list: null
