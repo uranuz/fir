@@ -9,7 +9,7 @@ return FirClass(
 			fields = ['rules', 'objects', 'roles', 'rights', 'groupObjects'];
 		
 		for( var i = 0; i < fields.length; ++i ) {
-			this['_' + fields[i]] = (right != null? Deserializer.fromJSON(right[fields[i]]): null);
+			this['_' + fields[i]] = (right != null? Deserializer.deserialize(right[fields[i]]): null);
 		}
 	}, DataSource, {
 		getRules: function() {
