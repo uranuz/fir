@@ -11,7 +11,7 @@ expr {=
 			hasMasterSwitch: true
 			masterSwitchTitle: null
 			keyField: "value"
-			captionField: "name"
+			displayField: "name"
 			selectedKeys: [];
 		def.body {*
 		<div data-fir-module="{{moduleName}}">
@@ -41,7 +41,7 @@ expr {=
 								value="{=at item keyField }"
 								{=if(not {=empty selectedKeys} and {=has selectedKeys {=at item keyField} }) "checked"}
 							/>
-							<span class="{=cls "itemText"}">{=at item captionField}</span>
+							<span class="{=cls "itemText"}">{=at item displayField}</span>
 						</label>
 					</div>
 					*}
@@ -51,5 +51,4 @@ expr {=
 		</div>
 		*}
 	};
-	expr null;
 }

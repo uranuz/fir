@@ -8,9 +8,9 @@ def PlainListBox {=
 		instanceName: undef
 		formField: null
 		items: []
-		idField: "value"
-		captionField: "caption"
-		selectedId: undef
+		keyField: "value"
+		displayField: "caption"
+		selectedKey: undef
 		disabled: null;
 	def.body {*
 	<div data-fir-module="{{moduleName}}">
@@ -23,9 +23,9 @@ def PlainListBox {=
 				>{=
 				repeat item in items {*
 				<option class="{=cls "listItem"}"
-					value="{=at item idField}"
-					{=if selectedId == {=at item idField} "selected"}
-					>{=at item captionField}</option>
+					value="{=at item keyField}"
+					{=if selectedKey == {=at item keyField} "selected"}
+					>{=at item displayField}</option>
 				*}
 			}
 			</select>

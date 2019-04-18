@@ -39,7 +39,10 @@ mod.fromJSON = function(jsonObj, emptyIfFailed) {
 			});
 		}
 	} else if( jsonObj.t === 'enum' ) {
-		return mod.enumFromJSON(jsonObj);
+		return jsonObj.hasOwnProperty("d")? new Enum({
+			format: fmt,
+			value: jsonObj.d
+		}): fmt;
 	}
 
 	return emptyIfFailed? void(0): jsonObj;
@@ -135,7 +138,10 @@ mod.deserializeRecord = function(data, fmt) {
 mod.recordFormatFieldsFromJSON = function(rawFields) {
 	for( var i = 0; i < rawFields.length; ++i ) {
 		if( rawFields[i].t === "enum" ) {
-			rawFields[i] = mod.enumFromJSON(rawFields[i]);
+			rawFields[i] = new EnumFormat({
+				rawData: rawFields[i].enum,
+				name: rawFields[i].n
+			});
 		} else {
 			rawFields[i] = new FieldFormat(rawFields[i])
 		}
@@ -150,19 +156,5 @@ mod.recordFormatFromJSON = function(jsonObj) {
 		keyFieldIndex: jsonObj.kfi
 	});
 };
-
-mod.enumFromJSON = function(jEnum) {
-	if( jEnum.hasOwnProperty("d") ) {
-		return new Enum({
-			rawData: jEnum.enum,
-			value: jEnum.d
-		});
-	} else {
-		return new EnumFormat({
-			rawData: jEnum.enum,
-			name: jEnum.n
-		})
-	}
-}
 
 });

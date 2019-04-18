@@ -54,13 +54,18 @@ expr {=
 		}
 	};
 
-	def enumWithNull {
+	def enumFormatWithNull {
 		def.pos
-			list: null
+			enumFormat: null
 			nullName: ''
 			nullValue: null;
 		def.body {=
-			insert list {'n': nullName, 'v': nullValue} 0
+			var res: [];
+			insert res {name: nullName, value: nullValue} {=len res};
+			repeat it in enumFormat {=
+				insert res {name: it.name, value: it.value} {=len res};
+			};
+			expr res;
 		}
 	};
 
