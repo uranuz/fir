@@ -86,7 +86,7 @@ return FirClass(
 					method: opts.RPCMethod,
 					params: RPCParams,
 					success: function(data) {
-						progData = IvyDeserializer.tryExtractLvlContainers(data);
+						progData = IvyDeserializer.deserialize(data);
 						tryRunRender();
 					},
 					error: function(res) {

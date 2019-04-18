@@ -14,10 +14,10 @@ define('fir/datctrl/ivy/Deserializer', [
 	EnumAdapter
 ) {
 
-mod.tryExtractContainer = function(node, emptyIfFailed) {
-	var container = Deserializer.fromJSON(node, emptyIfFailed);
+mod.deserializeItem = function(node) {
+	var container = Deserializer.deserializeItem(node);
 	if( container == null ) {
-		return emptyIfFailed? void(0): node;
+		return null;
 	}
 	switch( node.t ) {
 		case 'recordset':
@@ -26,10 +26,11 @@ mod.tryExtractContainer = function(node, emptyIfFailed) {
 			return new RecordAdapter(container);
 		case 'enum':
 			return node.hasOwnProperty("d")? new EnumAdapter(container): new EnumFormatAdapter(container);
+		case "date": case "dateTime": return container;
 		default: break;
 	}
-	return emptyIfFailed? void(0): node;
+	return null;
 };
 
-mod.tryExtractLvlContainers = Deserializer.extractorImpl.bind(null, mod.tryExtractContainer);
+mod.deserialize = Deserializer.deserializeImpl.bind(null, mod.deserializeItem);
 });

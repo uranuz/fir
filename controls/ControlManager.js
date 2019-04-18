@@ -167,7 +167,7 @@ return new (FirClass(
 			state.moduleName = $(state.controlTag).attr('data-fir-module');
 			try {
 				state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
-				state.opts = Deserializer.tryExtractLvlContainers(state.opts);
+				state.opts = Deserializer.deserialize(state.opts);
 			} catch (ex) {
 				throw new Error('Failed to parse control options from markup!!!');
 			}

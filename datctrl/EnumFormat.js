@@ -23,7 +23,7 @@ return FirClass(
 		this._d = opts.rawData || [];
 		this._n = opts.name;
 		this._names = {};
-		this._fmt = Deserializer.recordFormatFromJSON({
+		this._fmt = Deserializer.deserializeRecordFormat({
 			f: [
 				{"n": 'value', t: "str"},
 				{"n": 'name', t: "str"}

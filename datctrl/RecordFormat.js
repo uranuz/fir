@@ -21,7 +21,7 @@ var module = FirClass(
 			}
 			this._f = opts.fields;
 		} else if(opts.rawFields instanceof Array) {
-			this._f = Deserializer.recordFormatFieldsFromJSON(opts.rawFields);
+			this._f = Deserializer.deserializeRecordFormatFields(opts.rawFields);
 		} else {
 			this._f = [];
 		}
