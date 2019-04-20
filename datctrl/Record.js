@@ -3,8 +3,13 @@ define('fir/datctrl/Record', [
 	'fir/common/helpers',
 	'fir/datctrl/Deserializer',
 	'fir/datctrl/RecordFormat'
-], function(IRecord, helpers, Deserializer, RecordFormat) {
-return FirClass(
+], function(
+	IRecord,
+	helpers,
+	Deserializer,
+	RecordFormat
+) {
+var mod = FirClass(
 	function Record(opts) {
 		opts = opts || {};
 		if( opts.format != null && opts.fields != null ) {
@@ -52,11 +57,42 @@ return FirClass(
 			//Не используй меня. Я пустой!..
 			//...или реализуй меня и используй
 		},
+		_copyRecordData: function() {
+			var items = [];
+			for( var i = 0; i < this._d.length; ++i ) {
+				var val = this._d[i];
+				if( val && (val instanceof Object) && typeof(val.copy) === 'function' ) {
+					items.push(value.copy());
+				} else {
+					items.push(helpers.deepCopy(val));
+				}
+			}
+			return items;
+		},
 		copy: function() {
-			return new Record({
+			return new mod({
 				format: this._fmt.copy(),
-				data: helpers.deepCopy( this._d )
+				data: this._copyRecordData()
 			});
+		},
+		recordDataToJSON: function() {
+			var items = [];
+			for( var i = 0; i < this._d.length; ++i ) {
+				var val = this._d[i];
+				if( val && (val instanceof Object) && typeof(val.getValue) === 'function' ) {
+					items.push(val.getValue());
+				} else {
+					items.push(val);
+				}
+			}
+			return items;
+		},
+		toStdJSON: function() {
+			var res = this._fmt.toStdJSON();
+			res.d = this.recordDataToJSON();
+			res.t = 'record';
+			return res;
 		}
 });
+return mod;
 });

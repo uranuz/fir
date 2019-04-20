@@ -11,7 +11,7 @@ define('fir/datctrl/EnumFormat', [
 	helpers,
 	Deserializer
 ) {
-return FirClass(
+var mod = FirClass(
 	function EnumFormat(opts) {
 		opts = opts || {};
 		if( !(opts.rawData instanceof Array)  ) {
@@ -83,10 +83,18 @@ return FirClass(
 			throw new Error('Not implemented yet!');
 		},
 		copy: function() {
-			return new EnumFormat({
+			return new mod({
 				rawData: helpers.deepCopy(this._d),
 				name: this._name
 			});
+		},
+		toStdJSON: function() {
+			return {
+				enum: this._d,
+				n: this._n,
+				t: 'enum'
+			};
 		}
 });
+return mod;
 });

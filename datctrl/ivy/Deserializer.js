@@ -15,11 +15,17 @@ define('fir/datctrl/ivy/Deserializer', [
 ) {
 
 mod.deserializeItem = function(node) {
-	var container = Deserializer.deserializeItem(node);
+	var isPOD = Deserializer.isPlainOldObject(node);
+	if( !isPOD ) {
+		return node;
+	}
+	var
+		typeStr = node.t,
+		container = Deserializer.deserializeItem(node);
 	if( container == null ) {
 		return null;
 	}
-	switch( node.t ) {
+	switch( typeStr ) {
 		case 'recordset':
 			return new RecordSetAdapter(container);
 		case 'record':

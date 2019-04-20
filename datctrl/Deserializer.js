@@ -119,6 +119,7 @@ mod.deserializeRecordSet = function(data, fmt) {
 	if( !(data instanceof Array) ) {
 		throw new Error('Record raw data must be instance of array');
 	}
+	var items = [];
 	for( var i = 0; i < data.length; ++i ) {
 		var row = data[i];
 		if( !(row instanceof Array) ) {
@@ -127,11 +128,12 @@ mod.deserializeRecordSet = function(data, fmt) {
 		if( row.length !== fmt.getLength() ) {
 			throw new Error('RecordSet data row field count must match field count of record format!')
 		}
-		for( var j = 0; j < row.length; ++j ) {
-			row[j] = this.deserializeRecordValue(row[j], fmt.getFieldFormat(j));
-		}
+		items.push(new Record({
+			format: fmt,
+			data: mod.deserializeRecord(row, fmt)
+		}));
 	}
-	return data;
+	return items;
 };
 
 mod.deserializeRecord = function(data, fmt) {
@@ -141,22 +143,23 @@ mod.deserializeRecord = function(data, fmt) {
 	if( data.length !== fmt.getLength() ) {
 		throw new Error('Record raw data field count must match field count of record format!')
 	}
+	var items = [];
 	for( var i = 0; i < data.length; ++i ) {
-		data[i] = this.deserializeRecordValue(data[i], fmt.getFieldFormat(i));
+		items.push(mod.deserializeRecordValue(data[i], fmt.getFieldFormat(i)));
 	}
-	return data;
+	return items;
 };
 
 mod.deserializeRecordFormatFields = function(rawFields) {
+	var items = [];
 	for( var i = 0; i < rawFields.length; ++i ) {
 		if( rawFields[i].t === "enum" ) {
-			rawFields[i] = mod.deserializeEnumFormat(rawFields[i]);
+			items.push(mod.deserializeEnumFormat(rawFields[i]));
 		} else {
-			rawFields[i] = new FieldFormat(rawFields[i])
+			items.push(new FieldFormat(rawFields[i]));
 		}
 	}
-
-	return rawFields;
+	return items;
 };
 
 mod.deserializeRecordFormat = function(rawData) {

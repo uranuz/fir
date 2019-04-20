@@ -1,14 +1,12 @@
-define('fir/datctrl/ivy/RecordFormatAdapter', [
+define('fir/datctrl/ivy/FieldFormatAdapter', [
 	'ivy/ClassNode',
-	'fir/common/helpers',
-	'fir/datctrl/RecordFormat'
-], function(ClassNode, helpers, RecordFormat) {
+	'fir/datctrl/FieldFormat'
+], function(ClassNode, FieldFormat) {
 return FirClass(
-	function RecordFormatAdapter(fmt) {
-		if( !(fmt instanceof RecordFormat) ) {
-			throw new Error('Expected RecordFormat');
+	function FieldFormatAdapter(fmt) {
+		if( !(fmt instanceof FieldFormat) ) {
+			throw new Error('Expected FieldFormat');
 		}
-
 		this._fmt = fmt;
 	}, ClassNode, {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
@@ -24,13 +22,11 @@ return FirClass(
 		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
-			return this._fmt.getFieldFormat(index);
+			return this._fmt.getName(index);
 		},
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
-			switch(name) {
-				default: throw new Error('Property is undefined!');;
-			}
+			throw new Error('Not implemented!');
 		},
 		/** Analogue to void __setAttr__(IvyData, string); in D impl */
 		setAttr: function(value, name) {
@@ -42,7 +38,7 @@ return FirClass(
 		},
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
-			throw new Error('Not implemented!');
+			return this._rec.getLength();
 		}
 });
 });

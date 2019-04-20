@@ -1,7 +1,7 @@
 define('fir/datctrl/Enum', [
 	'fir/datctrl/EnumFormat'
 ], function(EnumFormat) {
-return FirClass(
+var mod = FirClass(
 	function Enum(opts) {
 		if( opts.format instanceof EnumFormat ) {
 			this._fmt = opts.format; //Формат перечисления (EnumFormat)
@@ -31,6 +31,18 @@ return FirClass(
 		},
 		getFormat: function() {
 			return this._fmt;
+		},
+		toStdJSON: function() {
+			var res = this._fmt.toStdJSON();
+			res.d = this._value;
+			return res;
+		},
+		copy: function() {
+			return new mod({
+				format: this._fmt.copy(),
+				value: this._value
+			})
 		}
 });
+return mod;
 });

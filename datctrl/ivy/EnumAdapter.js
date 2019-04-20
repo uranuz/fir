@@ -41,7 +41,7 @@ return FirClass(
 		},
 		/** Analogue to IvyData __serialize__(); in D impl */
 		serialize: function() {
-			throw new Error('Not implemented!');
+			return this._enum.toStdJSON();
 		},
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {

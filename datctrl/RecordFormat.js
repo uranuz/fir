@@ -9,7 +9,7 @@ define('fir/datctrl/RecordFormat', [
 	helpers,
 	Deserializer
 ) {
-var module = FirClass(
+var mod = FirClass(
 	function RecordFormat(opts) {
 		opts = opts || {}
 		if( opts.fields instanceof Array ) {
@@ -81,15 +81,32 @@ var module = FirClass(
 		getIsEmpty: function() {
 			return !this._f.length;
 		},
+		_copyFields: function() {
+			var res = [];
+			for( var i = 0; i < this._f.length; ++i ) {
+				res.push(this._f[i].copy());
+			}
+			return res;
+		},
 		copy: function() {
-			return new RecordFormat({
-				fields: helpers.deepCopy(this._f),
+			return new mod({
+				fields: this._copyFields(),
 				keyFieldIndex: this._keyFieldIndex
 			});
 		},
 		getLength: function() {
 			return this._f.length;
+		},
+		toStdJSON: function() {
+			var items = [];
+			for( var i = 0; i < this._f.length; ++i ) {
+				items.push(this._f[i].toStdJSON());
+			}
+			return {
+				f: items,
+				kfi: this._keyFieldIndex
+			};
 		}
 });
-return module;
+return mod;
 });

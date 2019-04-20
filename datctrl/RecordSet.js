@@ -2,11 +2,15 @@ define('fir/datctrl/RecordSet', [
 	'fir/datctrl/iface/RecordSet',
 	'fir/datctrl/RecordSetMixin',
 	'fir/datctrl/RecordFormat',
-	'fir/datctrl/Deserializer',
-	'fir/common/helpers'
-], function(IRecordSet, RecordSetMixin, RecordFormat, Deserializer, helpers) {
+	'fir/datctrl/Deserializer'
+], function(
+	IRecordSet,
+	RecordSetMixin,
+	RecordFormat,
+	Deserializer
+) {
 	"use strict";
-return FirClass(
+var mod = FirClass(
 	function RecordSet(opts) {
 		opts = opts || {}
 		if( opts.format != null && opts.fields != null ) {
@@ -34,7 +38,7 @@ return FirClass(
 			if( this._indexes[key] == null )
 				return null;
 			else
-				return this.getRecordAt( this._indexes[key] );
+				return this.getRecordAt(this._indexes[key]);
 		},
 		//Возвращает true, если в наборе имеется запись с ключом key, иначе - false
 		hasKey: function(key) {
@@ -49,8 +53,8 @@ return FirClass(
 			{
 				if( this._fmt.getLength() > 0 )
 					this._fmt = rec._fmt.copy();
-				this._indexes[ rec.getKey() ] = this._d.length;
-				this._d.push(rec._d);
+				this._indexes[rec.getKey()] = this._d.length;
+				this._d.push(rec);
 			}
 			else
 				console.error("Формат записи не совпадает с форматом набора данных!!!");
@@ -74,14 +78,33 @@ return FirClass(
 			this._indexes = {};
 
 			for( ; i < this._d.length ; i++ ) {
-				this._indexes[ this._d[i][kfi] ] = i;
+				this._indexes[this._d[i].get(kfi)] = i;
 			}
 		},
+		_copyRecords: function() {
+			var res = [];
+			for( var i = 0; i < this._d.length; ++i ) {
+				res.push(this._d[i].copy());
+			}
+			return res;
+		},
 		copy: function() {
-			return new RecordSet({
+			return new mod({
 				format: this._fmt.copy(),
-				data: helpers.deepCopy( this._d )
+				data: this._copyRecords()
 			});
 		},
+		toStdJSON: function() {
+			var
+				res = this._fmt.toStdJSON(),
+				items = [];
+			for( var i = 0; i < this._d.length; ++i ) {
+				items.push(this._d[i].recordDataToJSON());
+			}
+			res.d = items;
+			res.t = 'recordset';
+			return res;
+		}
 });
+return mod;
 });

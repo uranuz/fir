@@ -1,7 +1,7 @@
 define('fir/datctrl/FieldFormat', [
 	'fir/datctrl/iface/FieldFormat'
 ], function(IFieldFormat) {
-return FirClass(
+var mod = FirClass(
 	function FieldFormat(opts) {
 		if( typeof(opts.n) !== 'string' && !(opts.n instanceof String) ) {
 			throw new Error('Expected string as field format name');
@@ -17,6 +17,19 @@ return FirClass(
 		},
 		getType: function() {
 			return this._t;
+		},
+		copy: function() {
+			return new mod({
+				n: this._n,
+				t: this._t
+			});
+		},
+		toStdJSON: function() {
+			return {
+				n: this._n,
+				t: this._t
+			};
 		}
 	});
+return mod;
 });

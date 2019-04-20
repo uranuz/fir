@@ -15,6 +15,18 @@ return FirClass(
 		 */
 		getType: function() {
 			throw new Error('Not implemented yet!');
+		},
+
+		/**
+		 * Возвращает копию формата поля
+		 */
+		copy: function() {
+			throw new Error('Not implemented yet!');
+		},
+
+		/** Выводит формат поля в JSON */
+		toStdJSON: function() {
+			throw new Error('Not implemented yet!');
 		}
 });
 });
