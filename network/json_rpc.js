@@ -21,7 +21,6 @@ define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 		 */
 		invoke: function(args) {
 			var
-				undefined = ( function(undef){ return undef; })(),
 				_defArgs = json_rpc.defaultInvokeArgs,
 				_args = _defArgs;
 
@@ -30,10 +29,10 @@ define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 
 			_args.params = json_rpc._processParams(_args.params);
 
-			var xhr = commonHelpers.getXMLHTTP();
-			xhr.open( "POST", _args.uri, true );
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', _args.uri, true);
 			xhr.setRequestHeader("content-type", "application/json-rpc");
-			xhr.onreadystatechange = function() {	json_rpc._handleResponse(xhr); }
+			xhr.onreadystatechange = json_rpc._handleResponse.bind(null, xhr)
 			var idStr = "";
 			if( _args.error || _args.success || _args.complete ) {
 				if( !_args.id ) {
@@ -45,50 +44,45 @@ define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 			xhr.send( '{"jsonrpc":"2.0","method":"' + _args.method + '","params":' + _args.params + idStr + '}' );
 		},
 		_handleResponse: function(xhr) {
-			if( xhr.readyState === 4 ) {
-				var
-					responseJSON = JSON.parse(xhr.responseText),
-					invokeArgs = null;
-
-				if( responseJSON.id ) {
-					invokeArgs = json_rpc._responseQueue[responseJSON.id];
-					if( invokeArgs ) {
-						delete json_rpc._responseQueue[responseJSON.id];
-						if( typeof(responseJSON.error) !== 'undefined' ) {
-							console.error(
-								"Ошибка при выполнении удалённого метода: "
-								+ (
-									(responseJSON.error instanceof Object)? 
-									JSON.stringify(responseJSON.error.message):
-									JSON.stringify(responseJSON.error)
-								)
-							);
-							if( typeof(invokeArgs.error) === 'function' ) {
-								invokeArgs.error(responseJSON.error);
-							}
-						} else if( typeof(responseJSON.result) !== 'undefined' ) {
-							if( typeof(invokeArgs.success) === 'function' ) {
-								invokeArgs.success(responseJSON.result);
-							}
-						} else {
-							console.error("Некорректный формат результата при вызове удалённого метода!");
-						}
-						if( typeof(invokeArgs.complete) === 'function' ) {
-							invokeArgs.complete(responseJSON);
-						}
-					}
+			if( xhr.readyState !== 4 ) {
+				return;
+			}
+			var responseJSON = JSON.parse(xhr.responseText);
+			if( responseJSON.id == null ) {
+				return;
+			}
+			var invokeArgs = json_rpc._responseQueue[responseJSON.id];
+			if( invokeArgs == null ) {
+				return;
+			}
+			delete json_rpc._responseQueue[responseJSON.id];
+			if( typeof(responseJSON.error) !== 'undefined' ) {
+				var errorMsg = (responseJSON.error instanceof Object)? responseJSON.error.message: responseJSON.error;
+				console.error("Ошибка при выполнении удалённого метода: " + JSON.stringify(errorMsg));
+				if( typeof(invokeArgs.error) === 'function' ) {
+					invokeArgs.error(responseJSON.error);
 				}
+			} else if( typeof(responseJSON.result) !== 'undefined' ) {
+				if( typeof(invokeArgs.success) === 'function' ) {
+					invokeArgs.success(responseJSON.result);
+				}
+			} else {
+				console.error("Некорректный формат результата при вызове удалённого метода!");
+			}
+			if( typeof(invokeArgs.complete) === 'function' ) {
+				invokeArgs.complete(responseJSON);
 			}
 		},
 		_processParams: function(params) {
-			if( typeof params === "object" )
+			if( typeof params === "object" ) {
 				return JSON.stringify(params);
-			else if( (typeof params === "function") || (typeof params === "undefined") )
+			} else if( typeof(params) === "function" || typeof(params) === "undefined" ) {
 				return '"null"';
-			else if( typeof params === "string" )
+			} else if( typeof(params) === "string" ) {
 				return '"' + params + '"';
-			else //Для boolean, number
-				return params;
+			} else {
+				return params; // Для boolean, number
+			}
 		}
 	};
 	return json_rpc;

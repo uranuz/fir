@@ -3,13 +3,8 @@
  * @author Ur@nuz
  */
 define('fir/common/helpers', [], function() {
+	'use strict';
 	var helpers = {
-		inherit: function (proto) {
-			function F() {}
-			F.prototype = proto;
-			var object = new F;
-			return object;
-		},
 		//Глубокая копия объекта
 		deepCopy: function(o) {
 			var i, c, p, v;
@@ -29,32 +24,9 @@ define('fir/common/helpers', [], function() {
 			}
 			return c;
 		},
-		//Поверхностная копия объекта (если свойства объекта
-		//являются объектами, то копируются лишь ссылки)
-		copy: function(o) {
-			return jQuery.extend({}, o);
-		},
-		isInteger: function(num) {
-			return Math.max(0, num) === num;
-		},
+		isInteger: Number.isInteger,
 		isUnsigned: function(num) {
-			return Math.round(num) === num;
-		},
-		getXMLHTTP: function() {
-			var xmlhttp;
-			try {
-				xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-			} catch (e) {
-				try {
-					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-				} catch (E) {
-					xmlhttp = false;
-				}
-			}
-			if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
-				xmlhttp = new XMLHttpRequest();
-			}
-			return xmlhttp;
+			return Number.isInteger(num) && num >= 0;
 		},
 		parseGetParams: function() {
 			var $_GET = {};

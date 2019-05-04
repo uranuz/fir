@@ -2,31 +2,48 @@ define('fir/datctrl/EnumFormat', [
 	'fir/datctrl/iface/RecordSet',
 	'fir/datctrl/RecordSetMixin',
 	'fir/datctrl/iface/FieldFormat',
-	'fir/common/helpers',
-	'fir/datctrl/Deserializer'
+	'fir/datctrl/Deserializer',
+	'fir/datctrl/EnumItem'
 ], function(
 	IRecordSet,
 	RecordSetMixin,
 	IFieldFormat,
-	helpers,
-	Deserializer
+	Deserializer,
+	EnumItem
 ) {
 var mod = FirClass(
 	function EnumFormat(opts) {
 		opts = opts || {};
-		if( !(opts.rawData instanceof Array)  ) {
+		if( opts.rawData instanceof Array  ) {
+			this._d = [];
+			for( var i = 0; i < opts.rawData.length; ++i ) {
+				var rawItem = opts.rawData[i];
+				if( !(rawItem instanceof Array) ) {
+					throw new Error('Expected array as enum item raw data');
+				}
+				if( rawItem.length === 1 ) {
+					this._d.push(new EnumItem(rawItem[0]));
+				} else if( rawItem.length === 2 ) {
+					this._d.push(new EnumItem(rawItem[0], rawItem[1]));
+				} else {
+					throw new Error('Expected array of 1 or 2 elements as enum item raw data');
+				}
+			}
+		} else if( opts.data instanceof Array ) {
+			this._d = opts.data;
+		} else {
 			throw new Error('Expected enum items option');
 		}
 		if( opts.name != null && typeof(opts.name) !== 'string' && !(opts.name instanceof String) ) {
 			throw new Error('Expected string of null as enum field name');
 		}
-		this._d = opts.rawData || [];
+		
 		this._n = opts.name;
 		this._names = {};
 		this._fmt = Deserializer.deserializeRecordFormat({
 			f: [
-				{"n": 'value', t: "str"},
-				{"n": 'name', t: "str"}
+				{n: 'value', t: "str"},
+				{n: 'name', t: "str"}
 			],
 			kfi: 0
 		});
@@ -54,8 +71,8 @@ var mod = FirClass(
 			var i = 0, curItem;
 			for( ; i < this._d.length; ++i ) {
 				curItem = this._d[i];
-				if( curItem[1] === name )
-					return curItem[0];
+				if( curItem.get('name') === name )
+					return curItem.geKey();
 			}
 			throw new Error('No item with specified name in enum');
 		},
@@ -67,11 +84,11 @@ var mod = FirClass(
 			var i = 0, curItem;
 			for( ; i < this._d.length; ++i ) {
 				curItem = this._d[i];
-				this._names[curItem[0]] = [i, curItem[1]];
+				this._names[curItem.getKey()] = [i, curItem.get('name')];
 			}
 		},
 		getRecord: function(key) {
-			return this._names[key] == null? null: this.getRecordAt( this._names[key][0] );
+			return this._names[key] == null? null: this.getRecordAt(this._names[key][0]);
 		},
 		hasKey: function(key) {
 			return this._names[key] != null;
@@ -83,14 +100,22 @@ var mod = FirClass(
 			throw new Error('Not implemented yet!');
 		},
 		copy: function() {
+			var items = [];
+			for( var i = 0; i < this._d.length; ++i ) {
+				items.push(this._d[i].copy());
+			}
 			return new mod({
-				rawData: helpers.deepCopy(this._d),
+				data: items,
 				name: this._name
 			});
 		},
 		toStdJSON: function() {
+			var items = [];
+			for( var i = 0; i < this._d.length; ++i ) {
+				items.push(this._d[i].toStdJSON());
+			}
 			return {
-				enum: this._d,
+				enum: items,
 				n: this._n,
 				t: 'enum'
 			};

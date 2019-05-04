@@ -30,6 +30,10 @@ return FirClass(
 		},
 		getLength: function() {
 			throw new Error('Not implemented yet!');
+		},
+		/** Выводит формат записи в JSON */
+		toStdJSON: function() {
+			throw new Error('Not implemented yet!');
 		}
 });
 });

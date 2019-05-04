@@ -1,7 +1,8 @@
 define('fir/controls/Pagination/Pagination', [
 	'fir/controls/FirControl',
+	'fir/common/helpers',
 	'css!fir/controls/Pagination/Pagination'
-], function(FirControl) {
+], function(FirControl, helpers) {
 	var PagingMode = {
 		Offset: 0,
 		Page: 1
@@ -60,15 +61,22 @@ return FirClass(
 		 * @param {number} pageNum - номер страницы (начинаются с 0)
 		 */
 		setCurrentPage: function(pageNum) {
-			var closestForm = this._container.closest('form');
-			this._elems('pageHiddenField').val(parseInt(pageNum, 10) || 0);
-			this._elems('offsetField').val(parseInt(pageNum, 10) * this.getPageSize() || 0);
+			if( pageNum == null ) {
+				pageNum = 0;
+			}
+			if( !helpers.isUnsigned(pageNum) ) {
+				throw new Error('Expected non-negative integer as page number');
+			}
+			this._elems('pageHiddenField').val(pageNum);
+			this._elems('offsetField').val(pageNum * this.getPageSize());
 			// Хотя роботам это не понять, но пользователи привыкли, что номера страниц начинаются с 1
 			this._elems('currentPageField').val(this.getCurrentPage() + 1);
 
 			this._renderNavData(this.getNavigation());
 			this._setButtonsVisibility();
 			this._notify('onSetCurrentPage', this.getCurrentPage());
+
+			var closestForm = this._container.closest('form');
 			if( this._formField && closestForm.length ) {
 				closestForm[0].submit();
 			}
@@ -129,8 +137,11 @@ return FirClass(
 			return this._mode;
 		},
 		setPageSize: function(pageSize) {
-			if( pageSize === null ) {
-				return;
+			if( pageSize == null ) {
+				pageSize = 10; // Размер страницы по умолчанию
+			}
+			if( !helpers.isUnsigned(pageSize) || pageSize === 0) {
+				throw new Error('Expected positive integer as page size');
 			}
 			this._elems('pageSizeField').val(pageSize);
 			if( this.pageSizeFormField ) {
@@ -146,7 +157,9 @@ return FirClass(
 		 * 	offset - индекс первой записи страницы в списке записей, по которым идёт навигация (начинается с 0)
 		 */
 		setNavigation: function(nav) {
-			this.setPageSize(nav.pageSize);
+			if( nav.pageSize != null ) {
+				this.setPageSize(nav.pageSize);
+			}
 
 			// Пытаемся уточнить режим постраничной навигации по возвращённой структуре
 			if( nav.currentPage != null && nav.offset == null ) {
@@ -158,12 +171,18 @@ return FirClass(
 			// Обновляем значения основных полей изходя из полученной стуктуры навигации,
 			// либо используя старые значения, если в структуре не соотв. полей
 			if (nav.currentPage != null) {
-				this._elems('pageHiddenField').val(parseInt(nav.currentPage, 10) || 0);
+				if( !helpers.isUnsigned(nav.currentPage) ) {
+					throw new Error('Current page number expected to be non-negative integer');
+				}
+				this._elems('pageHiddenField').val(nav.currentPage);
 			} else {
 				this._elems('pageHiddenField').val((this.getCurrentPage() || 0) + 1);
 			}
 			if (nav.offset != null) {
-				this._elems('offsetField').val(parseInt(nav.offset, 10) || 0);
+				if( !helpers.isUnsigned(nav.offset) ) {
+					throw new Error('Navigation offset expected to be non-negative integer');
+				}
+				this._elems('offsetField').val(nav.offset);
 			} else {
 				this._elems('offsetField').val((this.getOffset() || 0) + this.getPageSize());
 			}
@@ -186,12 +205,17 @@ return FirClass(
 		_renderNavData: function(nav) {
 			var
 				page = this.getCurrentPage(),
-				offset = this.getOffset(),
 				pageSize = this.getPageSize();
 			this._elems('currentPageField').val(page? page + 1: 1);
 			if( nav.pageCount != null ) {
+				if( !helpers.isUnsigned(nav.pageCount) ) {
+					throw new Error('Page count expected to be non-negative integer');
+				}
 				this._elems('pageCount').text(nav.pageCount);
 			} else if( nav.recordCount != null && pageSize ) {
+				if( !helpers.isUnsigned(nav.recordCount) ) {
+					throw new Error('Page count expected to be non-negative integer');
+				}
 				this._elems('pageCount').text(Math.ceil(nav.recordCount / pageSize));
 			}
 
@@ -201,15 +225,15 @@ return FirClass(
 			var
 				page = this.getCurrentPage(),
 				pageCount = this.getPageCount(),
+				recordCount = this.getRecordCount(),
 				isFirstVisible = (page != null && page < 1? 'hidden': 'visible'),
-				isLastVisible = (page != null && pageCount != null && page + 1 >= pageCount? 'hidden': 'visible'),
-				recordCount = parseInt(this._elems('recordCount').text(), 10);
+				isLastVisible = (page != null && pageCount != null && page + 1 >= pageCount? 'hidden': 'visible');
 			this._elems('prevBtn').css('visibility', isFirstVisible);
 			this._elems('firstBtn').css('visibility', isFirstVisible);
 			this._elems('nextBtn').css('visibility', isLastVisible);
 			this._elems('lastBtn').css('visibility', isLastVisible);
 
-			if( isNaN(recordCount) ) {
+			if( recordCount == null ) {
 				this._elems('notFoundMsg').hide();
 				this._elems('recordCountMsg').hide();
 			} else if( recordCount > 0 ) {

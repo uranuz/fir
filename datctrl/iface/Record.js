@@ -40,6 +40,11 @@ return FirClass(
 		 */
 		copy: function() {
 			throw new Error('Not implemented yet!');
+		},
+
+		/** Выводит запись в JSON */
+		toStdJSON: function() {
+			throw new Error('Not implemented yet!');
 		}
 });
 });

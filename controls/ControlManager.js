@@ -29,7 +29,7 @@ return new (FirClass(
 		 * Т.е. если внутри подходящего элемента есть еще подходящие, то они уже не будут выбраны.
 		 * Элементы из корневого списка (если подходят под селектор) тоже попадут в результат.
 		 */
-		_getOuterMost: function(roots, selector, stopSelector) {
+		_getOuterMost: function(roots, selector, stopSelector, findFirstOne) {
 			var
 				jRoots = $(roots),
 				nextRoots = [],
@@ -44,7 +44,11 @@ return new (FirClass(
 						continue;
 					}
 					if( $(it).is(selector) ) {
-						result.push(it); // Подошло - добавляем в результат
+						if( findFirstOne ) {
+							return $(it);
+						} else {
+							result.push(it); // Подошло - добавляем в результат
+						}
 					} else {
 						// Не подошло - будем смотреть детей внутри него
 						for( var k = 0; k < it.children.length; ++k ) {
@@ -88,6 +92,10 @@ return new (FirClass(
 			var
 				parentState = state.parentState,
 				updateControl = true;
+			// Как только сохоанили себе локально ссылку на состояние родителя,
+			// то удаляем ее из состояния потомка во избежания утечек памяти и возможности обратиться к родителю
+			state.parentState = null;
+
 			// К этому моменту дочерние компоненты уже загрузились
 			if( state.control == null ) {
 				state.opts.container = $(state.controlTag); // Устанавливаем корневой тэг для компонента
@@ -157,7 +165,7 @@ return new (FirClass(
 			if( state.moduleName ) {
 				return state;
 			}
-			state.configTag = this._getOuterMost($(state.controlTag), '[data-fir-opts]', '[data-fir-module]');
+			state.configTag = this._getOuterMost($(state.controlTag), '[data-fir-opts]', '[data-fir-module]', true);
 			if( !state.controlTag || state.controlTag.length !== 1 ) {
 				throw new Error('Expected exactly 1 element as control tag!!!');
 			}
@@ -165,12 +173,8 @@ return new (FirClass(
 				throw new Error('Multiple "opts" tags found for control!!!');
 			}
 			state.moduleName = $(state.controlTag).attr('data-fir-module');
-			try {
-				state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
-				state.opts = Deserializer.deserialize(state.opts);
-			} catch (ex) {
-				throw new Error('Failed to parse control options from markup!!!');
-			}
+			state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
+			state.opts = Deserializer.deserialize(state.opts);
 			state.childControlTags = this._getOuterMost(state.controlTag.children(), '[data-fir-module]');
 			state.childLoadCounter = state.childControlTags.length;
 			if( state.control == null ) {

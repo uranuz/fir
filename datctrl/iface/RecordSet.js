@@ -73,6 +73,11 @@ return FirClass(
 		 */
 		getKeys: function() {
 			throw new Error('Not implemented yet!');
+		},
+
+		/** Выводит набор записей в JSON */
+		toStdJSON: function() {
+			throw new Error('Not implemented yet!');
 		}
 });
 });
