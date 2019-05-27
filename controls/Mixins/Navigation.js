@@ -1,7 +1,7 @@
 define('fir/controls/Mixins/Navigation', [
-	'fir/controls/Pagination/Pagination',
+	'fir/controls/Paging/Paging',
 	'fir/controls/Loader/Serializer'
-], function(Pagination, LoaderSerializer) {
+], function(Paging, LoaderSerializer) {
 return new (FirClass(
 	function NavigationMixin() {
 		// Название свойста, в которое приходит навигационная информация при постраничном переходе
@@ -18,8 +18,8 @@ return new (FirClass(
 		},
 		_getPaging: function() {
 			var paging = this.getChildByName(this.instanceName() + 'Paging');
-			if( !(paging instanceof Pagination) ) {
-				throw new Error('Expected instance of Pagination class');
+			if( !(paging instanceof Paging) ) {
+				throw new Error('Expected instance of Paging class');
 			}
 			return paging;
 		},
@@ -50,6 +50,7 @@ return new (FirClass(
 			var navData = state.opts[this._navProperty];
 			if( !navData ) {
 				console.warn('No navigation data is provided or navigation property name is incorrect');
+				return;
 			}
 			this._getPaging().setNavigation(navData || {});
 		}

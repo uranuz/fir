@@ -1,9 +1,9 @@
 expr {=
 from fir.controls.utils import cls;
-def Pagination {=
+def Paging {=
 	def.kv
-		moduleName: "fir/controls/Pagination/Pagination"
-		cssBaseClass: "fir-Pagination"
+		moduleName: "fir/controls/Paging/Paging"
+		cssBaseClass: "fir-Paging"
 		instanceName: "pagination"
 		formField: null
 		pageSizeFormField: null

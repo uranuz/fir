@@ -1,14 +1,14 @@
-define('fir/controls/Pagination/Pagination', [
+define('fir/controls/Paging/Paging', [
 	'fir/controls/FirControl',
 	'fir/common/helpers',
-	'css!fir/controls/Pagination/Pagination'
+	'css!fir/controls/Paging/Paging'
 ], function(FirControl, helpers) {
 	var PagingMode = {
 		Offset: 0,
 		Page: 1
 	};
 return FirClass(
-	function Pagination(opts) {
+	function Paging(opts) {
 		this.superproto.constructor.call(this, opts);
 		this._formField = opts.formField;
 		this._pageSizeFormField = opts.pageSizeFormField;

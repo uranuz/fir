@@ -230,22 +230,6 @@ return FirClass(
 		 * Если не указано, то предполагается полное обновление всего компонента
 		 */
 		_reloadControl: function(areaName) {
-			var
-				HTTPMethod = this._getHTTPMethod(areaName).toLowerCase(),
-				queryParams = this._getQueryParams(areaName) || {},
-				bodyParams,
-				queryParamsStr = '';
-
-			if( typeof(queryParams) !== 'object' ) {
-				throw new Error('Object expected as query params');
-			}
-			if( HTTPMethod === 'post' ) {
-				bodyParams = this._getBodyParams(areaName) || {};
-				if( typeof(bodyParams) !== 'object' ) {
-					throw new Error('Object expected as body params');
-				}
-			}
-
 			this._onUnsubscribe();
 
 			LoaderManager.load(this._getReloadOpts(areaName));
