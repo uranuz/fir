@@ -1,0 +1,16 @@
+expr {=
+from fir.controls.utils import cls, firScopeOptsEnc;
+def OpenDialog {=
+	def.kv
+		instanceName: null
+		cssBaseClass: 'fir-OpenDialog'
+		moduleName: 'fir/controls/OpenDialog/OpenDialog'
+		config: {};
+	def.body {*
+		<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
+			<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: ['config'] }"/>
+			<div class="{=cls 'dialogWrapper'}"></div>
+		</div>
+	*}
+}
+}

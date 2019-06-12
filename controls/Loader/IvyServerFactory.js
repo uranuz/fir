@@ -35,106 +35,99 @@ return FirClass(
 		this._userRights = userRights;
 		this._vpaths = vpaths;
 	}, LoaderAbstract, {
-		canLoad: function(opts) {
-			return !!opts.RPCMethod;
+		canLoad: function(config) {
+			return true;
 		},
-		load: function(opts) {
-			var
-				prog,
-				paramFields = ['queryParams', 'bodyParams'],
-				RPCParams = {},
-				progData = {},
-				extraGlobals = {
-					userIdentity: new IvyUserIdentity(this._userIdentity),
-					userRights: new IvyUserRights(this._userRights),
-					vpaths: this._vpaths
-				},
-				// List of sources that should be retrieved before rendering
-				// First source in template itself. The second is data from remote method.
-				// These sources will be retrieved in parallel
-				sources = [
-					this._ivyEngine.getByModuleName.bind(this._ivyEngine, opts.viewModule, function(res) {
-						prog = res;
-						tryRunRender();
-					})
-				],
-				// Counter that is used to know when all sources are retrieved
-				waitedSourcesCount = null;
-
+		load: function(config) {
 			// Ivy module name is required!
-			if( typeof(opts.viewModule) !== 'string' && opts.viewModule instanceof String ) {
+			if( typeof(config.viewModule) !== 'string' && !(config.viewModule instanceof String) ) {
 				throw new Error('Ivy module name required!');
 			}
 
+			if( typeof(config.viewMethod) !== 'string' && !(config.viewMethod instanceof String) ) {
+				throw new Error('Ivy view method name required!');
+			}
+
+			this._ivyEngine.getByModuleName(config.viewModule, this._onIvyModule_load.bind(this, config));
+		},
+
+		_getExtraGlobals: function() {
+			return {
+				userIdentity: new IvyUserIdentity(this._userIdentity),
+				userRights: new IvyUserRights(this._userRights),
+				vpaths: this._vpaths
+			}
+		},
+
+		_onIvyModule_load: function(config, prog) {
+			var modRes = prog.runSaveState({}, this._getExtraGlobals());
+			config.interp = modRes.interp;
+			modRes.asyncResult.then(
+				this._onIvyModule_init.bind(this, config),
+				function(error) {
+					config.error(res);
+				});
+		},
+
+		_onIvyModule_init: function(config) {
+			var defOpts = config.interp.getDirAttrDefaults(config.viewMethod, ['RPCMethod']);
+			if( !config.RPCMethod ) {
+				config.RPCMethod = defOpts.RPCMethod;
+			}
+
+			if( config.RPCMethod != null && typeof(config.RPCMethod) !== 'string' && !(config.RPCMethod instanceof String) ) {
+				throw new Error(`Method name must be string or null`);
+			}
+
+			if( config.RPCMethod ) {
+				json_rpc.invoke({
+					uri: "/jsonrpc/",
+					method: config.RPCMethod,
+					params: this._getRPCParams(config),
+					success: this._onData_load.bind(this, config),
+					error: function(res) {
+						config.error(res);
+					}
+				});
+			} else {
+				this._onData_load(config, {});
+			}
+		},
+
+		_getRPCParams: function(config) {
+			var
+				RPCParams = {},
+				paramFields = ['queryParams', 'bodyParams'];
 			// Merge all queryParams and bodyParams into RPCParams
 			for( var i = 0; i < paramFields.length; ++i ) {
 				var
 					field = paramFields[i],
-					pars = opts[field];
+					pars = config[field];
 				for( var key in pars ) {
 					if( pars.hasOwnProperty(key) ) {
 						RPCParams[key] = pars[key];
 					}
 				}
 			}
+			return RPCParams;
+		},
 
-			// There could be no remote method set for call. In this case just we don't call it
-			// and will render plain Ivy template using only global params
-			if( typeof(opts.RPCMethod) === 'string' || opts.RPCMethod instanceof String ) {
-				sources.push(json_rpc.invoke.bind(this, {
-					uri: "/jsonrpc/",
-					method: opts.RPCMethod,
-					params: RPCParams,
-					success: function(data) {
-						progData = IvyDeserializer.deserialize(data);
-						tryRunRender();
-					},
-					error: function(res) {
-						opts.error(res);
-					}
-				}));
-			} else if( opts.RPCMethod != null ) {
-				throw new Error(`Method name must be string or null`);
-			}
-
-			waitedSourcesCount = sources.length;
-			// Method that initialize actual rendering
-			function tryRunRender() {
-				--waitedSourcesCount;
-				if( waitedSourcesCount > 0 ) {
-					return;
-				}
-				// Put additional view params to pass into Ivy
-				for( var key in opts.viewParams ) {
-					if( opts.viewParams.hasOwnProperty(key) ) {
-						progData[key] = opts.viewParams[key];
-					}
-				}
-
-				// There 2 modes for running Ivy: run module only or run certain method
-				if( typeof(opts.viewMethod) === 'string' || opts.viewMethod instanceof String ) {
-					prog.runMethod(opts.viewMethod, progData, extraGlobals).then(
-						function(res) {
-							opts.success(iu.toString(res));
-						},
-						function(res) {
-							opts.error(res);
-						}
-					);
-				} else {
-					prog.run(progData, extraGlobals).then(
-						function(res) {
-							opts.success(iu.toString(res));
-						},
-						function(res) {
-							opts.error(res);
-						}
-					);
+		_onData_load: function(config, rawData) {
+			var data = IvyDeserializer.deserialize(rawData);
+			// Put additional view params to pass into Ivy
+			for( var key in config.viewParams ) {
+				if( config.viewParams.hasOwnProperty(key) ) {
+					data[key] = config.viewParams[key];
 				}
 			}
-			for( var i = 0; i < sources.length; ++i ) {
-				sources[i]();
-			}
+
+			config.interp.runModuleDirective(config.viewMethod, data, this._getExtraGlobals()).then(
+				function(res) {
+					config.success(iu.toString(res));
+				},
+				function(res) {
+					config.error(res);
+				});
 		}
 	}
 );

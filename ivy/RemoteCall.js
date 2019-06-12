@@ -1,26 +1,30 @@
-define('ivy/directives', [
-	'ivy/errors',
+define('fir/ivy/RemoteCall', [
 	'ivy/DirectiveInterpreter',
 	'ivy/utils',
 	'ivy/Consts',
-	'fir/common/base64'
+	'ivy/AsyncResult',
+	'fir/network/json_rpc'
 ], function(
-	errors,
 	DirectiveInterpreter,
 	iu,
-	Consts
+	Consts,
+	AsyncResult,
+	json_rpc
 ) {
-	var
-		IvyDataType = Consts.IvyDataType,
-		DirAttrKind = Consts.DirAttrKind;
+'use strict';
+var
+	IvyDataType = Consts.IvyDataType,
+	DirAttrKind = Consts.DirAttrKind;
 return FirClass(
-	function RemoteCallDirInterpreter() {
-		this._name = 'int';
+	function RemoteCallInterpreter() {
+		this._name = 'remoteCall';
 		this._attrBlocks = [{
 			'kind': DirAttrKind.NamedAttr,
-			'namedAttrs': [
-				{'name': 'value', 'typeName': 'any'}
-			]
+			'namedAttrs': {
+				uri: {name: 'uri', typeName: 'any'},
+				method: {name: 'method', typeName: 'any'},
+				data: {name: 'data', typeName: 'any'}
+			}
 		}, {
 			'kind': DirAttrKind.BodyAttr,
 			'bodyAttr': {}
@@ -30,44 +34,28 @@ return FirClass(
 			var
 				uriNode = interp.getValue("uri"), uriType = iu.getDataNodeType(uriNode),
 				methodNode = interp.getValue("method"), methodType = iu.getDataNodeType(methodNode),
-				dataNode = interp.getValue("data"), dataType = iu.getDataNodeType(dataNode),
-				forwardHTTPHeadersNode = interp.getValue("forwardHTTPHeaders"), forwardHTTPHeadersType = iu.getDataNodeType(forwardHTTPHeadersNode),
-				callbackNode = interp.getValue("callback"), callbackType = iu.getDataNodeType(callbackNode),
-				errbackNode = interp.getValue("errback"), errbackType = iu.getDataNodeType(errbackNode);
-			interp.internalAssert(uriType == IvyDataType.String, `Expected string as URI parameter`);
+				dataNode = interp.getValue("data"), dataType = iu.getDataNodeType(dataNode);
+			interp.internalAssert(uriType === IvyDataType.String, `Expected string as URI parameter`);
 			interp.internalAssert(
-				[IvyDataType.String, IvyDataType.Undef, IvyDataType.Null].canFind(methodType.type),
+				[IvyDataType.String, IvyDataType.Undef, IvyDataType.Null].indexOf(methodType) >= 0,
 				`Expected string as HTTP-method parameter`);
 			interp.internalAssert(
-				[IvyDataType.String, IvyDataType.Undef, IvyDataType.Null].canFind(dataType.type),
-				`Expected string as data parameter`);
-			interp.internalAssert(
-				[IvyDataType.AssocArray, IvyDataType.Undef, IvyDataType.Null].canFind(forwardHTTPHeadersType),
-				`Expected assoc array as forwardHTTPHeaders global variable`);
-			interp.internalAssert(
-				[IvyDataType.Callable, IvyDataType.Undef, IvyDataType.Null].canFind(callbackType),
-				`Expected Callable or null as callback method`);
-			interp.internalAssert(
-				[IvyDataType.Callable, IvyDataType.Undef, IvyDataType.Null].canFind(errbackType),
-				`Expected Callable or null as errback method`);
+				[IvyDataType.AssocArray, IvyDataType.Undef, IvyDataType.Null].indexOf(dataType) >= 0,
+				`Expected assoc array as data parameter`);
 
-			if( forwardHTTPHeadersType == IvyDataType.AssocArray )
-			for( var name in forwardHTTPHeadersNode ) {
-				var valNode = forwardHTTPHeadersNode[name];
-				interp.internalAssert(
-					iu.getDataNodeType(valNode) === IvyDataType.String,
-					`HTTP header value expected to be string`);
-			}
-
-			$.ajax(uriNode, {
-				success: function(jsonText) {
-					var json = JSON.parse(jsonText);
-					
+			var fResult = new AsyncResult();
+			json_rpc.invoke({
+				uri: uriNode,
+				method: methodNode,
+				params: dataNode,
+				success: function(res) {
+					fResult.resolve(res);
 				},
-				error: function(error) {
-					console.error(error);
+				error: function(err) {
+					fResult.reject(err)
 				}
 			});
+			interp._stack.push(fResult);
 		}
 	});
 });

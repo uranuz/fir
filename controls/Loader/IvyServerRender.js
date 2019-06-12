@@ -9,22 +9,22 @@ return FirClass(
 	function IvyServerRender() {
 		
 	}, LoaderAbstract, {
-		canLoad: function(opts) {
-			return !opts.method;
+		canLoad: function(config) {
+			return false;
 		},
-		load: function(opts) {
-			for( var key in opts.viewParams ) {
-				if( !opts.viewParams.hasOwnProperty(key) ) {
+		load: function(config) {
+			for( var key in config.viewParams ) {
+				if( !config.viewParams.hasOwnProperty(key) ) {
 					continue;
 				}
-				opts.queryParams[key] = opts.viewParams[key];
+				config.queryParams[key] = config.viewParams[key];
 			}
-			var queryParams = LoaderSerializer.serialize(opts.queryParams);
-			$.ajax(opts.URI + (queryParams? '?' + queryParams: ''), {
-				success: opts.success,
-				error: opts.error,
-				type: opts.HTTPMethod,
-				data: LoaderSerializer.serialize(opts.bodyParams)
+			var queryParams = LoaderSerializer.serialize(config.queryParams);
+			$.ajax(config.URI + (queryParams? '?' + queryParams: ''), {
+				success: config.success,
+				error: config.error,
+				type: config.HTTPMethod,
+				data: LoaderSerializer.serialize(config.bodyParams)
 			});
 		}
 	}

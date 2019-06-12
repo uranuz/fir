@@ -1,7 +1,9 @@
 define('fir/controls/ControlManager', [
 	'fir/common/base64',
-	'fir/datctrl/Deserializer'
-], function(Base64, Deserializer) {
+	'fir/datctrl/Deserializer',
+	'fir/controls/Loader/Manager',
+	'fir/common/helpers'
+], function(Base64, Deserializer, LoaderManager, helpers) {
 	function ControlLoadState() {
 		this.controlTag = null; // This control (or area) root tag
 		this.configTag = null; // Configuration tag 'data-fir-opts' inside control tag
@@ -14,6 +16,7 @@ define('fir/controls/ControlManager', [
 		this.parentState = null; // Instance of ControlLoadState for parent control
 		this.replaceMarkup = null;
 		this.areaName = null;
+		this.onAfterLoad = null;
 	}
 
 // ControlManger is singleton. So module returns instance of class
@@ -23,69 +26,31 @@ return new (FirClass(
 		this._controlCounter = 0; // Variable used to generate control names
 	}, {
 		ControlLoadState: ControlLoadState,
-		/**
-		 * Получает осуществляет "рекурсивный" поиск узлов по списку изначальных узлов roots (по селектору).
-		 * Выбирает только "наименее вложенные" элементы подходящие по селектору.
-		 * Т.е. если внутри подходящего элемента есть еще подходящие, то они уже не будут выбраны.
-		 * Элементы из корневого списка (если подходят под селектор) тоже попадут в результат.
-		 */
-		_getOuterMost: function(roots, selector, stopSelector, findFirstOne) {
-			var
-				jRoots = $(roots),
-				nextRoots = [],
-				result = [],
-				it;
-			// Ищем пока есть, где искать
-			while( jRoots.length > 0 ) {
-				// Проход по всем элементам данного уровня
-				for( var i = 0; i < jRoots.length; ++i ) {
-					it = jRoots[i];
-					if( it.nodeType !== 1 ) {
-						continue;
-					}
-					if( $(it).is(selector) ) {
-						if( findFirstOne ) {
-							return $(it);
-						} else {
-							result.push(it); // Подошло - добавляем в результат
-						}
-					} else {
-						// Не подошло - будем смотреть детей внутри него
-						for( var k = 0; k < it.children.length; ++k ) {
-							var child = it.children[k];
-							// Не заходим внутрь, если поймали критерий останова
-							if( !stopSelector || !$(child).is(stopSelector) ) {
-								nextRoots.push(child);
-							}
-						}
-					}
-				}
-				jRoots = nextRoots;
-				nextRoots = [];
-			}
-			return $(result);
+
+		/** Оживляет все компоненты в данной верстке */
+		reviveMarkup: function(newMarkup) {
+			// Выбираем корневые компоненты
+			helpers.getOuterMost(newMarkup, '[data-fir-module]').each(function(index, controlTag) {
+				var newState = new ControlLoadState();
+				newState.controlTag = $(controlTag);
+				this._initControlAndChildren(newState);
+			}.bind(this));
 		},
 
 		/** Запускает компоненты в работу после загрузки или обновления верстки */
-		launchMarkup: function(newMarkup, state) {
-			var self = this;
-			if( state == null ) {
-				// Выбираем корневые компоненты
-				this._getOuterMost(newMarkup, '[data-fir-module]').each(function(index, controlTag) {
-					var newState = new ControlLoadState();
-					newState.controlTag = $(controlTag);
-					self._initControlAndChildren(newState);
-				});
-			} else {
-				state.controlTag = this._getOuterMost(newMarkup, '.' + state.control.instanceHTMLClass());
-				if( !state.controlTag || state.controlTag.length !== 1 ) {
-					throw new Error(
-						'Expected exactly 1 element as control tag!!! '
-						+ 'Check if matching instance class is present on control root element '
-						+ 'and there is no multiple root control elements in markup.');
-				}
-				self._initControlAndChildren(state);
+		reviveControlMarkup: function(newMarkup, state) {
+			state = state || new ControlLoadState();
+			state.controlTag = helpers.getOuterMost(
+				newMarkup,
+				(state.control? '.' + state.control.instanceHTMLClass(): '[data-fir-module]')
+			);
+			if( !state.controlTag || state.controlTag.length !== 1 ) {
+				throw new Error(
+					'Expected exactly 1 element as control tag!!! '
+					+ 'Check if matching instance class is present on control root element '
+					+ 'and there is no multiple root control elements in markup.');
 			}
+			this._initControlAndChildren(state);
 		},
 
 		_onControlModuleLoaded: function(state, ControlClass) {
@@ -101,7 +66,6 @@ return new (FirClass(
 				state.opts.container = $(state.controlTag); // Устанавливаем корневой тэг для компонента
 				state.opts.childControls = state.childControls; // Прописываем контролы всей пачкой (**)
 				state.control = new ControlClass(state.opts);
-				state.control._onSubscribe();
 				updateControl = false;
 			}
 
@@ -124,21 +88,25 @@ return new (FirClass(
 				// Выполняем обновление состояния, когда уже добавили к родителю (на всякий случай)
 				if (!state.areaName) {
 					// Если название области для обновления не указано, то обновлялась вся вёрстка компонента,
-					// поэтому прописываем новый корневой тег в _container
+					// поэтому прописываем новый корневой тег компонента
 					state.control._container = $(state.controlTag);
 				}
-				state.control._updateControlState(state.opts);
-				if( state.control._container[0].parentNode == null ) {
+				if( state.control._getContainer()[0].parentNode == null ) {
 					console.warn(
 						'Container for control ' + state.control.instanceName() + ' has no link to parent node. '
 						+ 'Old container might been removed from document during update, '
 						+ 'but _container property has not been changed properly!'
 					);
 				}
-				state.control._onSubscribe();
 			}
 
-			state.control._onAfterLoad(state);
+			// Публикуем событие о завершении загрузки компонента
+			state.control._onAfterLoadInternal(state.opts, state.areaName);
+			state.control._onSubscribe(state.areaName);
+			if( typeof(state.onAfterLoad) === 'function' ) {
+				// This callback is set upon control creation
+				state.onAfterLoad(state.control, state.opts, state.areaName)
+			}
 
 			if( parentState != null && --(parentState.childLoadCounter) === 0 ) {
 				// Все компоненты родителя подгрузились - инициализируем его
@@ -146,6 +114,7 @@ return new (FirClass(
 			}
 		},
 
+		/** Декодирует опции компонента из base64 */
 		_extractControlOpts: function(rawOpts) {
 			var decodedOpts;
 			if( typeof(rawOpts) == 'string' || (rawOpts instanceof String) ) {
@@ -160,12 +129,13 @@ return new (FirClass(
 		_initCurrentControl: function(state) {
 			require([state.moduleName], this._onControlModuleLoaded.bind(this, state));
 		},
-
+		/** Получает состояние компонента из верстки. Добавляет состояние в контекст перезагрузки state */
 		_fillControlStateFromMarkup: function(state) {
 			if( state.moduleName ) {
+				// Опции уже получены
 				return state;
 			}
-			state.configTag = this._getOuterMost($(state.controlTag), '[data-fir-opts]', '[data-fir-module]', true);
+			state.configTag = helpers.getOuterMost($(state.controlTag), '[data-fir-opts]', '[data-fir-module]', true);
 			if( !state.controlTag || state.controlTag.length !== 1 ) {
 				throw new Error('Expected exactly 1 element as control tag!!!');
 			}
@@ -175,7 +145,7 @@ return new (FirClass(
 			state.moduleName = $(state.controlTag).attr('data-fir-module');
 			state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
 			state.opts = Deserializer.deserialize(state.opts);
-			state.childControlTags = this._getOuterMost(state.controlTag.children(), '[data-fir-module]');
+			state.childControlTags = helpers.getOuterMost(state.controlTag.children(), '[data-fir-module]');
 			state.childLoadCounter = state.childControlTags.length;
 			if( state.control == null ) {
 				state.childControls = []; // Список дочерних для текущего компонента
@@ -188,8 +158,10 @@ return new (FirClass(
 				self = this,
 				childStates = [],
 				existingChildren = {};
+			// Заполняем контекст загрузки данного контрола из верстки
 			this._fillControlStateFromMarkup(state);
 			state.childControlTags.each(function(index, childTag) {
+				// Создаем контексты загрузки для каждого из дочерних компонентов, найденных в верстке
 				var childState = new ControlLoadState();
 				childState.controlTag = $(childTag);
 				childState.parentState = state;
@@ -203,10 +175,15 @@ return new (FirClass(
 				existingChildren[childState.opts.instanceName] = true;
 			});
 			if( state.control ) {
+				// Уничтожаем компоненты, которых уже нет в новой верстке
 				state.control._destroyNonExisentChildControls(state, existingChildren);
-			}
-			if( state.control && state.replaceMarkup ) {
-				state.control._updateControlMarkup(state);
+
+				// Отписываемся от событий верстки ровно перед заменой этой верстки,
+				// чтобы если что-то отвалилось до этой точки, то события не перестанут работать
+				state.control._onUnsubscribe(areaName);
+				if( state.replaceMarkup ) {
+					state.control._updateControlMarkup(state);
+				}
 			}
 			if( state.childLoadCounter === 0 ) {
 				// Нет дочерних компонентов - инициализируем сразу, иначе асинхронно
@@ -273,6 +250,41 @@ return new (FirClass(
 		},
 		getNextNameIndex: function() {
 			return ++this._controlCounter;
+		},
+		reloadControl: function(control, areaName) {
+			control._onBeforeLoadInternal(areaName);
+			LoaderManager.load(control._getReloadOpts(areaName));
+		},
+		createControl: function(config) {
+			config = config || {};
+			if( !config.target ) {
+				throw new Error('Required target tag to be replaced by control');
+			}
+			config.success = this._onMarkupLoad.bind(this, config.target, config.success);
+			config.error = this._onMarkupLoadError.bind(this, config.error)
+			LoaderManager.load(config);
+		},
+		_onMarkupLoad: function(target, callback, html) {
+			var
+				target = $(target)[0],
+				newMarkup = $(html);
+			if( newMarkup.length !== 1 ) {
+				throw new Error('Expected exactly one root tag in markup when creating control');
+			}
+			// Replace specified target node with loaded markup
+			target.parentNode.replaceChild(newMarkup[0], target);
+			var state = new ControlLoadState();
+			// Set callback that should be called when control creation is finished
+			state.onAfterLoad = callback;
+			// Revive markup...
+			this.reviveControlMarkup(newMarkup, state);
+		},
+		_onMarkupLoadError: function(callback, err) {
+			if( typeof(callback) === 'function' ) {
+				callback(err);
+			} else {
+				console.error(err);
+			}
 		}
 }));
 });

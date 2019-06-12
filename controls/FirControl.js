@@ -1,7 +1,6 @@
 define('fir/controls/FirControl', [
-	'fir/controls/ControlManager',
-	'fir/controls/Loader/Manager'
-], function(ControlManager, LoaderManager) {
+	'fir/controls/ControlManager'
+], function(ControlManager) {
 return FirClass(
 	function FirControl(opts) {
 		if (opts.instanceName) {
@@ -75,7 +74,7 @@ return FirClass(
 		_elems: function(elemName, optional) {
 			var
 				elemClass = this._elemClass(elemName),
-				res = this._container.find(elemClass).addBack(elemClass);
+				res = this._getContainer().find(elemClass).addBack(elemClass);
 			if( res.length === 0 && !optional ) {
 				// Не выбрано элементов по классу. Это нехорошо, если только явно не указано, что они необязательые
 				console.log('No elements found by element class: ' + elemClass);
@@ -84,11 +83,13 @@ return FirClass(
 		},
 		//Возвращает jQuery-список всех элементов компонента
 		_allElems: function() {
-			return this._container.find('.' + this.instanceHTMLClass());
+			return this._getContainer().find('.' + this.instanceHTMLClass());
 		},
 
-		_onUnsubscribe: function() {},
-		_onSubscribe: function() {},
+		// Возвращает корневой элемент компонента
+		_getContainer: function() {
+			return this._container;
+		},
 
 		/**
 		 * Адрес для отправки запроса. Если не указано, то используется текущий URI (для REST-запросов).
@@ -155,7 +156,7 @@ return FirClass(
 
 		_getAreaElement: function(areaName) {
 			if( !areaName ) {
-				return this._container;
+				return this._getContainer();
 			}
 			var areaElement = this._elems(areaName)
 			if( !areaElement || !areaElement.length ) {
@@ -197,23 +198,46 @@ return FirClass(
 			}
 		},
 
-		/** Обработчик обновления внутреннего состояния компонента при завершении перезагрузки */
-		_updateControlState: function(opts) {},
+		/**
+		 * Обработчик для подписки на события верстки, и динамических дочерних компонентов,
+		 * которые могут появляться удаляться при перезагрузке текущего компонента.
+		 * Как правило, вместо перекрытия обработчика, нужно использовать событие onSubscribe
+		 */
+		_onSubscribe: function(areaName) {
+			this._notify('onSubscribe', areaName);
+		},
+
+		/**
+		 * Обработчик отписки от событий верстки при перезагрузке текущего компонента.
+		 * Нужно отписываться от событий для избежания накопления обработчиков и утечек памяти.
+		 * Для динамических дочерних компонентов отписка происходит автоматом при вызове destroy/
+		 * Как правило, вместо перекрытия обработчика, нужно использовать событие onUnsubscribe
+		 */
+		_onUnsubscribe: function(areaName) {
+			this._notify('onUnsubscribe', areaName);
+		},
+
 		_onMarkupLoad: function(areaName, html) {
 			var state = new ControlManager.ControlLoadState();
 			state.control = this;
 			state.replaceMarkup = true;
 			state.areaName = areaName;
-			ControlManager.launchMarkup($(html), state);
+			ControlManager.reviveControlMarkup($(html), state);
 		},
+
 		_onMarkupLoadError: function(areaName, error) {
 			console.error(error);
 		},
 
+		/** Обработчик вызывается перед обновлением компонента */
+		_onBeforeLoadInternal: function(areaName) {
+			this._notify('onBeforeLoad', areaName);
+		},
+
 		/** Обработчик завершения загрузки компонента для переопределения наследниками */
-		_onAfterLoad: function(state) {
+		_onAfterLoadInternal: function(opts, areaName) {
 			// Публикуем событие о завершении загрузки компонента
-			this._notify('onAfterLoad');
+			this._notify('onAfterLoad', opts, areaName);
 		},
 
 		/**
@@ -230,9 +254,7 @@ return FirClass(
 		 * Если не указано, то предполагается полное обновление всего компонента
 		 */
 		_reloadControl: function(areaName) {
-			this._onUnsubscribe();
-
-			LoaderManager.load(this._getReloadOpts(areaName));
+			ControlManager.reloadControl(this, areaName);
 		},
 
 		findInstanceByName: function(instanceName) {
@@ -261,7 +283,7 @@ return FirClass(
 				if( existingChildren[ childControls[j].instanceName() ] ) {
 					continue; // Контрол есть в новой верстке
 				}
-				if( areaElement != null && !areaElement[0].contains(childControls[j]._container[0]) ) {
+				if( areaElement != null && !areaElement[0].contains(childControls[j]._getContainer()[0]) ) {
 					continue; // Мы не должны удалять контролы, корневой тег которых находится вне перезагружаемой области
 				}
 				childControls[j].destroy();
@@ -280,12 +302,21 @@ return FirClass(
 			}
 
 			// Удалить вёрстку этого компонента
-			if( this._container ) {
-				$(this._container).remove();
+			if( this._getContainer() ) {
+				$(this._getContainer()).remove();
 			}
 
 			// Дерегистрировать компонент из реестра
 			ControlManager.unregisterControl(this);
+		},
+
+		/** Добавление колбэка, осуществляющего подписку на события */
+		_subscr: function(fn) {
+			this.subscribe('onSubscribe', fn.bind(this));
+		},
+		/** Добавление колбэка, осуществляющего отписку от событий */
+		_unsubscr: function(fn) {
+			this.subscribe('onUnsubscribe', fn.bind(this));
 		}
 });
 });

@@ -2,20 +2,18 @@ define('fir/controls/Mixins/Navigation', [
 	'fir/controls/Paging/Paging',
 	'fir/controls/Loader/Serializer'
 ], function(Paging, LoaderSerializer) {
-return new (FirClass(
+return FirClass(
 	function NavigationMixin() {
 		// Название свойста, в которое приходит навигационная информация при постраничном переходе
 		this._navProperty = 'nav';
+		this._subscr(function() {
+			this._getPaging().subscribe('onSetCurrentPage', this._onSetCurrentPage.bind(this));
+		});
+		this._unsubscr(function() {
+			this._getPaging().unsubscribe('onSetCurrentPage');
+		});
+		this.subscribe('onAfterLoad', this._onNavState_update);
 	}, {
-		_onSubscribe: function() {
-			if( this._onSetCurrentPageBinded == null ) {
-				this._onSetCurrentPageBinded = this._onSetCurrentPage.bind(this);
-			}
-			this._getPaging().subscribe('onSetCurrentPage', this._onSetCurrentPageBinded);
-		},
-		_onUnsubscribe: function() {
-			this._getPaging().unsubscribe('onSetCurrentPage', this._onSetCurrentPageBinded);
-		},
 		_getPaging: function() {
 			var paging = this.getChildByName(this.instanceName() + 'Paging');
 			if( !(paging instanceof Paging) ) {
@@ -41,18 +39,18 @@ return new (FirClass(
 			}
 			this._reloadControl(this._navigatedArea);
 		},
-		_onAfterLoad: function(state) {
-			this.superproto._onAfterLoad.apply(this, arguments);
+		/** Обработчик выполняет обновление навигационного состояния */
+		_onNavState_update: function(ev, opts, areaName) {
 			if( window.history != null ) {
-				var flt = LoaderSerializer.serialize(this._getQueryParams());
+				var flt = LoaderSerializer.serialize(this._getQueryParams(areaName));
 				window.history.replaceState(null, null, '?' + flt);
 			}
-			var navData = state.opts[this._navProperty];
+			var navData = opts[this._navProperty];
 			if( !navData ) {
 				console.warn('No navigation data is provided or navigation property name is incorrect');
 				return;
 			}
 			this._getPaging().setNavigation(navData || {});
 		}
-	}));
+	});
 });

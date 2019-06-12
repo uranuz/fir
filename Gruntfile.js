@@ -23,7 +23,8 @@
 					'datctrl/**/*.js',
 					'network/**/*.js',
 					'controls/**/*.js',
-					'security/**/*.js'
+					'security/**/*.js',
+					'ivy/**/*.js'
 				],
 				dest: '<%= deployPath %>/pub/fir/',
 				filter: 'isFile',

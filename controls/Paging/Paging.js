@@ -76,7 +76,7 @@ return FirClass(
 			this._setButtonsVisibility();
 			this._notify('onSetCurrentPage', this.getCurrentPage());
 
-			var closestForm = this._container.closest('form');
+			var closestForm = this._getContainer().closest('form');
 			if( this._formField && closestForm.length ) {
 				closestForm[0].submit();
 			}

@@ -1,0 +1,32 @@
+expr {=
+from fir.controls.utils import cls, firScopeOptsEnc;
+from fir.controls.OpenDialog import OpenDialog;
+def SelectorField {=
+	def.kv
+		moduleName: "fir/controls/SelectorField/SelectorField"
+		cssBaseClass: "fir-SelectorField"
+		instanceName
+		selectEventName
+		keyField: "num"
+		displayField: "name"
+		emptyText: 'Выбрать'
+		dialogConfig: {}
+		record: null;
+	def.body {*
+	{=set dialogConfig.instanceName: instanceName ~ 'Selector'}
+	<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
+		<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: [
+				'selectEventName', 'keyField', 'displayField', 'emptyText', 'record'
+			]}"/>
+		<a href="#!"
+			class="{=cls 'selectBtn'}"
+			>{=if not{=empty record} {=at record displayField} else emptyText}</a>
+		
+		{=OpenDialog
+			instanceName: instanceName ~ 'Dialog'
+			config: dialogConfig
+		}
+	</div>
+	*}
+};
+}
