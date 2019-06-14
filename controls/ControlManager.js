@@ -64,22 +64,23 @@ return new (FirClass(
 			// К этому моменту дочерние компоненты уже загрузились
 			if( state.control == null ) {
 				state.opts.container = $(state.controlTag); // Устанавливаем корневой тэг для компонента
-				state.opts.childControls = state.childControls; // Прописываем контролы всей пачкой (**)
+				state.opts.childControls = state.childControls; // Прописываем контролы всей пачкой (*#*)
 				state.control = new ControlClass(state.opts);
 				updateControl = false;
 			}
 
 			if( parentState != null ) {
+				var parentControl = parentState.control;
 				// Добавляем наш компонент в список дочерних для родителя
 				// Если компонент - корневой, то parentState == null
-				if( parentState.control == null ) {
-					// Родительский контрол не указан - добавляем просто в список, который потом добавляется в строке (**)
+				if( parentControl == null ) {
+					// Родительский контрол не указан - добавляем просто в список, который потом добавляется в строке (*#*)
 					parentState.childControls.push(state.control);
 				} else {
 					// Есть родительский контрол - добавляем ещё не существующие дочерние к нему
-					var existingInst = parentState.control.getChildByName(state.opts.instanceName);
+					var existingInst = parentControl.getChildByName(state.opts.instanceName);
 					if( !existingInst ) {
-						parentState.control._childControls.push(state.control);
+						parentControl._childControls.push(state.control);
 					}
 				}
 			}
@@ -101,11 +102,11 @@ return new (FirClass(
 			}
 
 			// Публикуем событие о завершении загрузки компонента
-			state.control._onAfterLoadInternal(state.opts, state.areaName);
+			state.control._onAfterLoadInternal(state.areaName, state.opts);
 			state.control._onSubscribe(state.areaName);
 			if( typeof(state.onAfterLoad) === 'function' ) {
 				// This callback is set upon control creation
-				state.onAfterLoad(state.control, state.opts, state.areaName)
+				state.onAfterLoad(state.control, state.areaName, state.opts)
 			}
 
 			if( parentState != null && --(parentState.childLoadCounter) === 0 ) {
@@ -180,7 +181,7 @@ return new (FirClass(
 
 				// Отписываемся от событий верстки ровно перед заменой этой верстки,
 				// чтобы если что-то отвалилось до этой точки, то события не перестанут работать
-				state.control._onUnsubscribe(areaName);
+				state.control._onUnsubscribe(state.areaName);
 				if( state.replaceMarkup ) {
 					state.control._updateControlMarkup(state);
 				}
@@ -251,9 +252,42 @@ return new (FirClass(
 		getNextNameIndex: function() {
 			return ++this._controlCounter;
 		},
-		reloadControl: function(control, areaName) {
+		reloadControl: function(control, areaName, extraConfig) {
 			control._onBeforeLoadInternal(areaName);
-			LoaderManager.load(control._getReloadOpts(areaName));
+			var config = control._getReloadOpts(areaName);
+			LoaderManager.load(this._mergeConfig(config, extraConfig));
+		},
+		_mergeConfig: function(config, extraConfig) {
+			config = config || {};
+			if( !extraConfig ) {
+				return config;
+			}
+			for( var key in extraConfig ) {
+				if( !extraConfig.hasOwnProperty(key) ) {
+					continue;
+				}
+				if( ['viewParams', 'queryParams', 'bodyParams'].indexOf(key) >= 0 ) {
+					// Merge method call params and template call params only
+					config[key] = config[key] || {};
+					var
+						inConfig = config[key],
+						inExtraConfig = extraConfig[key];
+					for( var inKey in inExtraConfig ) {
+						if( !inExtraConfig.hasOwnProperty(inKey) ) {
+							continue;
+						}
+						if( typeof(inExtraConfig[inKey]) === 'undefined' ) {
+							delete inConfig[inKey];
+							continue;
+						}
+						inConfig[inKey] = inExtraConfig[inKey];
+					}
+				} else {
+					// The rest config params are overwritten
+					config[key] = extraConfig[key];
+				}
+			}
+			return config;
 		},
 		createControl: function(config) {
 			config = config || {};

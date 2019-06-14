@@ -21,8 +21,8 @@ expr {=
 		'instanceName',
 		'cssBaseClass',
 		'cssClass',
-		'__scopeName__',
-		'__moduleName__',
+		'_ivyMethod',
+		'_ivyModule',
 		'moduleName'
 	];
 

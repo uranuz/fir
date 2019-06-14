@@ -10,7 +10,6 @@ return FirClass(
 			{ elem: 'dayField', fn: this._checkDayField.bind(this) },
 			{ elem: 'yearField', fn: this._checkYearField.bind(this) }
 		];
-		this._opts = opts;
 		this.initValidation();
 	}, FirControl, [Validation], {
 		rawDay: function() {
@@ -28,9 +27,9 @@ return FirClass(
 				day = parseInt(dayText, 10);
 		
 			if( dayText.length && (isNaN(day) || String(day) !== dayText) ) {
-				return this._opts.dayInvalidMessage;
+				return this._dayInvalidMessage;
 			} else if( day < 1 || day > 31 ) {
-				return this._opts.dayInvalidMessage;
+				return this._dayInvalidMessage;
 			}
 		},
 		_checkYearField: function(vld, elem) {
@@ -39,7 +38,7 @@ return FirClass(
 				year = parseInt(yearText, 10);
 
 			if( yearText.length && (isNaN(year) || String(year) !== yearText) ) {
-				return this._opts.yearInvalidMessage;
+				return this._yearInvalidMessage;
 			}
 		},
 		_parseNum: function(val) {

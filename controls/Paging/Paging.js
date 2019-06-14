@@ -191,6 +191,12 @@ return FirClass(
 			this._setButtonsVisibility();
 		},
 		getNavigation: function() {
+			var nav = this.getNavParams();
+			nav.recordCount = this.getRecordCount();
+			nav.pageCount = this.getPageCount();
+			return nav;
+		},
+		getNavParams: function() {
 			var nav = {};
 			switch(this._mode) {
 				case PagingMode.Offset: nav.offset = this.getOffset(); break;
@@ -198,9 +204,7 @@ return FirClass(
 				default: break;
 			}
 			nav.pageSize = this.getPageSize();
-			nav.recordCount = this.getRecordCount();
-			nav.pageCount = this.getPageCount();
-			return nav;
+			return nav
 		},
 		_renderNavData: function(nav) {
 			var

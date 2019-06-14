@@ -22,16 +22,7 @@ return FirClass(
 			return paging;
 		},
 		getNavParams: function() {
-			var
-				paging = this._getPaging(),
-				PagingMode = paging.PagingMode,
-				nav = {};
-			switch( paging.getPagingMode() ) {
-				case PagingMode.Offset: nav.offset = paging.getOffset(); break;
-				case PagingMode.Page: nav.currentPage = paging.getCurrentPage(); break;
-			}
-			nav.pageSize = paging.getPageSize();
-			return nav;
+			return this._getPaging().getNavParams();
 		},
 		_onSetCurrentPage: function() {
 			if( !this._navigatedArea ) {
@@ -40,7 +31,7 @@ return FirClass(
 			this._reloadControl(this._navigatedArea);
 		},
 		/** Обработчик выполняет обновление навигационного состояния */
-		_onNavState_update: function(ev, opts, areaName) {
+		_onNavState_update: function(ev, areaName, opts) {
 			if( window.history != null ) {
 				var flt = LoaderSerializer.serialize(this._getQueryParams(areaName));
 				window.history.replaceState(null, null, '?' + flt);

@@ -3,18 +3,7 @@ define('fir/controls/FirControl', [
 ], function(ControlManager) {
 return FirClass(
 	function FirControl(opts) {
-		if (opts.instanceName) {
-			this._instanceName = opts.instanceName;
-		} else {
-			this._instanceName = 'firControl' + ControlManager.getNextNameIndex();
-		}
-
-		this._container = opts.container;
-		this._childControls = opts.childControls;
-		this._cssBaseClass = opts.cssBaseClass;
-		this._cssClass = opts.cssClass;
-		this._viewModule = opts.__moduleName__;
-		this._viewMethod = opts.__scopeName__;
+		this._injectOptions(opts);
 		ControlManager.registerControl(this); // Компонент сам себя регистрирует
 	}, {
 		/// Возвращает имя экземпляра компонента интерфейса
@@ -34,7 +23,30 @@ return FirClass(
 
 		/// Возвращает HTML-класс экземпляра компонента интерфейса
 		instanceHTMLClass: function() {
-			return this._instanceName? 'i-' + this._instanceName: undefined;
+			return this.instanceName()? 'i-' + this.instanceName(): undefined;
+		},
+
+		/// Копируем опции в объект, добавляя к имени опции префикс '_'
+		_injectOptions: function(opts) {
+			var conflictOpts = [];
+			for( var optName in opts ) {
+				if( opts.hasOwnProperty(optName) ) {
+					if( this['_' + optName] != null ) {
+						conflictOpts.push(optName);
+					} else {
+						this['_' + optName] = opts[optName];
+					}
+				}
+			}
+			if( conflictOpts.length ) {
+				console.warn(
+					'Control options conflict with build in control properties: ' + conflictOpts.join(', ')
+					+ ' Build in properties shall not be rewritten. Consider renaming...');
+			}
+
+			if( !this._instanceName ) {
+				this._instanceName = 'firControl' + ControlManager.getNextNameIndex();
+			}
 		},
 
 		/// Подписаться на событие с именем ev с помощью обработчика hdl
@@ -55,14 +67,14 @@ return FirClass(
 		},
 		_elemFullClass: function(el) {
 			var cls = "e-" + el + " "
-			if( this._instanceName ) {
-				cls += "i-" + this._instanceName + " ";
+			if( this.instanceName() ) {
+				cls += "i-" + this.instanceName() + " ";
 			}
-			if( this._cssBaseClass ) {
-				cls += this._cssBaseClass + " "
+			if( this.cssBaseClass() ) {
+				cls += this.cssBaseClass() + " "
 			}
-			if( this._cssClass ) {
-				cls += this._cssClass + " "
+			if( this.cssClass() ) {
+				cls += this.cssClass() + " "
 			}
 			return cls;
 		},
@@ -111,9 +123,7 @@ return FirClass(
 
 		/** Параметры передаваемые в отображение, но не на основной сервис */
 		_getViewParams: function(areaName) {
-			return {
-				instanceName: this.instanceName()
-			};
+			return {};
 		}, 
 		/**
 		 * Параметры, передаваемые на основной сервис, предпочтительно через адресную строку (для REST-запросов)
@@ -132,26 +142,26 @@ return FirClass(
 		},
 
 		/** Имя модуля (шаблона) интерфейса */
-		_getViewModule: function(areaName) {
+		_getivyModule: function(areaName) {
 			if( !areaName ) {
-				return this._viewModule;
+				return this.__ivyModule;
 			}
-			var viewModule = this._getAreaElement(areaName).data('fir-view-module');
-			return viewModule || this._viewModule;
+			var ivyModule = this._getAreaElement(areaName).data('ivy-module');
+			return ivyModule || this.__ivyModule;
 		},
 
 		/** Имя метода (компонента) интерфейса */
-		_getViewMethod: function(areaName) {
+		_getivyMethod: function(areaName) {
 			if( !areaName ) {
-				return this._viewMethod;
+				return this.__ivyMethod;
 			}
-			var viewMethod = this._getAreaElement(areaName).data('fir-view-method');
-			if( !viewMethod ) {
+			var ivyMethod = this._getAreaElement(areaName).data('ivy-method');
+			if( !ivyMethod ) {
 				throw new Error(
 					'Unable to get view method for area: ' + areaName 
-					+ '. Maybe "data-fir-view-method" attribute is missing or area element does not exist');
+					+ '. Maybe "data-ivy-method" attribute is missing or area element does not exist');
 			}
-			return viewMethod;
+			return ivyMethod;
 		},
 
 		_getAreaElement: function(areaName) {
@@ -168,19 +178,24 @@ return FirClass(
 		},
 
 		_getReloadOpts: function(areaName) {
-			return {
+			var opts = {
 				URI: this._getRequestURI(areaName),
 				HTTPMethod: this._getHTTPMethod(areaName),
 				RPCMethod: this._getRPCMethod(areaName),
 				viewParams: this._getViewParams(areaName),
 				queryParams: this._getQueryParams(areaName),
 				bodyParams: this._getBodyParams(areaName),
-				viewModule: this._getViewModule(areaName),
-				viewMethod: this._getViewMethod(areaName),
+				ivyModule: this._getivyModule(areaName),
+				ivyMethod: this._getivyMethod(areaName),
 				// Add success/ error handlers
 				success: this._onMarkupLoad.bind(this, areaName),
 				error: this._onMarkupLoadError.bind(this, areaName)
 			};
+			if( !opts.viewParams.instanceName ) {
+				opts.viewParams.instanceName = this.instanceName();
+			}
+
+			return opts;
 		},
 
 		/** Обновление вёрстки компонента при его перезагрузке */
@@ -235,9 +250,9 @@ return FirClass(
 		},
 
 		/** Обработчик завершения загрузки компонента для переопределения наследниками */
-		_onAfterLoadInternal: function(opts, areaName) {
+		_onAfterLoadInternal: function(areaName, opts) {
 			// Публикуем событие о завершении загрузки компонента
-			this._notify('onAfterLoad', opts, areaName);
+			this._notify('onAfterLoad', areaName, opts);
 		},
 
 		/**
@@ -252,9 +267,10 @@ return FirClass(
 		 * 
 		 * @param areaName {string|null|undefined} Название обновляемой области внутри компонента.
 		 * Если не указано, то предполагается полное обновление всего компонента
+		 * @param extraConfig {Object} Переопределение конфигурации перезагрузки возвращаемой из _getReloadOpts
 		 */
-		_reloadControl: function(areaName) {
-			ControlManager.reloadControl(this, areaName);
+		_reloadControl: function(areaName, extraConfig) {
+			ControlManager.reloadControl(this, areaName, extraConfig);
 		},
 
 		findInstanceByName: function(instanceName) {
@@ -293,7 +309,7 @@ return FirClass(
 
 		// Уничтожить компонент
 		destroy: function() {
-			// TODO: Отписаться от всяческих событий
+			// Отписаться от всяческих событий
 			this._onUnsubscribe();
 
 			// Прибить дочерние компоненты

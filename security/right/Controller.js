@@ -137,7 +137,7 @@ return FirClass(
 	},
 
 	_genRightKey: function(roleNum, objectNum, accessKind) {
-		return roleNum + '#' + objectNum + '#' + (accessKind.length? accessKind: null);
+		return roleNum + '#' + objectNum + '#' + (accessKind? accessKind: null);
 	},
 
 	_getParentObjectIds: function(accessObject) {

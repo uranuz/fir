@@ -40,15 +40,15 @@ return FirClass(
 		},
 		load: function(config) {
 			// Ivy module name is required!
-			if( typeof(config.viewModule) !== 'string' && !(config.viewModule instanceof String) ) {
+			if( typeof(config.ivyModule) !== 'string' && !(config.ivyModule instanceof String) ) {
 				throw new Error('Ivy module name required!');
 			}
 
-			if( typeof(config.viewMethod) !== 'string' && !(config.viewMethod instanceof String) ) {
+			if( typeof(config.ivyMethod) !== 'string' && !(config.ivyMethod instanceof String) ) {
 				throw new Error('Ivy view method name required!');
 			}
 
-			this._ivyEngine.getByModuleName(config.viewModule, this._onIvyModule_load.bind(this, config));
+			this._ivyEngine.getByModuleName(config.ivyModule, this._onIvyModule_load.bind(this, config));
 		},
 
 		_getExtraGlobals: function() {
@@ -70,7 +70,7 @@ return FirClass(
 		},
 
 		_onIvyModule_init: function(config) {
-			var defOpts = config.interp.getDirAttrDefaults(config.viewMethod, ['RPCMethod']);
+			var defOpts = config.interp.getDirAttrDefaults(config.ivyMethod, ['RPCMethod']);
 			if( !config.RPCMethod ) {
 				config.RPCMethod = defOpts.RPCMethod;
 			}
@@ -121,7 +121,7 @@ return FirClass(
 				}
 			}
 
-			config.interp.runModuleDirective(config.viewMethod, data, this._getExtraGlobals()).then(
+			config.interp.runModuleDirective(config.ivyMethod, data, this._getExtraGlobals()).then(
 				function(res) {
 					config.success(iu.toString(res));
 				},
