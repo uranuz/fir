@@ -23,7 +23,9 @@ expr {=
 		'cssClass',
 		'_ivyMethod',
 		'_ivyModule',
-		'moduleName'
+		'moduleName',
+		'RPCMethod',
+		'requestURI'
 	];
 
 	def _addValues {=

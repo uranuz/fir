@@ -108,7 +108,7 @@ return FirClass(
 		 * Либо точка доступа по умолчанию для RPC-запросов
 		 */
 		_getRequestURI: function(areaName) {
-			return '';
+			return this._requestURI;
 		},
 		
 		/** Предпочитаемый HTTP-метод. Для RPC-запросов не действует */
@@ -118,7 +118,7 @@ return FirClass(
 		
 		/** Имя RPC-метода. Если указано, то запрос идет через RPC-протокол */
 		_getRPCMethod: function(areaName) {
-			return null;
+			return this._RPCMethod;
 		},
 
 		/** Параметры передаваемые в отображение, но не на основной сервис */
@@ -142,7 +142,7 @@ return FirClass(
 		},
 
 		/** Имя модуля (шаблона) интерфейса */
-		_getivyModule: function(areaName) {
+		_getIvyModule: function(areaName) {
 			if( !areaName ) {
 				return this.__ivyModule;
 			}
@@ -151,7 +151,7 @@ return FirClass(
 		},
 
 		/** Имя метода (компонента) интерфейса */
-		_getivyMethod: function(areaName) {
+		_getIvyMethod: function(areaName) {
 			if( !areaName ) {
 				return this.__ivyMethod;
 			}
@@ -185,8 +185,8 @@ return FirClass(
 				viewParams: this._getViewParams(areaName),
 				queryParams: this._getQueryParams(areaName),
 				bodyParams: this._getBodyParams(areaName),
-				ivyModule: this._getivyModule(areaName),
-				ivyMethod: this._getivyMethod(areaName),
+				ivyModule: this._getIvyModule(areaName),
+				ivyMethod: this._getIvyMethod(areaName),
 				// Add success/ error handlers
 				success: this._onMarkupLoad.bind(this, areaName),
 				error: this._onMarkupLoadError.bind(this, areaName)
