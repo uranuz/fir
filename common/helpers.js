@@ -52,12 +52,28 @@ define('fir/common/helpers', [
 			);
 		},
 		/** Подписывается на событие keyup, и запускает коллбэк, если нажата клавиша ENTER */
-		doOnEnter: function(elem, callback) {
-			elem = $(elem);
-			var throttledCb = helpers.throttle(callback, 1000, false);
-			elem.on('keyup', function(ev) {
-				if( ev.keyCode === Consts.KeyCode.Enter ) {
-					throttledCb.apply(this, arguments);
+		doOnEnter: function(control, elemNames, callback, timeout) {
+			if( typeof(elemNames) === 'string' || (elemNames instanceof String) ) {
+				elemNames = [elemNames];
+			} else if( !(elemNames instanceof Array) ) {
+				throw new Error('Expected element name or array of element names to subscribe');
+			}
+			var
+				timeout = timeout || 1000,
+				throttledCb = helpers.throttle(callback.bind(control), timeout, false),
+				onKeyUp = function(ev) {
+					if( ev.keyCode === Consts.KeyCode.Enter ) {
+						throttledCb.apply(undefined, arguments);
+					}
+				};
+			control._subscr(function() {
+				for( var i = 0; i < elemNames.length; ++i ) {
+					control._elems(elemNames).on('keyup', onKeyUp);
+				}
+			});
+			control._unsubscr(function() {
+				for( var i = 0; i < elemNames.length; ++i ) {
+					control._elems(elemNames).off('keyup', onKeyUp);
 				}
 			});
 		},

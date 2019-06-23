@@ -32,15 +32,18 @@ return FirClass(
 		},
 		/** Обработчик выполняет обновление навигационного состояния */
 		_onNavState_update: function(ev, areaName, opts) {
-			if( window.history != null ) {
-				var flt = LoaderSerializer.serialize(this._getQueryParams(areaName));
-				window.history.replaceState(null, null, '?' + flt);
-			}
 			var navData = opts[this._navProperty];
 			if( !navData ) {
 				console.warn('No navigation data is provided or navigation property name is incorrect');
 				return;
 			}
+			// TODO: Пока идея работает плохо...
+			/*
+			if( window.history != null ) {
+				var flt = LoaderSerializer.serialize(this._getQueryParams(areaName));
+				window.history.replaceState(null, null, '?' + flt);
+			}
+			*/
 			this._getPaging().setNavigation(navData || {});
 		}
 	});

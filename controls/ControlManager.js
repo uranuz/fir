@@ -291,10 +291,15 @@ return new (FirClass(
 		},
 		createControl: function(config) {
 			config = config || {};
-			if( !config.target ) {
+			var target = config.target;
+			if( !target ) {
 				throw new Error('Required target tag to be replaced by control');
 			}
-			config.success = this._onMarkupLoad.bind(this, config.target, config.success);
+			// Don't want to keep target in opts to reduce leaks;
+			config.target = null;
+			delete config.target;
+
+			config.success = this._onMarkupLoad.bind(this, target, config.success);
 			config.error = this._onMarkupLoadError.bind(this, config.error)
 			LoaderManager.load(config);
 		},

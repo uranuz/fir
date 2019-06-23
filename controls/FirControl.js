@@ -309,6 +309,16 @@ return FirClass(
 
 		// Уничтожить компонент
 		destroy: function() {
+			if( this._isControlDestroying === true ) {
+				return; // Защищаемся от повторного вызова уничтожения
+			} else if( typeof(this._isControlDestroying) !== 'undefined' ) {
+				throw new Error('Поле _isControlDestroying нельзя использовать в прикладном коде')
+			}
+			this._isControlDestroying = true; // В процессе уничтожения
+
+			// Кто-то чё-то хочет поделать прежде чем уничтожить компонент
+			this._notify('onDestroy');
+
 			// Отписаться от всяческих событий
 			this._onUnsubscribe();
 
