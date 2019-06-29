@@ -74,7 +74,7 @@ return FirClass(
 
 			this._renderNavData(this.getNavigation());
 			this._setButtonsVisibility();
-			this._notify('onSetCurrentPage', this.getCurrentPage());
+			this._notify('onSetCurrentPage', this.getNavParams());
 
 			var closestForm = this._getContainer().closest('form');
 			if( this._formField && closestForm.length ) {

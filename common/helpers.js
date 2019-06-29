@@ -3,8 +3,9 @@
  * @author Ur@nuz
  */
 define('fir/common/helpers', [
-	'fir/common/consts'
-], function(Consts) {
+	'fir/common/consts',
+	'fir/controls/Loader/Serializer'
+], function(Consts, LoaderSerializer) {
 	'use strict';
 	var helpers = {
 		//Глубокая копия объекта
@@ -153,6 +154,40 @@ define('fir/common/helpers', [
 				nextRoots = [];
 			}
 			return $(result);
+		},
+		replaceURIState: function(data) {
+			if( window.history == null ) {
+				return;
+			}
+			var flt = LoaderSerializer.serialize(data);
+			window.history.replaceState(null, null, '?' + flt);
+		},
+		managePaging: function(config) {
+			if( config.control == null ) {
+				throw new Error('Expected control to manage in "control" option');
+			}
+			var
+				control = config.control,
+				paging = config.paging,
+				navOpt = config.navOpt || 'nav',
+				pagingName = config.paging == null? 'Paging': null;
+			if( typeof(pagingName) === 'string' || pagingName instanceof String ) {
+				paging = control.getChildByName(pagingName);
+				paging = paging || control.getChildByName(control.instanceName() + pagingName);
+			}
+			if( paging == null ) {
+				throw new Error('Expected string or control in "paging" option')
+			}
+			
+			paging.subscribe('onSetCurrentPage', control._reloadControl.bind(control, config.areaName));
+			control.subscribe('onAfterLoad', function(ev, areaName, opts) {
+				if( opts[navOpt] ) {
+					paging.setNavigation(opts[navOpt]);
+				}
+				if( config.replaceURIState ) {
+					helpers.replaceURIState(control._getQueryParams(areaName));
+				}
+			});
 		}
 	};
 	return helpers;
