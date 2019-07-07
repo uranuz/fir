@@ -1,10 +1,9 @@
 define('fir/datctrl/ivy/RecordSetRange', [
-	'ivy/DataNodeRange',
-	'fir/datctrl/ivy/RecordAdapter'
-], function(DataNodeRange, RecordAdapter) {
+	'ivy/DataNodeRange'
+], function(DataNodeRange) {
 return FirClass(
 	function RecordSetRange(rs) {
-		this._rs = rs;
+		this._rs = rs; // RecordSetAdapter actually
 		this._i = 0;
 	}, DataNodeRange, {
 		// Method must return first item of range or raise error if range is empty
@@ -12,7 +11,7 @@ return FirClass(
 			if( this.empty() ) {
 				throw new Error('Range is empty!');
 			}
-			return new RecordAdapter(this._rs.at(this._i));
+			return this._rs.at(this._i);
 		},
 		// Method must advance range to the next item
 		pop: function() {

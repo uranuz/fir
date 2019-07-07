@@ -54,6 +54,10 @@ return new (FirClass(
 		},
 
 		_onControlModuleLoaded: function(state, ControlClass) {
+			if( !ControlClass && state.control == null ) {
+				// Контрол либо уже загружен, либо мы должны получить JS-модуль контрола
+				throw new Error('Unable to load JS control module: ' + state.moduleName)
+			}
 			var
 				parentState = state.parentState,
 				updateControl = true;

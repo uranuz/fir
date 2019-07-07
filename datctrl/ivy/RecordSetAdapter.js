@@ -2,12 +2,14 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 	'ivy/ClassNode',
 	'fir/datctrl/RecordSet',
 	'fir/datctrl/ivy/RecordSetRange',
-	'fir/datctrl/ivy/RecordFormatAdapter'
+	'fir/datctrl/ivy/RecordFormatAdapter',
+	'fir/datctrl/ivy/RecordAdapter'
 ], function(
 	ClassNode,
 	RecordSet,
 	RecordSetRange,
-	RecordFormatAdapter
+	RecordFormatAdapter,
+	RecordAdapter
 ) {
 return FirClass(
 	function RecordSetAdapter(rs) {
@@ -30,11 +32,10 @@ return FirClass(
 		 * IvyData opIndex(size_t);
 		 * in D impl */
 		at: function(index) {
-			if( typeof(index) === 'number' ) {
-				return this._rs.getRecordAt(index);
-			} else {
-				return this._rs.getRecord(index);
+			if( typeof(index) !== 'number' ) {
+				throw new Error('Expected integer as record index');
 			}
+			return new RecordAdapter(this._rs.getRecordAt(index), this._fmt);
 		},
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		getAttr: function(name) {
