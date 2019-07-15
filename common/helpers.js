@@ -34,9 +34,12 @@ define('fir/common/helpers', [
 		parseGetParams: function() {
 			var $_GET = {};
 			var __GET = window.location.search.substring(1).split("&");
-			for(var i=0; i<__GET.length; i++) {
+			for( var i = 0; i < __GET.length; i++ ) {
 				var getVar = __GET[i].split("=");
-				$_GET[getVar[0]] = typeof(getVar[1])=="undefined" ? "" : getVar[1];
+				if( !getVar[0] ) {
+					continue;
+				}
+				$_GET[getVar[0]] = typeof(getVar[1]) === "undefined"? "": getVar[1];
 			}
 			return $_GET;
 		},
@@ -185,7 +188,16 @@ define('fir/common/helpers', [
 					paging.setNavigation(opts[navOpt]);
 				}
 				if( config.replaceURIState ) {
-					helpers.replaceURIState(control._getQueryParams(areaName));
+					var
+						newParams = control._getQueryParams(areaName),
+						params = helpers.parseGetParams();
+					for( var key in newParams ) {
+						if( !newParams.hasOwnProperty(key) ) {
+							continue;
+						}
+						params[key] = newParams[key];
+					}
+					helpers.replaceURIState(params);
 				}
 			});
 		}
