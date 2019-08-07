@@ -1,17 +1,22 @@
 define('fir/controls/PlainDatePicker/PlainDatePicker', [
 	'fir/controls/FirControl',
-	'fir/controls/Mixins/Validation/Validation',
 	'css!fir/controls/PlainDatePicker/PlainDatePicker'
-], function(FirControl, Validation) {
+], function(FirControl) {
 return FirClass(
 	function PlainDatePicker(opts) {
 		this.superproto.constructor.call(this, opts);
-		this._validators = [
-			{ elem: 'dayField', fn: this._checkDayField.bind(this) },
-			{ elem: 'yearField', fn: this._checkYearField.bind(this) }
-		];
-		this.initValidation();
-	}, FirControl, [Validation], {
+		var validation = this.getChildByName(this.instanceName() + 'Validation');
+		validation.setOwner(this);
+		validation.addValidators([
+			{
+				elem: 'dayField',
+				fn: this._checkDayField.bind(this)
+			}, {
+				elem: 'yearField',
+				fn: this._checkYearField.bind(this)
+			}
+		]);
+	}, FirControl, {
 		rawDay: function() {
 			return this._elems('dayField').val();
 		},

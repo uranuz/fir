@@ -1,0 +1,21 @@
+expr {=
+from fir.controls.utils import cls, firScopeOptsEnc;
+def ValidationPopup {=
+	def.kv
+		instanceName
+		cssBaseClass: 'fir-ValidationPopup'
+		moduleName: 'fir/controls/Validation/Popup/Popup'
+		message: null;
+	def.body {*
+	<div class="{=cls 'position'}" data-fir-module="{{moduleName}}">
+		<input type="hidden" data-fir-opts="{=firScopeOptsEnc}"/>
+		<div class="{=cls 'container'}">
+			<div class="{=cls 'topRow'}">
+				<div class="{=cls 'closeBtn'}">X</div>
+			</div>
+			<div class="{=cls 'message'}">{{message}}</div>
+		</div>
+	</div>
+	*}
+}
+}

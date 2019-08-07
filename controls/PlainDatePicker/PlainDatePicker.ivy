@@ -1,5 +1,6 @@
 expr {=
 	from fir.controls.utils import cls, firScopeOptsEnc;
+	from fir.controls.Validation.Controller import ValidationController;
 	def PlainDatePicker {=
 		def.kv
 			instanceName: undef
@@ -66,6 +67,9 @@ expr {=
 						{=if disabled 'disabled'}
 					/>
 				</div>
+				{=ValidationController
+					instanceName: instanceName ~ 'Validation'
+				}
 			</div>
 		*};
 	};

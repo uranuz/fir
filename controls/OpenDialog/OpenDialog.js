@@ -18,7 +18,7 @@ return FirClass(
 		open: function(config) {
 			config = this._prepareConfig(config);
 
-			// Чистив все внутри обертки диалога
+			// Чистим все внутри обертки диалога
 			this._elems('dialogWrapper').empty();
 
 			// Добавляем div диалога в обертку
