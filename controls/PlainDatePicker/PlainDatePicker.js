@@ -6,7 +6,6 @@ return FirClass(
 	function PlainDatePicker(opts) {
 		this.superproto.constructor.call(this, opts);
 		var validation = this.getChildByName(this.instanceName() + 'Validation');
-		validation.setOwner(this);
 		validation.addValidators([
 			{
 				elem: 'dayField',

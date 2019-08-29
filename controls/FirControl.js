@@ -5,6 +5,8 @@ return FirClass(
 	function FirControl(opts) {
 		this._injectOptions(opts);
 		ControlManager.registerControl(this); // Компонент сам себя регистрирует
+		// Уведомляем прямых потомков о загрузке родителя
+		this._notifyParentCreated();
 	}, {
 		/// Возвращает имя экземпляра компонента интерфейса
 		instanceName: function() {
@@ -46,6 +48,19 @@ return FirClass(
 
 			if( !this._instanceName ) {
 				this._instanceName = 'firControl' + ControlManager.getNextNameIndex();
+			}
+		},
+		/**
+		 * Уведомление прямых потомков о готовности родителя компонента.
+		 * Некоторые компоненты могут нуждаться в знании об их родителе.
+		 * Хотя в целом это плохая практика - компоненты должны быть как можно более независимы от окружения
+		 */
+		_notifyParentCreated: function() {
+			for( var i = 0; i < this._childControls.length; ++i ) {
+				var child = this._childControls[i];
+				if( child ) {
+					child._notify('onParentCreated', this);
+				}
 			}
 		},
 
@@ -283,6 +298,9 @@ return FirClass(
 				}
 			}
 			return null;
+		},
+		getChildren: function() {
+			return this._childControls;
 		},
 		/**
 		 * Реализует логику удаления контролов, которые есть в старой верстке, но отстутствуют в новой

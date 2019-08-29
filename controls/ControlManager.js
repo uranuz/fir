@@ -61,7 +61,7 @@ return new (FirClass(
 			var
 				parentState = state.parentState,
 				updateControl = true;
-			// Как только сохоанили себе локально ссылку на состояние родителя,
+			// Как только сохранили себе локально ссылку на состояние родителя,
 			// то удаляем ее из состояния потомка во избежания утечек памяти и возможности обратиться к родителю
 			state.parentState = null;
 
@@ -105,9 +105,9 @@ return new (FirClass(
 				}
 			}
 
+			state.control._onSubscribe(state.areaName);
 			// Публикуем событие о завершении загрузки компонента
 			state.control._onAfterLoadInternal(state.areaName, state.opts);
-			state.control._onSubscribe(state.areaName);
 			if( typeof(state.onAfterLoad) === 'function' ) {
 				// This callback is set upon control creation
 				state.onAfterLoad(state.control, state.areaName, state.opts)
