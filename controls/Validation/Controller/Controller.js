@@ -9,13 +9,13 @@ var ValidationController = FirClass(
 		this._owner = null;
 		this._validators = [];
 		this._popup = null;
-		this._childControllers = [];
+		this._controllers = [];
 		// Должны подписаться до вызова конструктора родителя
 		this.once('onParentCreated', function(ev, parent) {
 			this.setOwner(parent);
 		}.bind(this));
 		this.superproto.constructor.call(this, opts);
-		
+
 	}, FirControl, {
 		/**
 		 * Установить владельца контроллера валидации
@@ -40,7 +40,7 @@ var ValidationController = FirClass(
 
 		/**
 		 * Добавить валидаторы к контроллеру
-		 * @param {Array} validators 
+		 * @param {Array} validators
 		 */
 		addValidators: function(validators) {
 			if ( !(validators instanceof Array) ) {
@@ -155,7 +155,7 @@ var ValidationController = FirClass(
 				top: elem.offset().top - cont.offset().top + elem.outerHeight()
 			});
 		},
-		
+
 		_onPopup_destroyed: function() {
 			// Дерегистрируем всплываху у себя и из центра по уничтожению
 			ValidationCenter.unsetPopup(this._popup);
@@ -164,7 +164,7 @@ var ValidationController = FirClass(
 		/**
 		 * Выполняет запуск всех валидаторов, указанных в контроллере
 		 */
-		validate: function() {
+		validateItself: function() {
 			var firstInvalid, firstResult;
 			for( var i = 0; i < this._validators.length; ++i ) {
 				var
@@ -181,6 +181,20 @@ var ValidationController = FirClass(
 			} else {
 				this._closePopup();
 			}
+			return this._checkResult(result);
+		},
+		validate: function() {
+			var isInvalid = false;
+			for( var i = 0; i < this._controllers.length; ++i ) {
+				var ctlr = this._controllers[i];
+				if( !ctlr.validate() ) {
+					isInvalid = true;
+				}
+			}
+			if( !this.validateItself() ) {
+				isInvalid = true;
+			}
+			return !isInvalid;
 		},
 		/**
 		 * Находит дочерние контроллеры валидации по отношению к владельцу текущего контроллера
@@ -188,39 +202,48 @@ var ValidationController = FirClass(
 		_findChildControllers: function() {
 			this._checkOwner();
 			var
-				allChilds = this._owner.getChildren(),
-				childs = [],
+				childs = this._owner.getChildren(),
 				controllers = [];
-			// Внутри владельца контроллера валидации выбираем только контролы,
-			// которые не являются контроллерми валидации
-			for( var i = 0; i < allChilds.length; ++i ) {
-				var thisChild = allChilds[i];
-				if( !(thisChild instanceof ValidationController) ) {
-					childs.push(thisChild);
-				}
-			}
-			
+
 			while( childs && childs.length ) {
-				var nextChilds = [];
+				var
+					nextChilds = [],
+					currControllers = [];
+				// Обход выполняется по "слоям" дочерних контролов. Сначала непосредственные "дети", потом их дети и т.д...
+				for( var k = 0; k < childs.length; ++k ) {
+					var ctrl = childs[k];
+					// Проверяем, что это контроллер валидации
+					if( !(ctrl instanceof ValidationController) ) {
+						continue;
+					}
+					if( ctrl === this ) {
+						continue;
+					}
+					// Если это контроллер валидации, не совпадающий с текущим, то помещаем его в список
+					currControllers.push(ctrl);
+				}
+
+				if( currControllers && currControllers.length ) {
+					Array.prototype.push.apply(controllers, currControllers);
+					// На этом уровне есть контроллеры валидации. Они уже должны быть проинициализированы.
+					// И они отвечают за поиск дочерних контроллеров на этом уровне...
+					break;
+				}
+
 				for( var i = 0; i < childs.length; ++i ) {
 					var ctrl = childs[i];
-					if( !ctrl ) {
-						continue; // Если будет мусор
+					// Проверяем, что это не пустой элемент, и не контроллер валидации
+					if( !ctrl || ctrl instanceof ValidationController ) {
+						continue;
 					}
-					// Теперь - главное. Проверяем, является ли это контроллером валидации
-					if( ctrl instanceof ValidationController ) {
-						// Если это контроллер валидации, то помещаем это в список
-						controllers.push(ctrl);
-					} else {
-						var ctrlChilds = ctrl.getChildren();
-						if( ctrlChilds && ctrlChilds.length ) {
-							nextChilds.push.apply(ctrlChilds);
-						}
+					var ctrlChilds = ctrl.getChildren();
+					if( ctrlChilds && ctrlChilds.length ) {
+						Array.prototype.push.apply(nextChilds, ctrlChilds);
 					}
 				}
 				childs = nextChilds;
 			}
-			this._childControllers = controllers;
+			this._controllers = controllers;
 		}
 	}
 );
