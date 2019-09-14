@@ -230,17 +230,17 @@ return new (FirClass(
 			if( !candidates || candidates.length === 0 ) {
 				return;
 			}
+			if( candidates.length === 1 && candidates[0] === control ) {
+				// Если это последний элемент, то удаляем всю "корзину"
+				delete this._controlRegistry[name];
+				return;
+			}
 			for( var i = 0; i < candidates.length; ++i ) {
 				// Дерегистрировать компонент из реестра
 				if( candidates[i] !== control ) {
 					continue;
 				}
-				if( candidates.length === 1 ) {
-					// Если это последний элемент, то удаляем всю "корзину"
-					delete this._controlRegistry[name];
-				} else {
-					candidates.splice(i, 1); // Удаляем с заданной позиции
-				}
+				candidates.splice(i, 1); // Удаляем с заданной позиции
 			}
 		},
 		findInstanceByName: function(instanceName) {

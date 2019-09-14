@@ -49,19 +49,15 @@ var ValidationController = FirClass(
 			this._checkOwner();
 			for( var i = 0; i < validators.length; ++i ) {
 				var vld = validators[i];
-				/*
 				if( typeof(vld.fn) === 'string' || vld.fn instanceof String ) {
 					vld.fn = this._owner[vld.fn];
 				}
-				*/
 				if( typeof(vld.fn) !== 'function' ) {
 					throw new Error('Expected validator function')
 				}
 				if( vld.control != null && !(vld.control instanceof FirControl) ) {
 					throw new Error('Expected FirControl instance in control option or empty')
 				}
-
-				this._validators.push(vld);
 
 				vld.control = vld.control || this._owner;
 
@@ -70,18 +66,17 @@ var ValidationController = FirClass(
 				}
 
 				vld.elem = vld.elem || control._getContainer();
-				vld._bondValidator = this._elemValidationDoer.bind(this, vld);
+				vld._bondValidator = this._validateElem.bind(this, vld);
 				vld.elem.on('blur', vld._bondValidator);
+				this._validators.push(vld);
 			}
 		},
 
 		// Визульная пометка элемента прошедшим или не прошедшим проверку
 		_markIfValid: function(result, elem) {
-			if( this._checkResult(result) ) {
-				elem.removeClass('fir-IsInvalidField');
-			} else {
-				elem.addClass('fir-IsInvalidField');
-			}
+			elem.toggleClass(
+				'fir-IsInvalidField',
+				!this._checkResult(result));
 		},
 
 		// Проверка результата проверки
@@ -98,15 +93,17 @@ var ValidationController = FirClass(
 			}
 		},
 
-		_elemValidationDoer: function(vld, ev) {
+		// Реализация валидации одного элемента
+		_validateElem: function(vld, ev) {
 			var
 				elem = $(ev.currentTarget),
 				result = vld.fn.call(vld.control, vld);
 			this._markIfValid(result, elem);
-			if( this._checkResult(result) ) {
-				this._closePopup();
+			
+			if( !this._checkResult(result) ) {
+				ValidationCenter._throttler(this._openPopup.bind(this, this._validationMsg(result), elem))
 			} else {
-				this._openPopup(this._validationMsg(result), elem);
+				this._closePopup();
 			}
 		},
 
@@ -164,36 +161,40 @@ var ValidationController = FirClass(
 		/**
 		 * Выполняет запуск всех валидаторов, указанных в контроллере
 		 */
-		validateItself: function() {
+		validateItself: function(withoutPopup) {
 			var firstInvalid, firstResult;
 			for( var i = 0; i < this._validators.length; ++i ) {
 				var
 					vld = this._validators[i],
 					result = vld.fn.call(vld.control, vld);
-				if( !this._checkResult(result) ) {
+				if( !this._checkResult(result) && !firstInvalid ) {
 					firstInvalid = vld;
 					firstResult = result;
 				}
 				this._markIfValid(result, vld.elem);
 			}
-			if( firstInvalid ) {
+			if( firstInvalid && !withoutPopup ) {
 				this._openPopup(this._validationMsg(firstResult), firstInvalid.elem);
-			} else {
-				this._closePopup();
 			}
-			return this._checkResult(result);
+			return !firstInvalid;
 		},
-		validate: function() {
+		validate: function(withoutPopup) {
 			var isInvalid = false;
 			for( var i = 0; i < this._controllers.length; ++i ) {
 				var ctlr = this._controllers[i];
-				if( !ctlr.validate() ) {
+				if( !ctlr.validate(withoutPopup || isInvalid) ) {
 					isInvalid = true;
 				}
 			}
-			if( !this.validateItself() ) {
+			// Если уже найден первый невалидный элемент, то всплываха уже показана, не хотим ее заменять
+			if( !this.validateItself(withoutPopup || isInvalid) ) {
 				isInvalid = true;
 			}
+			if( !isInvalid ) {
+				// Вроде мы уверены, что все корректно, тогда всплываху надо скрыть
+				this._closePopup();
+			}
+			this._notify('onValidate', !isInvalid);
 			return !isInvalid;
 		},
 		/**
