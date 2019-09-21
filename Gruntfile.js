@@ -77,4 +77,5 @@
 	grunt.registerTask('cleanAll', ['clean:templates', 'clean:scripts', 'clean:styles'])
 	grunt.registerTask('deploy', ['cleanAll', 'symlink:templates', 'symlink:scripts', 'sass:dist']);
 	grunt.registerTask('default', ['deploy']);
+	grunt.registerTask('dist', ['deploy']);
 }
