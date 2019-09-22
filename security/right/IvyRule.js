@@ -22,7 +22,8 @@ return FirClass(
 		hasRight: function(identity, data) {
 			var splitted = this._name.split(':');
 			if( splitted.length < 2 ) {
-				throw new Error('Expected at least module and directive names in ivy rule name');
+				return false;
+				//throw new Error('Expected at least module and directive names in ivy rule name');
 			}
 			var moduleName, dirName;
 
