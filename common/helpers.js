@@ -186,6 +186,8 @@ define('fir/common/helpers', [
 			control.subscribe('onAfterLoad', function(ev, areaName, opts) {
 				if( opts[navOpt] ) {
 					paging.setNavigation(opts[navOpt]);
+				} else {
+					console.warn('Unable to get navigation data from control opts!');
 				}
 				if( config.replaceURIState ) {
 					var

@@ -1,9 +1,16 @@
 define('fir/controls/ControlManager', [
 	'fir/common/base64',
+	'fir/common/Deferred',
 	'fir/datctrl/Deserializer',
 	'fir/controls/Loader/Manager',
 	'fir/common/helpers'
-], function(Base64, Deserializer, LoaderManager, helpers) {
+], function(
+	Base64,
+	Deferred,
+	Deserializer,
+	LoaderManager,
+	helpers
+) {
 	function ControlLoadState() {
 		this.controlTag = null; // This control (or area) root tag
 		this.configTag = null; // Configuration tag 'data-fir-opts' inside control tag
@@ -16,7 +23,7 @@ define('fir/controls/ControlManager', [
 		this.parentState = null; // Instance of ControlLoadState for parent control
 		this.replaceMarkup = null;
 		this.areaName = null;
-		this.onAfterLoad = null;
+		this.onAfterLoad = null; // Deffered that needs to be called on finish load
 	}
 
 // ControlManger is singleton. So module returns instance of class
@@ -40,6 +47,7 @@ return new (FirClass(
 		/** Запускает компоненты в работу после загрузки или обновления верстки */
 		reviveControlMarkup: function(newMarkup, state) {
 			state = state || new ControlLoadState();
+			state.onAfterLoad = new Deferred();
 			state.controlTag = helpers.getOuterMost(
 				newMarkup,
 				(state.control? '.' + state.control.instanceHTMLClass(): '[data-fir-module]')
@@ -51,6 +59,7 @@ return new (FirClass(
 					+ 'and there is no multiple root control elements in markup.');
 			}
 			this._initControlAndChildren(state);
+			return state.onAfterLoad;
 		},
 
 		_onControlModuleLoaded: function(state, ControlClass) {
@@ -108,9 +117,9 @@ return new (FirClass(
 			state.control._onSubscribe(state.areaName);
 			// Публикуем событие о завершении загрузки компонента
 			state.control._onAfterLoadInternal(state.areaName, state.opts);
-			if( typeof(state.onAfterLoad) === 'function' ) {
-				// This callback is set upon control creation
-				state.onAfterLoad(state.control, state.areaName, state.opts)
+			if( state.onAfterLoad ) {
+				// Сообщаем в Deferred о результате
+				state.onAfterLoad.resolve(state.control, state.areaName, state.opts);
 			}
 
 			if( parentState != null && --(parentState.childLoadCounter) === 0 ) {
@@ -257,9 +266,15 @@ return new (FirClass(
 			return ++this._controlCounter;
 		},
 		reloadControl: function(control, areaName, extraConfig) {
+			var def = new Deferred();
 			control._onBeforeLoadInternal(areaName);
 			var config = control._getReloadOpts(areaName);
-			LoaderManager.load(this._mergeConfig(config, extraConfig));
+			LoaderManager.load(
+				this._mergeConfig(config, extraConfig)
+			).then(
+				control._onMarkupLoad.bind(control, areaName),
+				control._onMarkupLoadError.bind(control));
+			return def;
 		},
 		_mergeConfig: function(config, extraConfig) {
 			config = config || {};
@@ -294,8 +309,12 @@ return new (FirClass(
 			return config;
 		},
 		createControl: function(config) {
-			config = config || {};
-			var target = config.target;
+			if( config == null ) {
+				throw new Error('Expected config object');
+			}
+			var
+				def = new Deferred(),
+				target = config.target;
 			if( !target ) {
 				throw new Error('Required target tag to be replaced by control');
 			}
@@ -303,11 +322,14 @@ return new (FirClass(
 			config.target = null;
 			delete config.target;
 
-			config.success = this._onMarkupLoad.bind(this, target, config.success);
-			config.error = this._onMarkupLoadError.bind(this, config.error)
-			LoaderManager.load(config);
+			LoaderManager.load(config).then(
+				this._onMarkupLoad.bind(this, def, target),
+				this._onMarkupLoadError.bind(this, def)
+			);
+			return def;
 		},
-		_onMarkupLoad: function(target, callback, html) {
+		/** Коллбэк, вызываемый когда готова верстка созданного шаблона */
+		_onMarkupLoad: function(def, target, html) {
 			var
 				target = $(target)[0],
 				newMarkup = $(html);
@@ -316,18 +338,24 @@ return new (FirClass(
 			}
 			// Replace specified target node with loaded markup
 			target.parentNode.replaceChild(newMarkup[0], target);
-			var state = new ControlLoadState();
-			// Set callback that should be called when control creation is finished
-			state.onAfterLoad = callback;
-			// Revive markup...
-			this.reviveControlMarkup(newMarkup, state);
+			// Revive markup. Get onAfterLoad Deferred as result...
+			this.reviveControlMarkup(newMarkup).then(
+				this._onMarkupRevive.bind(this, def),
+				this._onMarkupReviveError.bind(this, def)
+			);
 		},
-		_onMarkupLoadError: function(callback, err) {
-			if( typeof(callback) === 'function' ) {
-				callback(err);
-			} else {
-				console.error(err);
-			}
+		/** Коллбэк, вызываемый когда произошла ошибка при создании верстки шаблона */
+		_onMarkupLoadError: function(def, err) {
+			console.error(err);
+			def.reject(err);
+		},
+		/** Коллбэк, вызываемый при "оживлении" верстки. Т.е. созданы классы, отвечающие за работу компонента */
+		_onMarkupRevive: function(def, control, areaName, opts) {
+			def.resolve(control, areaName, opts);
+		},
+		/** Коллбек, вызываемый при ошибке "оживления" верстки компонента */
+		_onMarkupReviveError: function(def, err) {
+			def.reject(err);
 		}
 }));
 });

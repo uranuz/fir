@@ -1,12 +1,18 @@
 define('fir/controls/OpenDialog/OpenDialog', [
 	'fir/controls/FirControl',
 	'fir/controls/ControlManager',
+	'fir/common/Deferred',
+	'fir/controls/Mixins/DialogConfig',
 	'css!fir/controls/OpenDialog/OpenDialog'
-], function(FirControl, ControlManager) {
+], function(
+	FirControl,
+	ControlManager,
+	Deferred,
+	DialogConfig
+) {
 return FirClass(
 	function OpenDialog(opts) {
 		this.superproto.constructor.call(this, opts);
-		this._config = opts.config;
 		this._config.dialogOpts = this._config.dialogOpts || {};
 
 		var dialogOpts = this._config.dialogOpts;
@@ -14,8 +20,9 @@ return FirClass(
 		dialogOpts.modal = true;
 		// Добавляем обработчик закрытия диалога
 		dialogOpts.close = this._onDialogControl_close.bind(this);
-	}, FirControl, {
+	}, FirControl, [DialogConfig], {
 		open: function(config) {
+			var def = new Deferred();
 			config = this._prepareConfig(config);
 
 			// Чистим все внутри обертки диалога
@@ -27,35 +34,21 @@ return FirClass(
 
 			// Создаем плейсхолдер для компонента, который будет заменен на компонент
 			config.target = $('<div>').appendTo(this._dlg);
-			config.success = this._onDialogControl_load.bind(this, config.dialogOpts);
-			ControlManager.createControl(config);
-		},
-		// Добавляет в конфиг опции по умолчанию "из шаблона" OpenDialog
-		_prepareConfig: function(config) {
-			config = config || {};
-			// Мерджим параметры конфигурации по-умолчанию
-			for( var key in this._config ) {
-				if( !config.hasOwnProperty(key) ) {
-					config[key] = this._config[key];
-				}
-			}
-
-			// Мерджим опции диалога по-умолчанию
-			for( var key in this._config.dialogOpts ) {
-				if( !config.dialogOpts.hasOwnProperty(key) ) {
-					config.dialogOpts[key] = this._config.dialogOpts[key];
-				}
-			}
-			return config;
+			ControlManager.createControl(config).then(
+				this._onDialogControl_load.bind(this, def, config.dialogOpts),
+				def.reject.bind(def)
+			);
+			return def;
 		},
 		close: function() {
 			this._dlg.dialog('close');
 		},
-		_onDialogControl_load: function(dialogOpts, child) {
+		_onDialogControl_load: function(def, dialogOpts, child) {
 			this._dialogControl = child;
 			// При уничтожении дочернего компонента сам диалог пусть тоже уничтожается
 			this._dialogControl.once('onDestroy', this.close.bind(this));
 			this._elems('dialog').dialog(dialogOpts);
+			def.resolve(this._dialogControl);
 			// Оповестим, что диалог загрузился
 			this._notify('dialogControlLoad', this._dialogControl);
 		},

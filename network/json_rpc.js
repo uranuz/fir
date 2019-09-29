@@ -1,4 +1,6 @@
-define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
+define('fir/network/json_rpc', [
+	'fir/common/Deferred'
+], function(Deferred) {
 	var json_rpc = {
 		/** Аргументы по-умолчанию для вызова ф-ции invoke */
 		defaultInvokeArgs: {
@@ -7,11 +9,9 @@ define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 			params: null, //Параметры вызова удалённого метода
 			success: null, //Обработчик успешного вызова удалённого метода
 			error: null,  //Обработчик ошибки
-			complete: null, //Обработчик завершения (после success или error)
 			id: null //Идентификатор соединения
 		},
 		_counter: 0,
-		_responseQueue: [null],
 		_generateId: function(args) {
 			return json_rpc._counter++;
 		},
@@ -21,6 +21,8 @@ define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 		 */
 		invoke: function(args) {
 			var
+				resDef = new Deferred(),
+				callDef = new Deferred(),
 				_defArgs = json_rpc.defaultInvokeArgs,
 				_args = _defArgs;
 
@@ -28,49 +30,56 @@ define('fir/network/json_rpc', ['fir/common/helpers'], function(commonHelpers) {
 				_args = args;
 
 			_args.params = json_rpc._processParams(_args.params);
+			callDef.then(
+				function() {
+					var succArgs = Array.prototype.slice.call(arguments);
+					resDef.resolve.apply(resDef, succArgs);
+					if( typeof(_args.success) === 'function' ) {
+						_args.success.apply(null, succArgs);
+					}
+				},
+				function(err) {
+					var errArgs = Array.prototype.slice.call(arguments);
+					console.error("Ошибка при выполнении удалённого метода: " + JSON.stringify(err));
+					if( typeof(_args.error) === 'function' ) {
+						_args.error.apply(null, errArgs);
+					}
+				});
 
 			var xhr = new XMLHttpRequest();
 			xhr.open('POST', _args.uri, true);
 			xhr.setRequestHeader("content-type", "application/json-rpc");
-			xhr.onreadystatechange = json_rpc._handleResponse.bind(null, xhr)
+			xhr.onreadystatechange = json_rpc._handleResponse.bind(null, xhr, callDef)
 			var idStr = "";
 			if( _args.error || _args.success || _args.complete ) {
 				if( !_args.id ) {
 					_args.id = json_rpc._generateId(_args);
 				}
-				json_rpc._responseQueue[_args.id] = _args;
 				idStr = ',"id":"' + _args.id + '"';
 			}
 			xhr.send( '{"jsonrpc":"2.0","method":"' + _args.method + '","params":' + _args.params + idStr + '}' );
+			return resDef;
 		},
-		_handleResponse: function(xhr) {
+		_handleResponse: function(xhr, def) {
 			if( xhr.readyState !== 4 ) {
 				return;
 			}
-			var responseJSON = JSON.parse(xhr.responseText);
-			if( responseJSON.id == null ) {
-				return;
+			var responseJSON;
+			try {
+				responseJSON = JSON.parse(xhr.responseText);
+			} catch(err) {
+				def.reject(err);
+				return; // Nothing to do there
 			}
-			var invokeArgs = json_rpc._responseQueue[responseJSON.id];
-			if( invokeArgs == null ) {
-				return;
+
+			if( !typeof(responseJSON.result) === 'undefined' && responseJSON.error == null ) {
+				def.reject(new Error(`В ответе по протоколу JSON-RPC нет "result" и "error"!`));
+				return; // ...
 			}
-			delete json_rpc._responseQueue[responseJSON.id];
-			if( typeof(responseJSON.error) !== 'undefined' ) {
-				var errorMsg = (responseJSON.error instanceof Object)? responseJSON.error.message: responseJSON.error;
-				console.error("Ошибка при выполнении удалённого метода: " + JSON.stringify(errorMsg));
-				if( typeof(invokeArgs.error) === 'function' ) {
-					invokeArgs.error(responseJSON.error);
-				}
-			} else if( typeof(responseJSON.result) !== 'undefined' ) {
-				if( typeof(invokeArgs.success) === 'function' ) {
-					invokeArgs.success(responseJSON.result);
-				}
+			if( responseJSON.error != null ) {
+				def.reject(responseJSON.error);
 			} else {
-				console.error("Некорректный формат результата при вызове удалённого метода!");
-			}
-			if( typeof(invokeArgs.complete) === 'function' ) {
-				invokeArgs.complete(responseJSON);
+				def.resolve(responseJSON.result);
 			}
 		},
 		_processParams: function(params) {

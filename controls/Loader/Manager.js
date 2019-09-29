@@ -30,8 +30,7 @@ return new (FirClass(
 				if( !loader.canLoad(opts) ) {
 					continue;
 				} else {
-					loader.load(opts);
-					return;
+					return loader.load(opts);
 				}
 			}
 			throw new Error('Unable to find suitable loader!');

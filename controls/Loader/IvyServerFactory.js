@@ -7,6 +7,7 @@ define('fir/controls/Loader/IvyServerFactory', [
 	'fir/datctrl/ivy/Deserializer',
 	'fir/datctrl/ivy/UserRights',
 	'fir/datctrl/ivy/UserIdentity',
+	'fir/common/Deferred',
 	'ivy/utils'
 ], function(
 	LoaderAbstract,
@@ -17,6 +18,7 @@ define('fir/controls/Loader/IvyServerFactory', [
 	IvyDeserializer,
 	IvyUserRights,
 	IvyUserIdentity,
+	Deferred,
 	iu
 ) {
 return FirClass(
@@ -39,6 +41,7 @@ return FirClass(
 			return true;
 		},
 		load: function(config) {
+			config.deferred = new Deferred();
 			// Ivy module name is required!
 			if( typeof(config.ivyModule) !== 'string' && !(config.ivyModule instanceof String) ) {
 				throw new Error('Ivy module name required!');
@@ -49,6 +52,7 @@ return FirClass(
 			}
 
 			this._ivyEngine.getByModuleName(config.ivyModule, this._onIvyModule_load.bind(this, config));
+			return config.deferred;
 		},
 
 		_getExtraGlobals: function() {
@@ -64,9 +68,7 @@ return FirClass(
 			config.interp = modRes.interp;
 			modRes.asyncResult.then(
 				this._onIvyModule_init.bind(this, config),
-				function(error) {
-					config.error(res);
-				});
+				config.deferred.reject.bind(config.deferred));
 		},
 
 		_onIvyModule_init: function(config) {
@@ -88,9 +90,7 @@ return FirClass(
 					method: config.RPCMethod,
 					params: this._getRPCParams(config),
 					success: this._onData_load.bind(this, config),
-					error: function(res) {
-						config.error(res);
-					}
+					error: config.deferred.reject.bind(config.deferred)
 				});
 			} else {
 				this._onData_load(config, {});
@@ -116,7 +116,9 @@ return FirClass(
 		},
 
 		_onData_load: function(config, rawData) {
-			var data = IvyDeserializer.deserialize(rawData);
+			var
+				def = config.deferred,
+				data = IvyDeserializer.deserialize(rawData);
 			// Put additional view params to pass into Ivy
 			for( var key in config.viewParams ) {
 				if( config.viewParams.hasOwnProperty(key) ) {
@@ -124,13 +126,13 @@ return FirClass(
 				}
 			}
 
-			config.interp.runModuleDirective(config.ivyMethod, data, this._getExtraGlobals()).then(
+			config.interp.runModuleDirective(
+				config.ivyMethod, data, this._getExtraGlobals()
+			).then(
 				function(res) {
-					config.success(iu.toString(res));
+					def.resolve(iu.toString(res));
 				},
-				function(res) {
-					config.error(res);
-				});
+				def.reject.bind(def));
 		}
 	}
 );

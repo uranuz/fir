@@ -48,12 +48,8 @@ return FirClass(
 				uri: uriNode,
 				method: methodNode,
 				params: dataNode,
-				success: function(res) {
-					fResult.resolve(res);
-				},
-				error: function(err) {
-					fResult.reject(err)
-				}
+				success: fResult.resolve.bind(fResult),
+				error: fResult.reject.bind(fResult)
 			});
 			interp._stack.push(fResult);
 		}

@@ -201,10 +201,7 @@ return FirClass(
 				queryParams: this._getQueryParams(areaName),
 				bodyParams: this._getBodyParams(areaName),
 				ivyModule: this._getIvyModule(areaName),
-				ivyMethod: this._getIvyMethod(areaName),
-				// Add success/ error handlers
-				success: this._onMarkupLoad.bind(this, areaName),
-				error: this._onMarkupLoadError.bind(this, areaName)
+				ivyMethod: this._getIvyMethod(areaName)
 			};
 			if( !opts.viewParams.instanceName ) {
 				opts.viewParams.instanceName = this.instanceName();
@@ -307,21 +304,21 @@ return FirClass(
 		 */
 		_destroyNonExisentChildControls: function(state, existingChildren) {
 			var
-				childControls = state.control._childControls,
+				childs = state.control._childControls,
 				areaElement = (state.areaName && state.replaceMarkup? this._getAreaElement(state.areaName): null);
 			if( areaElement && areaElement.length != 1 ) {
 				console.warn('Method _getAreaElement probably works wrong!');
 			}
 			// Будем удалять с конца, чтобы не было проблем со смещением индексов
-			for( var j = childControls.length - 1; j > 0; --j ) {
-				if( existingChildren[ childControls[j].instanceName() ] ) {
+			for( var j = childs.length - 1; j >= 0; --j ) {
+				if( existingChildren[ childs[j].instanceName() ] ) {
 					continue; // Контрол есть в новой верстке
 				}
-				if( areaElement != null && !areaElement[0].contains(childControls[j]._getContainer()[0]) ) {
+				if( areaElement != null && !areaElement[0].contains(childs[j]._getContainer()[0]) ) {
 					continue; // Мы не должны удалять контролы, корневой тег которых находится вне перезагружаемой области
 				}
-				childControls[j].destroy();
-				childControls.splice(j, 1); // Нужно убрать пустые элементы из массива дочерних
+				childs[j].destroy();
+				childs.splice(j, 1); // Нужно убрать пустые элементы из массива дочерних
 			}
 		},
 
@@ -341,9 +338,7 @@ return FirClass(
 			this._onUnsubscribe();
 
 			// Прибить дочерние компоненты
-			for( var i = 0; i < this._childControls.length; ++i ) {
-				this._childControls[i].destroy();
-			}
+			this._destroyChildren();
 
 			// Удалить вёрстку этого компонента
 			if( this._getContainer() ) {
@@ -352,6 +347,15 @@ return FirClass(
 
 			// Дерегистрировать компонент из реестра
 			ControlManager.unregisterControl(this);
+		},
+
+		/** Удаление дочерних компонентов */
+		_destroyChildren: function() {
+			var childs = this._childControls;
+			for( var j = childs.length - 1; j >= 0; --j ) {
+				childs[j].destroy();
+				childs.splice(j, 1); // Убираем контролы из списка
+			}
 		},
 
 		/** Добавление колбэка, осуществляющего подписку на события */
