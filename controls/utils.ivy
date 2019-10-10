@@ -112,4 +112,49 @@ expr {=
 			return false
 		}
 	};
+
+	def treeMetaInfo {=
+		def.kv
+			rs
+			keyProperty
+			parentProperty;
+		def.body {=
+			var
+				roots: []
+				idxByKey: {}
+				i: 0;
+			for obj in rs {=
+				var
+					num: {=at obj keyProperty}
+					numStr: {=str num}
+					parentNum: {=at obj parentProperty}
+					parentNumStr: {=str parentNum};
+				if not parentNum {=
+					insert roots numStr null
+				} else {=
+					var dat: {=
+						if {=has idxByKey parentNumStr}
+							{=at idxByKey parentNumStr}
+						else
+							{idx: null, children: []}
+					};
+					insert dat.children numStr null;
+					setat idxByKey dat parentNumStr;
+				};
+				var dat2: {=
+					if {=has idxByKey numStr}
+						{=at idxByKey numStr}
+					else
+						{idx: i, children: []}
+				};
+				set dat2.idx: i;
+				setat idxByKey dat2 numStr;
+				set i: i + 1;
+			};
+			return {
+				roots: roots,
+				idxByKey: idxByKey
+			};
+		}
+	};
 }
