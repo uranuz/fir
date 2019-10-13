@@ -24,6 +24,16 @@ define('fir/controls/ControlManager', [
 		this.replaceMarkup = null;
 		this.areaName = null;
 		this.onAfterLoad = null; // Deffered that needs to be called on finish load
+		this.optSets = null;
+	}
+
+	ControlLoadState.prototype.getOptSets = function() {
+		if( this.optSets != null ) {
+			return this.optSets;
+		}
+		if( this.parentState != null ) {
+			return this.parentState.getOptSets();
+		}
 	}
 
 // ControlManger is singleton. So module returns instance of class
@@ -157,8 +167,18 @@ return new (FirClass(
 				throw new Error('Multiple "opts" tags found for control!!!');
 			}
 			state.moduleName = $(state.controlTag).attr('data-fir-module');
-			state.opts = this._extractControlOpts(state.configTag.attr('data-fir-opts'));
-			state.opts = Deserializer.deserialize(state.opts);
+			var
+				optSets = state.getOptSets(),
+				optData = state.configTag.attr('data-fir-opts');
+			// Если заданы наборы опций, то следует получать опции оттуда. Значит - верстка строится на интерфейсе
+			// Если наборы опций не заданы, то опции закодированы в верстке в Base64
+			if( optSets != null ) {
+				state.opts = optSets[optData];
+				delete optSets[optData]; // Избавимся от набора опций сразу как получили его
+			} else {
+				state.opts = this._extractControlOpts(optData);
+				state.opts = Deserializer.deserialize(state.opts); // В первой ветке десериализация не нужна
+			}
 			state.childControlTags = helpers.getOuterMost(state.controlTag.children(), '[data-fir-module]');
 			state.childLoadCounter = state.childControlTags.length;
 			if( state.control == null ) {
@@ -268,11 +288,15 @@ return new (FirClass(
 		reloadControl: function(control, areaName, extraConfig) {
 			var def = new Deferred();
 			control._onBeforeLoadInternal(areaName);
-			var config = control._getReloadOpts(areaName);
+			var
+				config = control._getReloadOpts(areaName),
+				state = new ControlLoadState();
+			config.optSets = {};
+			state.optSets = config.optSets;
 			LoaderManager.load(
 				this._mergeConfig(config, extraConfig)
 			).then(
-				control._onMarkupLoad.bind(control, areaName),
+				control._onMarkupLoad.bind(control, areaName, state),
 				control._onMarkupLoadError.bind(control));
 			return def;
 		},
@@ -314,22 +338,24 @@ return new (FirClass(
 			}
 			var
 				def = new Deferred(),
-				target = config.target;
+				target = config.target,
+				state = new ControlLoadState();
 			if( !target ) {
 				throw new Error('Required target tag to be replaced by control');
 			}
 			// Don't want to keep target in opts to reduce leaks;
 			config.target = null;
 			delete config.target;
+			config.optSet = {};
+			state.optSets = config.optSets;
 
 			LoaderManager.load(config).then(
-				this._onMarkupLoad.bind(this, def, target),
-				this._onMarkupLoadError.bind(this, def)
-			);
+				this._onMarkupLoad.bind(this, def, target, state),
+				this._onMarkupLoadError.bind(this, def));
 			return def;
 		},
 		/** Коллбэк, вызываемый когда готова верстка созданного шаблона */
-		_onMarkupLoad: function(def, target, html) {
+		_onMarkupLoad: function(def, target, state, html) {
 			var
 				target = $(target)[0],
 				newMarkup = $(html);
@@ -339,10 +365,9 @@ return new (FirClass(
 			// Replace specified target node with loaded markup
 			target.parentNode.replaceChild(newMarkup[0], target);
 			// Revive markup. Get onAfterLoad Deferred as result...
-			this.reviveControlMarkup(newMarkup).then(
+			this.reviveControlMarkup(newMarkup, state).then(
 				this._onMarkupRevive.bind(this, def),
-				this._onMarkupReviveError.bind(this, def)
-			);
+				this._onMarkupReviveError.bind(this, def));
 		},
 		/** Коллбэк, вызываемый когда произошла ошибка при создании верстки шаблона */
 		_onMarkupLoadError: function(def, err) {

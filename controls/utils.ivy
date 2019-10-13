@@ -58,7 +58,7 @@ expr {=
 		def.kv
 			fields: null;
 		def.body noscope {=
-			toJSONBase64 {=firScopeOpts fields: fields}
+			optStorage {=firScopeOpts fields: fields}
 		}
 	};
 

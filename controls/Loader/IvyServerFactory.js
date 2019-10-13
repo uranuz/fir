@@ -55,16 +55,17 @@ return FirClass(
 			return config.deferred;
 		},
 
-		_getExtraGlobals: function() {
+		_getExtraGlobals: function(optSets) {
 			return {
 				userIdentity: new IvyUserIdentity(this._userIdentity),
 				userRights: new IvyUserRights(this._userRights),
-				vpaths: this._vpaths
+				vpaths: this._vpaths,
+				optSets: optSets // Наборы опций для компонентов
 			}
 		},
 
 		_onIvyModule_load: function(config, prog) {
-			var modRes = prog.runSaveState({}, this._getExtraGlobals());
+			var modRes = prog.runSaveState({}, this._getExtraGlobals(config.optSets));
 			config.interp = modRes.interp;
 			modRes.asyncResult.then(
 				this._onIvyModule_init.bind(this, config),
@@ -88,10 +89,10 @@ return FirClass(
 				json_rpc.invoke({
 					uri: "/jsonrpc/",
 					method: config.RPCMethod,
-					params: this._getRPCParams(config),
-					success: this._onData_load.bind(this, config),
-					error: config.deferred.reject.bind(config.deferred)
-				});
+					params: this._getRPCParams(config)
+				}).then(
+					this._onData_load.bind(this, config),
+					config.deferred.reject.bind(config.deferred));
 			} else {
 				this._onData_load(config, {});
 			}
@@ -127,7 +128,7 @@ return FirClass(
 			}
 
 			config.interp.runModuleDirective(
-				config.ivyMethod, data, this._getExtraGlobals()
+				config.ivyMethod, data, this._getExtraGlobals(config.optSets)
 			).then(
 				function(res) {
 					def.resolve(iu.toString(res));

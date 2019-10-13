@@ -47,10 +47,10 @@ return FirClass(
 			json_rpc.invoke({
 				uri: uriNode,
 				method: methodNode,
-				params: dataNode,
-				success: fResult.resolve.bind(fResult),
-				error: fResult.reject.bind(fResult)
-			});
+				params: dataNode
+			}).then(
+				fResult.resolve.bind(fResult),
+				fResult.reject.bind(fResult));
 			interp._stack.push(fResult);
 		}
 	});

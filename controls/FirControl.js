@@ -244,8 +244,7 @@ return FirClass(
 			this._notify('onUnsubscribe', areaName);
 		},
 
-		_onMarkupLoad: function(areaName, html) {
-			var state = new ControlManager.ControlLoadState();
+		_onMarkupLoad: function(areaName, state, html) {
 			state.control = this;
 			state.replaceMarkup = true;
 			state.areaName = areaName;
