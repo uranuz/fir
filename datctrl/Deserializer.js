@@ -17,54 +17,56 @@ define('fir/datctrl/Deserializer', [
 ) {
 
 mod.deserializeImpl = function(itemDeserializer, node) {
-	var isPOD = mod.isPlainOldObject(node);
-	if( !isPOD ) {
-		return node;
-	}
-	// Пытаемся десериализовать сам этот объект
-	var data = itemDeserializer(node);
-	if( data != null ) {
+	var
+		isPOD = mod.isPlainOldObject(node),
+		// Предполагаем, что null всегда десериализуется в null,
+		// а внутренняя реализация всегда возвращает null, если не удалось десеарилизовать
+		data = itemDeserializer(node);
+	if( data !== null ) {
 		return data; // Десеварилизовалось - дальше не надо ходить
-	}
-
-	for( var key in node ) {
-		if( !node.hasOwnProperty(key) ) {
-			continue;
+	} else if( isPOD ) {
+		for( var key in node ) {
+			if( !node.hasOwnProperty(key) ) {
+				continue;
+			}
+			// Проходим по свойствам объекта, пытаемся их рекурсивно разобрать
+			node[key] = mod.deserializeImpl(itemDeserializer, node[key]);
 		}
-		// Проходим по свойствам объекта, пытаемся их рекурсивно разобрать
-		node[key] = mod.deserializeImpl(itemDeserializer, node[key]);
 	}
 	return node;
 };
 
-mod.deserializeItem = function(rawData) {
-	if( !mod.isContainerRawData(rawData) ) {
-		return null;
-	}
-	switch( rawData.t ) {
-		case "recordset": return new RecordSet({
-			format: mod.deserializeRecordFormat(rawData),
-			rawData: rawData.d
-		});
+mod.deserializeItem = function(node) {
+	if( node === 'undef' ) {
+		return undefined;
+	} else if( mod.isContainerRawData(node) ) {
+		switch( node.t ) {
+			case "recordset": return new RecordSet({
+				format: mod.deserializeRecordFormat(node),
+				rawData: node.d
+			});
 
-		case "record": return new Record({
-			format: mod.deserializeRecordFormat(rawData),
-			rawData: rawData.d
-		});
+			case "record": return new Record({
+				format: mod.deserializeRecordFormat(node),
+				rawData: node.d
+			});
 
-		case "enum": {
-			// Тут либое енум, либо енум-формат в зависимости от присутствия поля "d"
-			if( rawData.hasOwnProperty('d') ) {
-				return new Enum({
-					format: mod.deserializeEnumFormat(rawData),
-					value: rawData.d
-				});
-			} else {
-				return mod.deserializeEnumFormat(rawData);
+			case "enum": {
+				// Тут либое енум, либо енум-формат в зависимости от присутствия поля "d"
+				if( node.hasOwnProperty('d') ) {
+					return new Enum({
+						format: mod.deserializeEnumFormat(node),
+						value: node.d
+					});
+				} else {
+					return mod.deserializeEnumFormat(node);
+				}
 			}
-		}
 
-		case "date": case "dateTime": return new Date(val.d);
+			case "date":
+			case "dateTime":
+				return new Date(val.d);
+		}
 	}
 	return null; // Ниче не удалось найтить
 }

@@ -3,13 +3,15 @@ define('fir/datctrl/ivy/RecordSetAdapter', [
 	'fir/datctrl/RecordSet',
 	'fir/datctrl/ivy/RecordSetRange',
 	'fir/datctrl/ivy/RecordFormatAdapter',
-	'fir/datctrl/ivy/RecordAdapter'
+	'fir/datctrl/ivy/RecordAdapter',
+	'fir/ivy/UnwrappableNode'
 ], function(
 	ClassNode,
 	RecordSet,
 	RecordSetRange,
 	RecordFormatAdapter,
-	RecordAdapter
+	RecordAdapter,
+	UnwrappableNode
 ) {
 return FirClass(
 	function RecordSetAdapter(rs) {
@@ -18,7 +20,7 @@ return FirClass(
 		}
 		this._rs = rs;
 		this._fmt = new RecordFormatAdapter(this._rs.getFormat());
-	}, ClassNode, {
+	}, ClassNode, [UnwrappableNode], {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			return new RecordSetRange(this);
@@ -55,6 +57,9 @@ return FirClass(
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
 			return this._rs.getLength();
+		},
+		unwrap: function(interp) {
+			return this._rs;
 		}
 });
 });

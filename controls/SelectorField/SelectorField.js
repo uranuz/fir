@@ -31,18 +31,23 @@ return FirClass(
 		},
 
 		_onItem_select: function(ev, rec) {
-			if( rec != null ) {
-				this._record = rec;
-				this._elems('selectBtn').text(rec.get(this._displayField))
-			} else {
-				this._record = null;
-				this._elems('selectBtn').text(this._emptyText);
-			}
+			this._record = rec;
+			this._reloadControl('itemWrapper');
+			
 			this._selectorDialog.close();
 		},
 
 		getRecord: function() {
 			return this._record;
+		},
+
+		_getViewParams: function(areaName) {
+			if( areaName === 'itemWrapper' ) {
+				return {
+					record: this.getRecord(),
+					itemTemplate: this._itemTemplate
+				};
+			}
 		}
 });
 });

@@ -4,39 +4,99 @@ define('fir/datctrl/ivy/Deserializer', [
 	'fir/datctrl/ivy/RecordSetAdapter',
 	'fir/datctrl/ivy/RecordAdapter',
 	'fir/datctrl/ivy/EnumFormatAdapter',
-	'fir/datctrl/ivy/EnumAdapter'
+	'fir/datctrl/ivy/EnumAdapter',
+	'ivy/Consts',
+	'ivy/ModuleObject',
+	'ivy/CodeObject',
+	'ivy/ClassNode',
+	'fir/ivy/UnwrappableNode'
 ], function(
 	mod,
 	Deserializer,
 	RecordSetAdapter,
 	RecordAdapter,
 	EnumFormatAdapter,
-	EnumAdapter
+	EnumAdapter,
+	IvyConsts,
+	ModuleObject,
+	CodeObject,
+	IClassNode,
+	UnwrappableNode
 ) {
 
-mod.deserializeItem = function(node) {
-	var isPOD = Deserializer.isPlainOldObject(node);
-	if( !isPOD ) {
+var IvyDataType = IvyConsts.IvyDataType;
+mod.deserializeItem = function(node, moduleObj) {
+	if( node === 'undef' ) {
+		return undefined;
+	} else if(
+		node === null
+		|| node === true || node === false || node instanceof Boolean
+		|| typeof(node) === 'number' || node instanceof Number
+		|| typeof(node) === 'string' || node instanceof String
+	) {
 		return node;
-	}
-	var
-		typeStr = node.t,
-		container = Deserializer.deserializeItem(node);
-	if( container == null ) {
-		return null;
-	}
-	switch( typeStr ) {
-		case 'recordset':
-			return new RecordSetAdapter(container);
-		case 'record':
-			return new RecordAdapter(container);
-		case 'enum':
-			return node.hasOwnProperty("d")? new EnumAdapter(container): new EnumFormatAdapter(container);
-		case "date": case "dateTime": return container;
-		default: break;
+	} else if( node instanceof Array ) {
+		return node; // Do we need deserialize inner items of array?
+	} else if( node instanceof Object ) {
+		if( node.hasOwnProperty('_t') && typeof(node._t) === 'number' ) {
+			// It's Ivy-style serialized value
+			switch( node._t ) {
+				case IvyDataType.ModuleObject: {
+					var
+						consts = node.consts,
+						moduleObj = new ModuleObject(node.fileName, consts, node.entryPointIndex);
+					for( var i = 0; i < consts.length; ++i ) {
+						consts[i] = mod.deserializeItem(consts[i], moduleObj);
+					}
+					return moduleObj;
+				}
+
+				case IvyDataType.CodeObject: {
+					if( !(moduleObj instanceof ModuleObject) ) {
+						throw new Error('ModuleObject is required to deserialize CodeObject')
+					}
+					return new CodeObject(node.name, node.instrs, moduleObj, node.attrBlocks);
+				}
+				case IvyDataType.DateTime:
+					return new Date(con._v);
+				default: break;
+			}
+		} else if( node.hasOwnProperty('t') && typeof(node.t) === 'string' ) {
+			// It's webtank-style serialized value
+			var
+				typeStr = node.t,
+				container = Deserializer.deserializeItem(node);
+			if( container == null ) {
+				return null; // Не шмогли...
+			}
+			switch( typeStr ) {
+				case 'recordset':
+					return new RecordSetAdapter(container);
+				case 'record':
+					return new RecordAdapter(container);
+				case 'enum':
+					return node.hasOwnProperty("d")? new EnumAdapter(container): new EnumFormatAdapter(container);
+				case "date": case "dateTime": return container;
+				default: break;
+			}
+		}
 	}
 	return null;
-};
+}
+
+mod.unwrapOpts = function(optsNode) {
+	if( optsNode instanceof Object ) {
+		for( var key in optsNode ) {
+			if( !optsNode.hasOwnProperty(key) ) {
+				continue;
+			}
+			if( (optsNode[key] instanceof IClassNode) && optsNode[key].isInstanceOf(UnwrappableNode) ) {
+				optsNode[key] = optsNode[key].unwrap();
+			}
+		}
+	}
+	return optsNode;
+}
 
 mod.deserialize = Deserializer.deserializeImpl.bind(null, mod.deserializeItem);
 });

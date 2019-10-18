@@ -1,5 +1,5 @@
 expr {=
-from fir.controls.utils import cls;
+from fir.controls.utils import cls, firScopeOptsEnc;
 def Paging {=
 	def.kv
 		moduleName: "fir/controls/Paging/Paging"
@@ -27,7 +27,19 @@ def Paging {=
 			set nav.recordCount: recordCount or nav.recordCount;
 		}
 	<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
-		<input type="hidden" data-fir-opts="{=toJSONBase64 {=scope} }"/>
+		<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: [
+			'formField',
+			'pageSizeFormField',
+			'nav',
+			'pageSize',
+			'currentPage',
+			'offset',
+			'pageCount',
+			'recordCount',
+			'title',
+			'notFoundMsg',
+			'recordCountTitle'
+		] }"/>
 		<div class="form-inline">
 			<div class="{=cls 'formRow'} form-group input-group">
 				<div class="input-group-prepend bg-secondary">

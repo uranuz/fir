@@ -2,12 +2,14 @@ define('fir/controls/ControlManager', [
 	'fir/common/base64',
 	'fir/common/Deferred',
 	'fir/datctrl/Deserializer',
+	'fir/datctrl/ivy/Deserializer',
 	'fir/controls/Loader/Manager',
 	'fir/common/helpers'
 ], function(
 	Base64,
 	Deferred,
 	Deserializer,
+	IvyDeserializer,
 	LoaderManager,
 	helpers
 ) {
@@ -175,6 +177,7 @@ return new (FirClass(
 			if( optSets != null ) {
 				state.opts = optSets[optData];
 				delete optSets[optData]; // Избавимся от набора опций сразу как получили его
+				IvyDeserializer.unwrapOpts(state.opts); // Извлекает оригинальные значения из адаптеров для ivy
 			} else {
 				state.opts = this._extractControlOpts(optData);
 				state.opts = Deserializer.deserialize(state.opts); // В первой ветке десериализация не нужна
@@ -346,7 +349,7 @@ return new (FirClass(
 			// Don't want to keep target in opts to reduce leaks;
 			config.target = null;
 			delete config.target;
-			config.optSet = {};
+			config.optSets = {};
 			state.optSets = config.optSets;
 
 			LoaderManager.load(config).then(

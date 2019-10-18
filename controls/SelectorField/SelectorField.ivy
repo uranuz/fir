@@ -1,6 +1,41 @@
 expr {=
 from fir.controls.utils import cls, firScopeOptsEnc;
 from fir.controls.OpenDialog import OpenDialog;
+
+def DefaultItemTemplate {=
+	def.kv
+		record
+		displayField
+		emptyText;
+	def.body noscope {*
+	<a href="#!"
+		class="{=cls 'selectBtn'}"
+		>{=if not{=empty record} {=at record displayField} else emptyText}</a>
+	*}
+};
+
+def ItemTemplateProxy {=
+	def.kv
+		cssBaseClass
+		instanceName
+		record
+		displayField
+		emptyText
+		itemTemplate;
+	def.body {*
+	<div
+		class="{=cls 'itemWrapper'}"
+		data-ivy-method="{{_ivyMethod}}">
+	<div>{{_ivyMethod}}</div>
+	{=call itemTemplate {
+		record: record,
+		displayField: displayField,
+		emptyText: emptyText
+	} }
+	</div>
+	*}
+};
+
 def SelectorField {=
 	def.kv
 		moduleName: "fir/controls/SelectorField/SelectorField"
@@ -10,17 +45,24 @@ def SelectorField {=
 		keyField: "num"
 		displayField: "name"
 		emptyText: 'Выбрать'
+		itemTemplate: DefaultItemTemplate
 		dialogConfig: {}
 		record: null;
 	def.body {*
 	{=set dialogConfig.instanceName: instanceName ~ 'Selector'}
 	<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
 		<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: [
-				'selectEventName', 'keyField', 'displayField', 'emptyText', 'record'
+				'selectEventName', 'keyField', 'displayField', 'emptyText', 'record', 'itemTemplate'
 			]}"/>
-		<a href="#!"
-			class="{=cls 'selectBtn'}"
-			>{=if not{=empty record} {=at record displayField} else emptyText}</a>
+		
+		{=ItemTemplateProxy
+			cssBaseClass: cssBaseClass
+			instanceName: instanceName
+			record: record
+			displayField: displayField
+			emptyText: emptyText
+			itemTemplate: itemTemplate
+		}
 		
 		{=OpenDialog
 			instanceName: instanceName ~ 'Dialog'

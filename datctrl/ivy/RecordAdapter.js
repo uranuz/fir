@@ -3,13 +3,15 @@ define('fir/datctrl/ivy/RecordAdapter', [
 	'fir/datctrl/Record',
 	'fir/datctrl/ivy/RecordFormatAdapter',
 	'fir/datctrl/ivy/EnumAdapter',
-	'fir/datctrl/Enum'
+	'fir/datctrl/Enum',
+	'fir/ivy/UnwrappableNode'
 ], function(
 	ClassNode,
 	Record,
 	RecordFormatAdapter,
 	EnumAdapter,
-	Enum
+	Enum,
+	UnwrappableNode
 ) {
 return FirClass(
 	function RecordAdapter(rec, fmt) {
@@ -61,6 +63,9 @@ return FirClass(
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
 			return this._rec.getLength();
+		},
+		unwrap: function() {
+			return this._rec;
 		}
 });
 });
