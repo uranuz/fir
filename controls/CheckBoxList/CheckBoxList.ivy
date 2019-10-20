@@ -39,7 +39,7 @@ expr {=
 								name="{{formField}}"
 								class="{=cls "itemInput"}"
 								value="{=at item keyField }"
-								{=if(not {=empty selectedKeys} and {=has selectedKeys {=at item keyField} }) "checked"}
+								{=if(selectedKeys and {=has selectedKeys {=at item keyField} }) "checked"}
 							/>
 							<span class="{=cls "itemText"}">{=at item displayField}</span>
 						</label>

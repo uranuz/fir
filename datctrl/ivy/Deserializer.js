@@ -5,6 +5,10 @@ define('fir/datctrl/ivy/Deserializer', [
 	'fir/datctrl/ivy/RecordAdapter',
 	'fir/datctrl/ivy/EnumFormatAdapter',
 	'fir/datctrl/ivy/EnumAdapter',
+	'fir/datctrl/Record',
+	'fir/datctrl/RecordSet',
+	'fir/datctrl/EnumFormat',
+	'fir/datctrl/Enum',
 	'ivy/Consts',
 	'ivy/ModuleObject',
 	'ivy/CodeObject',
@@ -17,6 +21,10 @@ define('fir/datctrl/ivy/Deserializer', [
 	RecordAdapter,
 	EnumFormatAdapter,
 	EnumAdapter,
+	Record,
+	RecordSet,
+	EnumFormat,
+	Enum,
 	IvyConsts,
 	ModuleObject,
 	CodeObject,
@@ -96,6 +104,26 @@ mod.unwrapOpts = function(optsNode) {
 		}
 	}
 	return optsNode;
+}
+
+mod.wrapOpts = function(vp) {
+	if( vp instanceof Object ) {
+		for( var key in vp ) {
+			if( !vp.hasOwnProperty(key) ) {
+				continue;
+			}
+			if( vp[key] instanceof EnumFormat ) {
+				vp[key] = new EnumFormatAdapter(vp[key]);
+			} else if( vp[key] instanceof Enum ) {
+				vp[key] = new EnumAdapter(vp[key]);
+			} else if( vp[key] instanceof Record ) {
+				vp[key] = new RecordAdapter(vp[key]);
+			} else if( vp[key] instanceof RecordSet ) {
+				vp[key] = new RecordSetAdapter(vp[key]);
+			}
+		}
+	}
+	return vp;
 }
 
 mod.deserialize = Deserializer.deserializeImpl.bind(null, mod.deserializeItem);

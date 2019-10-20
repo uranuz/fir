@@ -251,7 +251,7 @@ return FirClass(
 			ControlManager.reviveControlMarkup($(html), state);
 		},
 
-		_onMarkupLoadError: function(areaName, error) {
+		_onMarkupLoadError: function(error) {
 			console.error(error);
 		},
 

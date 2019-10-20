@@ -63,9 +63,9 @@ def Paging {=
 					size="5"
 					maxlength="5"
 					value="{=
-						if not{=empty nav.currentPage}
+						if nav.currentPage
 							nav.currentPage + 1
-						elif not{=empty nav.offset} and not{=empty nav.pageSize}
+						elif nav.offset and nav.pageSize
 							nav.offset / nav.pageSize + 1
 						else 1
 					}"
@@ -73,9 +73,9 @@ def Paging {=
 				<div class="input-group-append bg-secondary">
 					<span class="{=cls 'pageCountBlock'} input-group-text border-secondary">
 						из &nbsp;<span class="{=cls 'pageCount'}">
-							{=if not{=empty nav.pageCount}
+							{=if nav.pageCount
 									nav.pageCount
-								elif not{=empty nav.recordCount} and not{=empty nav.pageSize}
+								elif nav.recordCount and nav.pageSize
 									nav.recordCount / nav.pageSize + 1
 							}
 						</span>
@@ -109,19 +109,19 @@ def Paging {=
 		<input type="hidden"
 			class="{=cls 'pageHiddenField'}"
 			value="{{nav.currentPage or 0}}"
-			{=if not{=empty nav.currentPage} and {=empty nav.offset} and not{=empty formField}
+			{=if nav.currentPage and nav.offset and formField
 				{*name="{{formField}}"*}
 			}/>
 		<input type="hidden"
 			class="{=cls 'offsetField'}"
 			value="{{nav.offset or 0}}"
-			{=if not{=empty nav.offset} and not{=empty formField}
+			{=if nav.offset and formField
 				{*name="{{formField}}"*}
 			}/>
 		<input type="hidden"
 			class="{=cls 'pageSizeField'}"
 			value="{{nav.pageSize}}"
-			{=if not{=empty pageSizeFormField}
+			{=if pageSizeFormField
 				{*name="{{pageSizeFormField}}"*}
 			}/>
 	</div>

@@ -45,7 +45,9 @@ return FirClass(
 			if( areaName === 'itemWrapper' ) {
 				return {
 					record: this.getRecord(),
-					itemTemplate: this._itemTemplate
+					itemTemplate: this._itemTemplate,
+					displayField: this._displayField,
+					emptyText: this._emptyText
 				};
 			}
 		}

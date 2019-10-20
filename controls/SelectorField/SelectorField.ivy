@@ -10,7 +10,7 @@ def DefaultItemTemplate {=
 	def.body noscope {*
 	<a href="#!"
 		class="{=cls 'selectBtn'}"
-		>{=if not{=empty record} {=at record displayField} else emptyText}</a>
+		>{=if record {=at record displayField} else emptyText}</a>
 	*}
 };
 
@@ -26,8 +26,9 @@ def ItemTemplateProxy {=
 	<div
 		class="{=cls 'itemWrapper'}"
 		data-ivy-method="{{_ivyMethod}}">
-	<div>{{_ivyMethod}}</div>
 	{=call itemTemplate {
+		cssBaseClass: cssBaseClass,
+		instanceName: instanceName,
 		record: record,
 		displayField: displayField,
 		emptyText: emptyText

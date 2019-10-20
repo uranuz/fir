@@ -25,9 +25,9 @@ expr {=
 			disabled: null;
 		def.body {*
 			{=
-				if {=empty dayFormField} and not{=empty formField} {=set dayFormField: formField ~ '__day'};
-				if {=empty monthFormField} and not{=empty formField} {=set monthFormField: formField ~ '__month'};
-				if {=empty yearFormField} and not{=empty formField} {=set yearFormField: formField ~ '__year'};
+				if {=empty dayFormField} and formField {=set dayFormField: formField ~ '__day'};
+				if {=empty monthFormField} and formField {=set monthFormField: formField ~ '__month'};
+				if {=empty yearFormField} and formField {=set yearFormField: formField ~ '__year'};
 			}
 			<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
 				<input type="hidden" data-fir-opts="{=firScopeOptsEnc
@@ -35,14 +35,14 @@ expr {=
 				}"/>
 				<div class="{=cls 'row' 'form-inline flex-nowrap'}">
 					<input type="text"
-						{=if not{=empty dayFormField} {*name="{{dayFormField}}"*} }
+						{=if dayFormField {*name="{{dayFormField}}"*} }
 						class="{=cls 'dayField' 'form-control'}"
 						placeholder="{{dayPlaceholder}}"
 						value="{=if {=empty date} day else {=dtGet date 'day'} }"
 						{=if disabled 'disabled'}
 					/>
 					<select
-						{=if not{=empty monthFormField} {*name="{{monthFormField}}"*} }
+						{=if monthFormField {*name="{{monthFormField}}"*} }
 						class="{=cls 'monthField' 'form-control'}"
 						{=if disabled 'disabled'}
 						>
@@ -60,7 +60,7 @@ expr {=
 					}
 					</select>
 					<input type="text"
-						{=if not{=empty yearFormField} {*name="{{yearFormField}}"*} }
+						{=if yearFormField {*name="{{yearFormField}}"*} }
 						class="{=cls 'yearField' 'form-control'}"
 						placeholder="{{yearPlaceholder}}"
 						value="{=if {=empty date} year else {=dtGet date 'year'} }"

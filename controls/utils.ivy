@@ -3,17 +3,17 @@ expr {=
 		def.pos el, baseClass: null;
 		def.body noscope {%
 			expr "e-" ~ el ~ " ";
-			if not{=empty instanceName}
+			if instanceName
 				"i-" ~ instanceName ~ " ";
-			if not{=empty cssBaseClass}
+			if cssBaseClass
 				cssBaseClass ~ " ";
-			if {=has {=scope} "cssClass"} and not{=empty cssClass}
+			if {=has {=scope} "cssClass"} and cssClass
 				cssClass ~ " ";
-			if {=has {=scope} "cssBaseElemClass"} and not{=empty cssBaseElemClass} and {=has cssBaseElemClass el}
+			if {=has {=scope} "cssBaseElemClass"} and cssBaseElemClass and {=has cssBaseElemClass el}
 				{=at cssBaseElemClass el} ~ " ";
-			if {=has {=scope} "cssElemClass"} and not{=empty cssElemClass} and {=has cssElemClass el}
+			if {=has {=scope} "cssElemClass"} and cssElemClass and {=has cssElemClass el}
 				{=at cssElemClass el} ~ " " 
-			elif not{=empty baseClass}
+			elif baseClass
 				baseClass ~ " ";
 		}
 	};
@@ -31,7 +31,7 @@ expr {=
 	def _addValues {=
 		def.kv result fields allScope;
 		def.body {=
-			if not{=empty fields} {=
+			if fields {=
 				for name in fields {=
 					if {=has allScope name} {=
 						setat result {=at allScope name} name;
@@ -86,9 +86,9 @@ expr {=
 		def.body noscope {=
 			var copyRight: userRights;
 			set copyRight.object: {=
-				if not{=empty obj}
+				if obj
 					obj
-				elif not{=empty subobj} and {=has {=scope} 'accessObject'}
+				elif subobj and {=has {=scope} 'accessObject'}
 					accessObject ~ '.' ~ subobj
 				elif {=has {=scope} 'accessObject'}
 					accessObject;

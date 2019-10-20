@@ -119,11 +119,12 @@ return FirClass(
 		_onData_load: function(config, rawData) {
 			var
 				def = config.deferred,
-				data = IvyDeserializer.deserialize(rawData);
+				data = IvyDeserializer.deserialize(rawData),
+				viewParams = IvyDeserializer.wrapOpts(config.viewParams);
 			// Put additional view params to pass into Ivy
-			for( var key in config.viewParams ) {
-				if( config.viewParams.hasOwnProperty(key) ) {
-					data[key] = config.viewParams[key];
+			for( var key in viewParams ) {
+				if( viewParams.hasOwnProperty(key) ) {
+					data[key] = viewParams[key];
 				}
 			}
 
