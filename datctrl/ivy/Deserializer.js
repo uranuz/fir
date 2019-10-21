@@ -5,10 +5,14 @@ define('fir/datctrl/ivy/Deserializer', [
 	'fir/datctrl/ivy/RecordAdapter',
 	'fir/datctrl/ivy/EnumFormatAdapter',
 	'fir/datctrl/ivy/EnumAdapter',
+	'fir/datctrl/ivy/FieldFormatAdapter',
+	'fir/datctrl/ivy/RecordFormatAdapter',
 	'fir/datctrl/Record',
 	'fir/datctrl/RecordSet',
 	'fir/datctrl/EnumFormat',
 	'fir/datctrl/Enum',
+	'fir/datctrl/FieldFormat',
+	'fir/datctrl/RecordFormat',
 	'ivy/Consts',
 	'ivy/ModuleObject',
 	'ivy/CodeObject',
@@ -21,10 +25,14 @@ define('fir/datctrl/ivy/Deserializer', [
 	RecordAdapter,
 	EnumFormatAdapter,
 	EnumAdapter,
+	FieldFormatAdapter,
+	RecordFormatAdapter,
 	Record,
 	RecordSet,
 	EnumFormat,
 	Enum,
+	FieldFormat,
+	RecordFormat,
 	IvyConsts,
 	ModuleObject,
 	CodeObject,
@@ -120,6 +128,10 @@ mod.wrapOpts = function(vp) {
 				vp[key] = new RecordAdapter(vp[key]);
 			} else if( vp[key] instanceof RecordSet ) {
 				vp[key] = new RecordSetAdapter(vp[key]);
+			} else if( vp[key] instanceof FieldFormat ) {
+				vp[key] = new FieldFormatAdapter(vp[key]);
+			} else if( vp[key] instanceof RecordFormat ) {
+				vp[key] = new RecordFormatAdapter(vp[key]);
 			}
 		}
 	}

@@ -1,14 +1,15 @@
 define('fir/datctrl/ivy/EnumFormatAdapter', [
 	'ivy/ClassNode',
-	'fir/datctrl/EnumFormat'
-], function(ClassNode, EnumFormat) {
+	'fir/datctrl/EnumFormat',
+	'fir/ivy/UnwrappableNode'
+], function(ClassNode, EnumFormat, UnwrappableNode) {
 return FirClass(
 	function EnumFormatAdapter(fmt) {
 		if( !(fmt instanceof EnumFormat) ) {
 			throw new Error('Expected EnumFormat');
 		}
 		this._fmt = fmt;
-	}, ClassNode, {
+	}, ClassNode, [UnwrappableNode], {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -39,6 +40,9 @@ return FirClass(
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
 			return this._fmt.getLength();
+		},
+		unwrap: function() {
+			return this._fmt;
 		}
 });
 });

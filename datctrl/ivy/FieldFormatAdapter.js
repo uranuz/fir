@@ -1,14 +1,15 @@
 define('fir/datctrl/ivy/FieldFormatAdapter', [
 	'ivy/ClassNode',
-	'fir/datctrl/FieldFormat'
-], function(ClassNode, FieldFormat) {
+	'fir/datctrl/FieldFormat',
+	'fir/ivy/UnwrappableNode'
+], function(ClassNode, FieldFormat, UnwrappableNode) {
 return FirClass(
 	function FieldFormatAdapter(fmt) {
 		if( !(fmt instanceof FieldFormat) ) {
 			throw new Error('Expected FieldFormat');
 		}
 		this._fmt = fmt;
-	}, ClassNode, {
+	}, ClassNode, [UnwrappableNode], {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -38,7 +39,10 @@ return FirClass(
 		},
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
-			return this._rec.getLength();
+			throw new Error('Not implemented!');
+		},
+		unwrap: function() {
+			return this._fmt;
 		}
 });
 });

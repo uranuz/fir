@@ -1,14 +1,15 @@
 define('fir/datctrl/ivy/EnumAdapter', [
 	'ivy/ClassNode',
-	'fir/datctrl/Enum'
-], function(ClassNode, Enum) {
+	'fir/datctrl/Enum',
+	'fir/ivy/UnwrappableNode'
+], function(ClassNode, Enum, UnwrappableNode) {
 return FirClass(
 	function EnumAdapter(en) {
 		if( !(en instanceof Enum) ) {
 			throw new Error('Expected Enum');
 		}
 		this._enum = en;
-	}, ClassNode, {
+	}, ClassNode, [UnwrappableNode], {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -46,6 +47,9 @@ return FirClass(
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
 			throw new Error('Not implemented!');
+		},
+		unwrap: function() {
+			return this._enum;
 		}
 });
 });

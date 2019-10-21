@@ -1,8 +1,8 @@
 define('fir/datctrl/ivy/RecordFormatAdapter', [
 	'ivy/ClassNode',
-	'fir/common/helpers',
-	'fir/datctrl/RecordFormat'
-], function(ClassNode, helpers, RecordFormat) {
+	'fir/datctrl/RecordFormat',
+	'fir/ivy/UnwrappableNode'
+], function(ClassNode, RecordFormat, UnwrappableNode) {
 return FirClass(
 	function RecordFormatAdapter(fmt) {
 		if( !(fmt instanceof RecordFormat) ) {
@@ -10,7 +10,7 @@ return FirClass(
 		}
 
 		this._fmt = fmt;
-	}, ClassNode, {
+	}, ClassNode, [UnwrappableNode], {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -43,6 +43,9 @@ return FirClass(
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
 			throw new Error('Not implemented!');
+		},
+		unwrap: function() {
+			return this._fmt;
 		}
 });
 });

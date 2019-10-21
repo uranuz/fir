@@ -1,14 +1,15 @@
 define('fir/datctrl/ivy/UserIdentity', [
 	'ivy/ClassNode',
-	'fir/security/right/UserIdentity'
-], function(ClassNode, UserIdentity) {
+	'fir/security/right/UserIdentity',
+	'fir/ivy/UnwrappableNode'
+], function(ClassNode, UserIdentity, UnwrappableNode) {
 return FirClass(
 	function IvyUserIdentity(userIdentity) {
 		if( !(userIdentity instanceof UserIdentity) ) {
 			throw new Error('Expected UserIdentity');
 		}
 		this._userIdentity = userIdentity;
-	}, ClassNode, {
+	}, ClassNode, [UnwrappableNode], {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
@@ -46,6 +47,9 @@ return FirClass(
 		/** Analogue to size_t length() @property; in D impl */
 		getLength: function() {
 			throw new Error('Not implemented!');
+		},
+		unwrap: function() {
+			return this._userIdentity;
 		}
 });
 });

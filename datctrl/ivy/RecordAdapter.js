@@ -24,7 +24,7 @@ return FirClass(
 		} else{
 			this._fmt = new RecordFormatAdapter(this._rec.getFormat());
 		}
-	}, ClassNode, {
+	}, ClassNode, [UnwrappableNode], {
 		/** Analogue to IvyNodeRange opSlice(); in D impl */
 		range: function() {
 			throw new Error('Not implemented!');
