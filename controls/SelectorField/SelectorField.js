@@ -41,6 +41,10 @@ return FirClass(
 			return this._record;
 		},
 
+		getSelectedKey: function() {
+			return this._record? this._record.getKey(): null;
+		},
+
 		_getViewParams: function(areaName) {
 			if( areaName === 'itemWrapper' ) {
 				return {

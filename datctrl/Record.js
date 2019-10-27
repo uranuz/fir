@@ -53,9 +53,28 @@ var mod = FirClass(
 		getKey: function() {
 			return this._d[ this._fmt._keyFieldIndex ];
 		},
-		set: function() {
-			//Не используй меня. Я пустой!..
-			//...или реализуй меня и используй
+		set: function(field, value) {
+			if( typeof(field) === 'string' || field instanceof String ) {
+				this._setImpl(field, value);
+			} else if( (field instanceof Object) && value == null ) {
+				this._setMass(field);
+			}
+		},
+		_setImpl: function(field, value) {
+			var index = this._fmt.getIndex(field);
+			if( typeof(value) === 'undefined' ) {
+				return; // If value is undefined then we treat it as there is not changes needed
+			}
+			// TODO: Add typechecking
+			this._d[index] = value;
+		},
+		_setMass: function(obj) {
+			for( var field in obj ) {
+				if( !obj.hasOwnProperty(field) ) {
+					continue;
+				}
+				this._setImpl(field, obj[field]);
+			}
 		},
 		_copyRecordData: function() {
 			var items = [];
@@ -91,6 +110,14 @@ var mod = FirClass(
 			var res = this._fmt.toStdJSON();
 			res.d = this.recordDataToJSON();
 			res.t = 'record';
+			return res;
+		},
+		toObject: function() {
+			var res = {};
+			for( var i = 0; i < this._fmt.getLength(); ++i ) {
+				var field = this._fmt.getName(i);
+				res[field] = this.get(i);
+			}
 			return res;
 		}
 });
