@@ -65,7 +65,7 @@ var ValidationController = FirClass(
 					vld.elem = vld.control._elems(vld.elem);
 				}
 
-				vld.elem = vld.elem || control._getContainer();
+				vld.elem = vld.elem || vld.control._getContainer();
 				vld._bondValidator = this._validateElem.bind(this, vld);
 				vld.elem.on('blur', vld._bondValidator);
 				this._validators.push(vld);
