@@ -65,6 +65,27 @@ return FirClass(
 			}
 			// Control starts dates from 1, but JS starts from 0
 			return new Date(yy, mm - 1, dd, 0, 0, 0, 0);
+		},
+		getOptDate: function() {
+			var
+				year = this.getYear(),
+				month = this.getMonth(),
+				day = this.getDay();
+			if( !year && !month && !day ) {
+				return null; // Date is completely empty
+			}
+			var res = {};
+			// Add parts of date that are not empty
+			if( year ) {
+				res.year = year;
+			}
+			if( month ) {
+				res.month = month;
+			}
+			if( day ) {
+				res.day = day;
+			}
+			return res;
 		}
 });
 });
