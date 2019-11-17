@@ -3,7 +3,7 @@ define('fir/controls/OpenDialog/OpenDialog', [
 	'fir/controls/ControlManager',
 	'fir/common/Deferred',
 	'fir/controls/Mixins/DialogConfig',
-	'css!fir/controls/OpenDialog/OpenDialog'
+	'fir/controls/OpenDialog/OpenDialog.scss'
 ], function(
 	FirControl,
 	ControlManager,

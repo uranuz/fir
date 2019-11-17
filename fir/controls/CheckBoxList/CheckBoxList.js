@@ -1,7 +1,7 @@
 define('fir/controls/CheckBoxList/CheckBoxList', [
 	'fir/controls/FirControl',
 	'fir/controls/Mixins/MultiSelect',
-	'css!fir/controls/CheckBoxList/CheckBoxList'
+	'fir/controls/CheckBoxList/CheckBoxList.scss'
 ], function(FirControl, MultiSelect) {
 'use strict';
 return FirClass(

@@ -1,7 +1,7 @@
 define('fir/controls/Paging/Paging', [
 	'fir/controls/FirControl',
 	'fir/common/helpers',
-	'css!fir/controls/Paging/Paging'
+	'fir/controls/Paging/Paging.scss'
 ], function(FirControl, helpers) {
 	var PagingMode = {
 		Offset: 0,

@@ -1,6 +1,6 @@
 define('fir/controls/SelectorField/SelectorField', [
 	'fir/controls/FirControl',
-	'css!fir/controls/SelectorField/SelectorField'
+	'fir/controls/SelectorField/SelectorField.scss'
 ], function(FirControl) {
 'use strict';
 return FirClass(

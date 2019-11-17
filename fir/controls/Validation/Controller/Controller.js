@@ -2,7 +2,7 @@ define('fir/controls/Validation/Controller/Controller', [
 	'fir/controls/FirControl',
 	'fir/controls/ControlManager',
 	'fir/controls/Validation/Center',
-	'css!fir/controls/Validation/Controller/Controller'
+	'fir/controls/Validation/Controller/Controller.scss'
 ], function(FirControl, ControlManager, ValidationCenter) {
 var ValidationController = FirClass(
 	function ValidationController(opts) {

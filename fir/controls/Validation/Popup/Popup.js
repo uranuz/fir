@@ -1,6 +1,6 @@
 define('fir/controls/Validation/Popup/Popup', [
 	'fir/controls/FirControl',
-	'css!fir/controls/Validation/Popup/Popup'
+	'fir/controls/Validation/Popup/Popup.scss'
 ], function(FirControl) {
 'use strict';
 return FirClass(

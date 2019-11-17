@@ -1,6 +1,6 @@
 define('fir/controls/PlainDatePicker/PlainDatePicker', [
 	'fir/controls/FirControl',
-	'css!fir/controls/PlainDatePicker/PlainDatePicker'
+	'fir/controls/PlainDatePicker/PlainDatePicker.scss'
 ], function(FirControl) {
 return FirClass(
 	function PlainDatePicker(opts) {
