@@ -1,4 +1,4 @@
-define('fir/ivy/OptStorage', [
+define('fir/ivy/directive/OptStorage', [
 	'ivy/DirectiveInterpreter',
 	'ivy/utils',
 	'ivy/Consts',

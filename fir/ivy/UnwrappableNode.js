@@ -4,7 +4,7 @@ define('fir/ivy/UnwrappableNode', [
 'use strict';
 
 return FirClass(
-	function OptStorageInterpreter() {
+	function UnwrappableNode() {
 	}, {
 		unwrap: function(interp) {
 			throw new Error('Not implemented!');

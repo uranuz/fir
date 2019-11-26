@@ -1,4 +1,4 @@
-define('fir/ivy/RemoteCall', [
+define('fir/ivy/directive/RemoteCall', [
 	'ivy/DirectiveInterpreter',
 	'ivy/utils',
 	'ivy/Consts',
