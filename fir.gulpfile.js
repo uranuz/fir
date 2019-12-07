@@ -19,7 +19,7 @@ var
 	if( argv.publicPath ) {
 		config.publicPath = argv.publicPath;
 	} else {
-		config.publicPath = '/pub';
+		config.publicPath = '/pub/';
 		console.warn('--publicPath is not set, so using default value: ' + config.publicPath);
 	}
 	
@@ -41,23 +41,35 @@ var
 })();
 
 function buildLib(config, callback) {
+	var
+		libraryTarget = 'var',
+		manifestsPath = path.join(config.outPub, `manifest/`);
 	// run webpack
 	webpack({
 		context: __dirname,
 		mode: (devMode? 'development': 'production'),
 		entry: {
 			fir: glob.sync(path.join(__dirname, 'fir/**/*.js')),
-			'fir/common/globals': 'fir/common/globals'
+			fir_globals: [path.join(__dirname, 'fir/common/globals')]
 		},
+		/*
 		externals: [
 			nodeExternals(),
-			/^ivy\//
+			// /^ivy\//,
+			function(basePath, moduleName, callback) {
+				if( /^(ivy)\//.test(moduleName) ) {
+					return callback(null, 'arguments[2]("./' + moduleName + '.js")');
+				}
+				callback();
+			}
 		],
+		*/
 		resolve: {
 			modules: [
 				__dirname
 			],
-			extensions: ['.js']
+			extensions: ['.js'],
+			symlinks: false
 		},
 		module: {
 			rules: [
@@ -95,20 +107,33 @@ function buildLib(config, callback) {
 				}
 			]
 		},
+		
+		/*
 		optimization: {
 			runtimeChunk: {
 				name: "manifest",
 			}
 		},
+		*/
+		
 		devtool: '(none)', //'cheap-source-map',
 		output: {
 			path: config.outPub,
 			publicPath: config.publicPath,
-			libraryTarget: 'umd',
-			library: 'fir',
-			umdNamedDefine: true,
+			libraryTarget: libraryTarget,
+			library: '[name]_lib',
 		},
 		plugins: [
+
+			new webpack.DllReferencePlugin({
+				//context: path.resolve(__dirname, '../ivy'),
+				manifest: require(path.join(manifestsPath, 'ivy.manifest.json')),
+				sourceType: libraryTarget
+			}),
+			new webpack.DllPlugin({
+				name: '[name]_lib',
+				path: path.join(manifestsPath, '[name].manifest.json')
+			}),
 			new MiniCssExtractPlugin({
 				// Options similar to the same options in webpackOptions.output
 				// both options are optional
@@ -157,8 +182,7 @@ gulp.task("fir-symlink-js", function() {
 // Create bundles then add nonexisting files as symlinks...
 gulp.task("fir-js", gulp.series(["fir-webpack", "fir-symlink-js"]));
 
-gulp.task("fir", gulp.parallel(["fir-js", "fir-symlink-templates"]));
+gulp.task("fir", gulp.series(["fir-js", "fir-symlink-templates"]));
 
 
-gulp.task("default", gulp.parallel(['fir']));
-
+gulp.task("default", gulp.series(['fir']));

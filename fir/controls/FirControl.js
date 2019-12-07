@@ -4,7 +4,6 @@ define('fir/controls/FirControl', [
 return FirClass(
 	function FirControl(opts) {
 		this._injectOptions(opts);
-		ControlManager.registerControl(this); // Компонент сам себя регистрирует
 		// Уведомляем прямых потомков о загрузке родителя
 		this._notifyParentCreated();
 	}, {
@@ -283,10 +282,6 @@ return FirClass(
 		_reloadControl: function(areaName, extraConfig) {
 			ControlManager.reloadControl(this, areaName, extraConfig);
 		},
-
-		findInstanceByName: function(instanceName) {
-			return ControlManager.findInstanceByName(instanceName);
-		},
 		getChildByName: function(name) {
 			for( var i = 0; i < this._childControls.length; ++i ) {
 				if( this._childControls[i].instanceName() === name ) {
@@ -343,9 +338,6 @@ return FirClass(
 			if( this._getContainer() ) {
 				$(this._getContainer()).remove();
 			}
-
-			// Дерегистрировать компонент из реестра
-			ControlManager.unregisterControl(this);
 		},
 
 		/** Удаление дочерних компонентов */

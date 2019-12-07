@@ -2,10 +2,6 @@
   "name": "fir",
   "version": "0.0.1",
   "description": "Interface library used with 'webtank' and 'ivy'",
-  "main": "Gruntfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/uranuz/fir.git"

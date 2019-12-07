@@ -4,6 +4,7 @@ define('fir/controls/ControlManager', [
 	'fir/datctrl/Deserializer',
 	'fir/datctrl/ivy/Deserializer',
 	'fir/controls/Loader/Manager',
+	'fir/controls/iface/IControlModuleLoader',
 	'fir/common/helpers'
 ], function(
 	Base64,
@@ -11,22 +12,21 @@ define('fir/controls/ControlManager', [
 	Deserializer,
 	IvyDeserializer,
 	LoaderManager,
+	IControlModuleLoader,
 	helpers
 ) {
 	function ControlLoadState() {
 		this.controlTag = null; // This control (or area) root tag
-		this.configTag = null; // Configuration tag 'data-fir-opts' inside control tag
 		this.opts = null; // Parsed options
 		this.moduleName = null; // Path to module of this control
 		this.control = null; // This control instance
-		this.childControlTags = null; // Root tags of child controls
-		this.childControls = null; // Child control instances
+		this.childStates = []; // List of ControlLoadState instances for child controls
 		this.childLoadCounter = null; // Count of remaining child controls that need to be loaded
 		this.parentState = null; // Instance of ControlLoadState for parent control
 		this.replaceMarkup = null;
 		this.areaName = null;
 		this.onAfterLoad = null; // Deffered that needs to be called on finish load
-		this.optSets = null;
+		this.optSets = null; // Sets of options that needs to be passed to loaded controls
 	}
 
 	ControlLoadState.prototype.getOptSets = function() {
@@ -41,8 +41,8 @@ define('fir/controls/ControlManager', [
 // ControlManger is singleton. So module returns instance of class
 return new (FirClass(
 	function ControlManager() {
-		this._controlRegistry = {};
 		this._controlCounter = 0; // Variable used to generate control names
+		this._moduleLoader = null;
 	}, {
 		ControlLoadState: ControlLoadState,
 
@@ -71,7 +71,6 @@ return new (FirClass(
 					+ 'and there is no multiple root control elements in markup.');
 			}
 			this._initControlAndChildren(state);
-			return state.onAfterLoad;
 		},
 
 		_onControlModuleLoaded: function(state, ControlClass) {
@@ -89,19 +88,18 @@ return new (FirClass(
 			// К этому моменту дочерние компоненты уже загрузились
 			if( state.control == null ) {
 				state.opts.container = $(state.controlTag); // Устанавливаем корневой тэг для компонента
-				state.opts.childControls = state.childControls; // Прописываем контролы всей пачкой (*#*)
+				state.opts.childControls = state.childStates.map(function(it) {
+					return it.control;
+				}); // Прописываем контролы всей пачкой (*#*)
 				state.control = new ControlClass(state.opts);
 				updateControl = false;
 			}
 
+			// Если компонент - корневой в данном процессе загрузки, то parentState == null
 			if( parentState != null ) {
 				var parentControl = parentState.control;
 				// Добавляем наш компонент в список дочерних для родителя
-				// Если компонент - корневой, то parentState == null
-				if( parentControl == null ) {
-					// Родительский контрол не указан - добавляем просто в список, который потом добавляется в строке (*#*)
-					parentState.childControls.push(state.control);
-				} else {
+				if( parentControl ) {
 					// Есть родительский контрол - добавляем ещё не существующие дочерние к нему
 					var existingInst = parentControl.getChildByName(state.opts.instanceName);
 					if( !existingInst ) {
@@ -151,9 +149,28 @@ return new (FirClass(
 			}
 			return {};
 		},
+		getModuleLoader: function() {
+			if( !this._moduleLoader ) {
+				throw new Error('Control module loader is required, but not set!');
+			}
+			return this._moduleLoader;
+		},
+
+		setModuleLoader: function(loader) {
+			if( !(loader instanceof IControlModuleLoader) ) {
+				throw new Error('Expected instance of IControlModuleLoader');
+			}
+			this._moduleLoader = loader;
+		},
 
 		_initCurrentControl: function(state) {
-			require([state.moduleName], this._onControlModuleLoaded.bind(this, state));
+			this.getModuleLoader()
+				.load(state.moduleName)
+				.then(
+					this._onControlModuleLoaded.bind(this, state),
+					function(err) {
+						console.error('Unable to load module "' + state.moduleName + '"!');
+					});
 		},
 		/** Получает состояние компонента из верстки. Добавляет состояние в контекст перезагрузки state */
 		_fillControlStateFromMarkup: function(state) {
@@ -161,17 +178,18 @@ return new (FirClass(
 				// Опции уже получены
 				return state;
 			}
-			state.configTag = helpers.getOuterMost($(state.controlTag), '[data-fir-opts]', '[data-fir-module]', true);
 			if( !state.controlTag || state.controlTag.length !== 1 ) {
 				throw new Error('Expected exactly 1 element as control tag!!!');
 			}
-			if( state.configTag.length > 1 ) {
+			var configTag = helpers.getOuterMost(state.controlTag, '[data-fir-opts]', '[data-fir-module]', true);
+			if( configTag.length > 1 ) {
 				throw new Error('Multiple "opts" tags found for control!!!');
 			}
-			state.moduleName = $(state.controlTag).attr('data-fir-module');
-			var
-				optSets = state.getOptSets(),
-				optData = state.configTag.attr('data-fir-opts');
+			state.moduleName = state.controlTag.attr('data-fir-module');
+			if( !state.moduleName ) {
+				throw new Error('Control module name is required!');
+			}
+			var optSets = state.getOptSets();
 			// Если заданы наборы опций, то следует получать опции оттуда. Значит - верстка строится на интерфейсе
 			// Если наборы опций не заданы, то опции закодированы в верстке в Base64
 			if( optSets != null ) {
@@ -179,13 +197,8 @@ return new (FirClass(
 				delete optSets[optData]; // Избавимся от набора опций сразу как получили его
 				IvyDeserializer.unwrapOpts(state.opts); // Извлекает оригинальные значения из адаптеров для ivy
 			} else {
-				state.opts = this._extractControlOpts(optData);
-				state.opts = Deserializer.deserialize(state.opts); // В первой ветке десериализация не нужна
-			}
-			state.childControlTags = helpers.getOuterMost(state.controlTag.children(), '[data-fir-module]');
-			state.childLoadCounter = state.childControlTags.length;
-			if( state.control == null ) {
-				state.childControls = []; // Список дочерних для текущего компонента
+				var serializedOpts = this._extractControlOpts(configTag.attr('data-fir-opts'));
+				state.opts = Deserializer.deserialize(serializedOpts); // В первой ветке десериализация не нужна
 			}
 			return state;
 		},
@@ -193,11 +206,14 @@ return new (FirClass(
 		_initControlAndChildren: function(state) {
 			var
 				self = this,
-				childStates = [],
-				existingChildren = {};
+				existingChildren = {},
+				childControlTags = helpers.getOuterMost(state.controlTag.children(), '[data-fir-module]');
 			// Заполняем контекст загрузки данного контрола из верстки
 			this._fillControlStateFromMarkup(state);
-			state.childControlTags.each(function(index, childTag) {
+			state.childLoadCounter = childControlTags.length; // Запоминаем сколько контролов надо загрузить
+
+			// Подготавливаем состояние для дочерних компонентов
+			childControlTags.each(function(index, childTag) {
 				// Создаем контексты загрузки для каждого из дочерних компонентов, найденных в верстке
 				var childState = new ControlLoadState();
 				childState.controlTag = $(childTag);
@@ -208,7 +224,7 @@ return new (FirClass(
 					// то сохраняем ссылку на него, чтобы он не был создан заново
 					childState.control = state.control.getChildByName(childState.opts.instanceName);
 				}
-				childStates.push(childState);
+				state.childStates.push(childState);
 				existingChildren[childState.opts.instanceName] = true;
 			});
 			if( state.control ) {
@@ -225,65 +241,12 @@ return new (FirClass(
 			if( state.childLoadCounter === 0 ) {
 				// Нет дочерних компонентов - инициализируем сразу, иначе асинхронно
 				this._initCurrentControl(state);
-			}
-			// require нужен, т.к. при использовании сборок дочерние модули часто находятся в родителе,
-			// и нужно подгрузить родителя первым
-			require([state.moduleName], function() {
-				for( var i = 0; i < childStates.length; ++i ) {
-					self._initControlAndChildren(childStates[i]); // Инициализируем дочерние компоненты
-				}
-			});
-		},
-		registerControl: function(control) {
-			var
-				name = control.instanceName(),
-				already = false;
-			if( !this._controlRegistry.hasOwnProperty(name) ) {
-				this._controlRegistry[name] = [];
-			} else if( this._controlRegistry[name].length ) {
-				console.warn('Control with name "' + name + '" already registered!');
-			}
-			for(var i = 0; i < this._controlRegistry[name].length; ++i ) {
-				var testControl = this._controlRegistry[name][i];
-				if( testControl === control ) {
-					already = true;
-					console.warn('Duplicate registration of the same control with name: ' + name);
-					break;
-				}
-			}
-			if( !already ) {
-				this._controlRegistry[name].push(control);
-			}
-		},
-		unregisterControl: function(control) {
-			var
-				name = control.instanceName(),
-				candidates = this._controlRegistry[name];
-			if( !candidates || candidates.length === 0 ) {
 				return;
 			}
-			if( candidates.length === 1 && candidates[0] === control ) {
-				// Если это последний элемент, то удаляем всю "корзину"
-				delete this._controlRegistry[name];
-				return;
+			// Инициализируем дочерние компоненты
+			for( var i = 0; i < state.childStates.length; ++i ) {
+				self._initControlAndChildren(state.childStates[i]);
 			}
-			for( var i = 0; i < candidates.length; ++i ) {
-				// Дерегистрировать компонент из реестра
-				if( candidates[i] !== control ) {
-					continue;
-				}
-				candidates.splice(i, 1); // Удаляем с заданной позиции
-			}
-		},
-		findInstanceByName: function(instanceName) {
-			var candidates = this._controlRegistry[instanceName];
-			if( !candidates || candidates.length === 0 ) {
-				return null;
-			}
-			if( candidates.length > 1 ) {
-				console.warn('There are ' + candidates.length + ' controls with name "' + instanceName + '" in registry');
-			}
-			return candidates[0];
 		},
 		getNextNameIndex: function() {
 			return ++this._controlCounter;
