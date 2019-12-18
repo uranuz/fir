@@ -42,7 +42,7 @@ var
 
 function buildLib(config, callback) {
 	var
-		libraryTarget = 'var',
+		libraryTarget = 'window',
 		manifestsPath = path.join(config.outPub, `manifest/`);
 	// run webpack
 	webpack({
@@ -120,8 +120,9 @@ function buildLib(config, callback) {
 		output: {
 			path: config.outPub,
 			publicPath: config.publicPath,
+			filename: '[name].js',
 			libraryTarget: libraryTarget,
-			library: '[name]_lib',
+			library: '[name]',
 		},
 		plugins: [
 
@@ -131,7 +132,7 @@ function buildLib(config, callback) {
 				sourceType: libraryTarget
 			}),
 			new webpack.DllPlugin({
-				name: '[name]_lib',
+				name: '[name]',
 				path: path.join(manifestsPath, '[name].manifest.json')
 			}),
 			new MiniCssExtractPlugin({
