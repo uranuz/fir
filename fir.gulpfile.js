@@ -52,18 +52,6 @@ function buildLib(config, callback) {
 			fir: glob.sync(path.join(__dirname, 'fir/**/*.js')),
 			fir_globals: [path.join(__dirname, 'fir/common/globals')]
 		},
-		/*
-		externals: [
-			nodeExternals(),
-			// /^ivy\//,
-			function(basePath, moduleName, callback) {
-				if( /^(ivy)\//.test(moduleName) ) {
-					return callback(null, 'arguments[2]("./' + moduleName + '.js")');
-				}
-				callback();
-			}
-		],
-		*/
 		resolve: {
 			modules: [
 				__dirname
@@ -107,15 +95,6 @@ function buildLib(config, callback) {
 				}
 			]
 		},
-		
-		/*
-		optimization: {
-			runtimeChunk: {
-				name: "manifest",
-			}
-		},
-		*/
-		
 		devtool: '(none)', //'cheap-source-map',
 		output: {
 			path: config.outPub,
@@ -125,7 +104,6 @@ function buildLib(config, callback) {
 			library: '[name]',
 		},
 		plugins: [
-
 			new webpack.DllReferencePlugin({
 				//context: path.resolve(__dirname, '../ivy'),
 				manifest: require(path.join(manifestsPath, 'ivy.manifest.json')),

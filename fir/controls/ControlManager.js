@@ -71,6 +71,7 @@ return new (FirClass(
 					+ 'and there is no multiple root control elements in markup.');
 			}
 			this._initControlAndChildren(state);
+			return state.onAfterLoad;
 		},
 
 		_onControlModuleLoaded: function(state, ControlClass) {
@@ -185,19 +186,29 @@ return new (FirClass(
 			if( configTag.length > 1 ) {
 				throw new Error('Multiple "opts" tags found for control!!!');
 			}
-			state.moduleName = state.controlTag.attr('data-fir-module');
-			if( !state.moduleName ) {
-				throw new Error('Control module name is required!');
+			// Определяем имя JS-модуля для контрола
+			if( state.control ) {
+				if( !state.control._moduleName ) {
+					throw new Error('Expected JS-module name for existing control!!!');
+				}
+				state.moduleName = state.control._moduleName;
+			} else {
+				state.moduleName = state.controlTag.attr('data-fir-module');
+				if( !state.moduleName ) {
+					throw new Error('Expected JS-module name for new control!');
+				}
 			}
-			var optSets = state.getOptSets();
+			var
+				optSets = state.getOptSets(),
+				optDataOrId = configTag.attr('data-fir-opts');
 			// Если заданы наборы опций, то следует получать опции оттуда. Значит - верстка строится на интерфейсе
 			// Если наборы опций не заданы, то опции закодированы в верстке в Base64
-			if( optSets != null ) {
-				state.opts = optSets[optData];
-				delete optSets[optData]; // Избавимся от набора опций сразу как получили его
+			if( optSets != null && optDataOrId ) {
+				state.opts = optSets[optDataOrId];
+				delete optSets[optDataOrId]; // Избавимся от набора опций сразу как получили его
 				IvyDeserializer.unwrapOpts(state.opts); // Извлекает оригинальные значения из адаптеров для ivy
 			} else {
-				var serializedOpts = this._extractControlOpts(configTag.attr('data-fir-opts'));
+				var serializedOpts = this._extractControlOpts(optDataOrId);
 				state.opts = Deserializer.deserialize(serializedOpts); // В первой ветке десериализация не нужна
 			}
 			return state;
