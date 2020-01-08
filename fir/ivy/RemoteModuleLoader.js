@@ -35,8 +35,8 @@ function RemoteModuleLoader(endpoint) {
 	load: function(moduleName, callback) {
 		var self = this;
 		$.ajax(this._endpoint + '?moduleName=' + moduleName + '&generalTemplate=no', {
-			success: function(jModules) {
-				callback(self.parseModules(jModules), moduleName);
+			success: function(json) {
+				callback(self.parseModules(json.result), moduleName);
 			},
 			error: function(error) {
 				console.error(error);
