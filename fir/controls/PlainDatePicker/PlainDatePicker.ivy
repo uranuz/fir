@@ -38,7 +38,7 @@ expr {=
 						{=if dayFormField {*name="{{dayFormField}}"*} }
 						class="{=cls 'dayField' 'form-control'}"
 						placeholder="{{dayPlaceholder}}"
-						value="{=if {=empty date} day else {=dtGet date 'day'} }"
+						value="{=if {=empty date} day else date.day}"
 						{=if disabled 'disabled'}
 					/>
 					<select
@@ -53,7 +53,7 @@ expr {=
 							<option
 								class="{=cls 'monthItem' 'form-control'}"
 								value="{{index}}"
-								{=if index == {=if {=empty date} month else {=dtGet date 'month'} } "selected"}
+								{=if index == {=if {=empty date} month else date.month} "selected"}
 								>{{item}}</option>
 							{=set index: index + 1}
 						*}
@@ -63,7 +63,7 @@ expr {=
 						{=if yearFormField {*name="{{yearFormField}}"*} }
 						class="{=cls 'yearField' 'form-control'}"
 						placeholder="{{yearPlaceholder}}"
-						value="{=if {=empty date} year else {=dtGet date 'year'} }"
+						value="{=if {=empty date} year else date.year}"
 						{=if disabled 'disabled'}
 					/>
 				</div>
