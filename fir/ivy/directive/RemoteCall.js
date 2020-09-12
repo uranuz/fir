@@ -1,8 +1,8 @@
 define('fir/ivy/directive/RemoteCall', [
-	'ivy/DirectiveInterpreter',
+	'ivy/interpreter/directive/iface',
 	'ivy/utils',
-	'ivy/Consts',
-	'ivy/AsyncResult',
+	'ivy/types/data/consts',
+	'ivy/types/data/async_result',
 	'fir/network/json_rpc'
 ], function(
 	DirectiveInterpreter,

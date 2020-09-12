@@ -1,4 +1,12 @@
 define("fir/common/FirClass", [], function() {
+	/** Special class that is used to declare properties */
+	function FirProperty(descr) {
+		if( descr == null ) {
+			throw new Error('Expected property desriptor object arument');
+		}
+		this.descr = descr
+	}
+	
 	/**
 	 * Special method that could be used to call constructors of the base class and mixins
 	 */
@@ -117,12 +125,19 @@ define("fir/common/FirClass", [], function() {
 		}
 		var props = (typeof(src) === 'function'? __getPrototype(src): src);
 		for( key in props ) {
+			var prop = props[key];
 			// Don't copy Object's built in properties and special properties
 			if(
-				((typeof {}[key] == "undefined") || ({}[key] != props[key]))
+				((typeof {}[key] == "undefined") || ({}[key] != prop))
 				&& SPECIAL_FIELDS.indexOf(key) < 0
 			) {
-				proto[key] = props[key];
+				
+				if( prop instanceof FirProperty ) {
+					// Detected instance of property descriptor
+					Object.defineProperty(proto, key, prop.descr);
+				} else {
+					proto[key] = prop;
+				}
 				__checkOwnProp(proto, key);
 			}
 		}
@@ -203,6 +218,10 @@ define("fir/common/FirClass", [], function() {
 		}
 		return __extends(ctor, base, mixins);
 	}
+
 	window.FirClass = FirClass;
+	window.firProperty = function(descr) {
+		return new FirProperty(descr);
+	};
 	return FirClass;
 });

@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/UserIdentity', [
-	'ivy/ClassNode',
+	'ivy/types/data/iface/class_node',
 	'fir/security/right/UserIdentity',
 	'fir/ivy/UnwrappableNode'
 ], function(ClassNode, UserIdentity, UnwrappableNode) {

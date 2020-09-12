@@ -13,10 +13,10 @@ define('fir/datctrl/ivy/Deserializer', [
 	'fir/datctrl/Enum',
 	'fir/datctrl/FieldFormat',
 	'fir/datctrl/RecordFormat',
-	'ivy/Consts',
-	'ivy/ModuleObject',
-	'ivy/CodeObject',
-	'ivy/ClassNode',
+	'ivy/types/data/consts',
+	'ivy/types/module_object',
+	'ivy/types/code_object',
+	'ivy/types/data/iface/class_node',
 	'fir/ivy/UnwrappableNode'
 ], function(
 	mod,

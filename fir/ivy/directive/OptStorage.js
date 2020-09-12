@@ -1,8 +1,8 @@
 define('fir/ivy/directive/OptStorage', [
-	'ivy/DirectiveInterpreter',
+	'ivy/interpreter/directive/iface',
 	'ivy/utils',
-	'ivy/Consts',
-	'ivy/ClassNode'
+	'ivy/types/data/consts',
+	'ivy/types/data/iface/class_node'
 ], function(
 	DirectiveInterpreter,
 	iu,

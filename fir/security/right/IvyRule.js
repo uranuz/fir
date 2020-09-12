@@ -1,7 +1,7 @@
 define('fir/security/right/IvyRule', [
 	'ivy/utils',
-	'ivy/Consts',
-	'ivy/Engine',
+	'ivy/types/data/consts',
+	'ivy/engine',
 	'fir/datctrl/ivy/UserIdentity'
 ], function(iu, IvyConst, IvyEngine, IvyUserIdentity) {
 var IvyDataType = IvyConst.IvyDataType;

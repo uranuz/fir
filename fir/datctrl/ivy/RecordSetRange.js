@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/RecordSetRange', [
-	'ivy/DataNodeRange'
+	'ivy/types/data/iface/range'
 ], function(DataNodeRange) {
 return FirClass(
 	function RecordSetRange(rs) {

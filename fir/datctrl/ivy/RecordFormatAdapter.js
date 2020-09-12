@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/RecordFormatAdapter', [
-	'ivy/ClassNode',
+	'ivy/types/data/iface/class_node',
 	'fir/datctrl/RecordFormat',
 	'fir/ivy/UnwrappableNode'
 ], function(ClassNode, RecordFormat, UnwrappableNode) {

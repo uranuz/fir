@@ -1,6 +1,6 @@
 define('fir/controls/Loader/IvyServerFactory', [
 	'fir/controls/Loader/Abstract',
-	'ivy/Engine',
+	'ivy/engine',
 	'fir/security/right/UserIdentity',
 	'fir/security/right/UserRights',
 	'fir/network/json_rpc',

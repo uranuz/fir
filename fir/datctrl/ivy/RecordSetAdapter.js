@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/RecordSetAdapter', [
-	'ivy/ClassNode',
+	'ivy/types/data/iface/class_node',
 	'fir/datctrl/RecordSet',
 	'fir/datctrl/ivy/RecordSetRange',
 	'fir/datctrl/ivy/RecordFormatAdapter',

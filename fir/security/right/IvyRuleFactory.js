@@ -1,7 +1,7 @@
 define('fir/security/right/IvyRuleFactory', [
 	'fir/security/right/iface/RuleFactory',
 	'fir/security/right/IvyRule',
-	'ivy/Engine'
+	'ivy/engine'
 ], function(IAccessRuleFactory, IvyRule, IvyEngine) {
 return FirClass(
 	function IvyRuleFactory(ivyEngine) {

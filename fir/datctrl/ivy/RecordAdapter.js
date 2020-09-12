@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/RecordAdapter', [
-	'ivy/ClassNode',
+	'ivy/types/data/iface/class_node',
 	'fir/datctrl/Record',
 	'fir/datctrl/ivy/RecordFormatAdapter',
 	'fir/datctrl/ivy/EnumAdapter',

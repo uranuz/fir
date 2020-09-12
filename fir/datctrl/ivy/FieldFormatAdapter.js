@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/FieldFormatAdapter', [
-	'ivy/ClassNode',
+	'ivy/types/data/iface/class_node',
 	'fir/datctrl/FieldFormat',
 	'fir/ivy/UnwrappableNode'
 ], function(ClassNode, FieldFormat, UnwrappableNode) {

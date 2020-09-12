@@ -1,5 +1,5 @@
 define('fir/ivy/directive/StandardFactory', [
-	'ivy/directive/StandardFactory',
+	'ivy/interpreter/directive/standard_factory',
 	'fir/ivy/directive/OptStorage',
 	'fir/ivy/directive/RemoteCall',
 	'fir/ivy/directive/ToJSONBase64'

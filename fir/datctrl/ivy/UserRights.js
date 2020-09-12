@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/UserRights', [
-	'ivy/ClassNode',
+	'ivy/types/data/iface/class_node',
 	'fir/security/right/UserRights'
 ], function(ClassNode, UserRights) {
 return FirClass(

@@ -1,5 +1,5 @@
 define('fir/datctrl/ivy/EnumAdapter', [
-	'ivy/ClassNode',
+	'ivy/types/data/iface/class_node',
 	'fir/datctrl/Enum',
 	'fir/ivy/UnwrappableNode'
 ], function(ClassNode, Enum, UnwrappableNode) {

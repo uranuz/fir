@@ -1,7 +1,7 @@
 define('fir/ivy/directive/ToJSONBase64', [
-	'ivy/DirectiveInterpreter',
+	'ivy/interpreter/directive/iface',
 	'ivy/utils',
-	'ivy/Consts',
+	'ivy/types/data/consts',
 	'fir/common/base64'
 ], function(
 	DirectiveInterpreter,
