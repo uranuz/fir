@@ -220,8 +220,29 @@ define("fir/common/FirClass", [], function() {
 	}
 
 	window.FirClass = FirClass;
-	window.firProperty = function(descr) {
+	window.firProperty = function(getterOrDescr, setter) {
+		var descr;
+		if( maybeProps instanceof Object && typeof(maybeMixins) !== 'function' ) {
+			if( setter != null ) {
+				throw new Error('If property descriptor is passed as first argument then setter arument is not allowed')
+			}
+			descr = getterOrDescr;
+		} else {
+			descr = {};
+			if( typeof(getterOrDescr) === 'function' ) {
+				descr.get = getterOrDescr
+			}
+			if( typeof(setter) === 'function' ) {
+				descr.set = setter;
+			}
+		}
 		return new FirProperty(descr);
 	};
+	window.firPODCtor = function(self, klass, args) {
+		if( self instanceof klass ) {
+			return null;
+		}
+		return new (klass.bind(1, arguments));
+	}
 	return FirClass;
 });
