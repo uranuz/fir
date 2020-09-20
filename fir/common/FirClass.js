@@ -129,7 +129,7 @@ define("fir/common/FirClass", [], function() {
 			// Don't copy Object's built in properties and special properties
 			if(
 				((typeof {}[key] == "undefined") || ({}[key] != prop))
-				&& SPECIAL_FIELDS.indexOf(key) < 0
+				&& SPECIAL_FIELDS.includes(key)
 			) {
 				
 				if( prop instanceof FirProperty ) {

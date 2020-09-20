@@ -1,8 +1,8 @@
-define('fir/ivy/directive/StandardFactory', [
+define('fir/ivy/directive/standard_factory', [
 	'ivy/interpreter/directive/standard_factory',
-	'fir/ivy/directive/OptStorage',
-	'fir/ivy/directive/RemoteCall',
-	'fir/ivy/directive/ToJSONBase64'
+	'fir/ivy/directive/opt_storage',
+	'fir/ivy/directive/remote_call',
+	'fir/ivy/directive/to_json_base64'
 ], function(
 	IvyFactory,
 	OptStorage,

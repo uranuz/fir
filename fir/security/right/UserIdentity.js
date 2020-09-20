@@ -32,7 +32,7 @@ return FirClass(
 		
 		///Функция возвращает true, если пользователь входит в группу
 		isInRole: function(roleName) {
-			return this._accessRoles.indexOf(roleName) >= 0;
+			return this._accessRoles.includes(roleName);
 		},
 
 		///Делает текущий экземпляр удостоверения пользователя недействительным

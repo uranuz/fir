@@ -1,5 +1,5 @@
 define('fir/security/right/IvyRule', [
-	'ivy/utils',
+	'ivy/types/data/data',
 	'ivy/types/data/consts',
 	'ivy/engine',
 	'fir/datctrl/ivy/UserIdentity'
@@ -55,7 +55,7 @@ return FirClass(
 				IvyDataType.Undef,
 				IvyDataType.Null,
 				IvyDataType.Boolean
-			].indexOf(iu.getDataNodeType(res)) < 0) {
+			].includes(iu.getDataNodeType(res))) {
 				throw new Error('Expected Undef, Null or Boolean as rights check result');
 			}
 			return !!res;

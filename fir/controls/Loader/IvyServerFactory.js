@@ -8,7 +8,7 @@ define('fir/controls/Loader/IvyServerFactory', [
 	'fir/datctrl/ivy/UserRights',
 	'fir/datctrl/ivy/UserIdentity',
 	'fir/common/Deferred',
-	'ivy/utils'
+	'ivy/types/data/data'
 ], function(
 	LoaderAbstract,
 	IvyEngine,
@@ -19,7 +19,7 @@ define('fir/controls/Loader/IvyServerFactory', [
 	IvyUserRights,
 	IvyUserIdentity,
 	Deferred,
-	iu
+	idat
 ) {
 return FirClass(
 	function IvyServerFactory(engine, userIdentity, userRights, vpaths) {
@@ -132,7 +132,7 @@ return FirClass(
 				config.ivyMethod, data, this._getExtraGlobals(config.optSets)
 			).then(
 				function(res) {
-					def.resolve(iu.toString(res));
+					def.resolve(idat.toString(res));
 				},
 				def.reject.bind(def));
 		}

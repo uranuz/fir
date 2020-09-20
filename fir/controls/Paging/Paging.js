@@ -114,7 +114,7 @@ return FirClass(
 			return isNaN(pageSize)? null: pageSize;
 		},
 		setPagingMode: function(mode) {
-			if( [PagingMode.Page, PagingMode.Offset].indexOf(mode) < 0 ) {
+			if( [PagingMode.Page, PagingMode.Offset].includes(mode) ) {
 				throw new Error('Invalid navigation mode: ' + mode);
 			}
 			this._mode = mode;

@@ -286,7 +286,7 @@ return new (FirClass(
 				if( !extraConfig.hasOwnProperty(key) ) {
 					continue;
 				}
-				if( ['viewParams', 'queryParams', 'bodyParams'].indexOf(key) >= 0 ) {
+				if( ['viewParams', 'queryParams', 'bodyParams'].includes(key) ) {
 					// Merge method call params and template call params only
 					config[key] = config[key] || {};
 					var
