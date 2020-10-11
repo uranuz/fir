@@ -45,12 +45,14 @@ function RemoteModuleLoader(endpoint) {
 	},
 	parseModules: function(json) {
 		var moduleObjects = json.moduleObjects;
-		for( var modName in moduleObjects ) {
-			if( !moduleObjects.hasOwnProperty(modName) || this._moduleObjects.hasOwnProperty(modName) ) {
-				// Skip build-in properties. Do not recreate the same modules again
-				continue;
+		for( var i = 0; i < moduleObjects.length; ++i )
+		{
+			var rawModule = moduleObjects[i];
+			if( this._moduleObjects.hasOwnProperty(rawModule.symbol) ) {
+				return; // Module is loaded already
 			}
-			this._moduleObjects[modName] = IvyDeserializer.deserialize(moduleObjects[modName]);
+			var moduleObject = IvyDeserializer.deserialize(rawModule);
+			this._moduleObjects[moduleObject.symbol.name] = moduleObject;
 		}
 		return this._moduleObjects;
 	}

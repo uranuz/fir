@@ -3,7 +3,7 @@ define('fir/security/right/IvyRule', [
 	'ivy/types/data/consts',
 	'ivy/engine',
 	'fir/datctrl/ivy/UserIdentity'
-], function(iu, IvyConst, IvyEngine, IvyUserIdentity) {
+], function(idat, IvyConst, IvyEngine, IvyUserIdentity) {
 var IvyDataType = IvyConst.IvyDataType;
 return FirClass(
 	function IvyRule(ivyEngine, name) {
@@ -51,11 +51,11 @@ return FirClass(
 				data: data
 			});
 			
-			if([
+			if(![
 				IvyDataType.Undef,
 				IvyDataType.Null,
 				IvyDataType.Boolean
-			].includes(iu.getDataNodeType(res))) {
+			].includes(idat.type(res))) {
 				throw new Error('Expected Undef, Null or Boolean as rights check result');
 			}
 			return !!res;

@@ -65,7 +65,7 @@ return FirClass(
 		},
 
 		_onIvyModule_load: function(config, prog) {
-			var modRes = prog.runSaveState({}, this._getExtraGlobals(config.optSets));
+			var modRes = prog.runSaveState(this._getExtraGlobals(config.optSets));
 			config.interp = modRes.interp;
 			modRes.asyncResult.then(
 				this._onIvyModule_init.bind(this, config),
@@ -73,12 +73,12 @@ return FirClass(
 		},
 
 		_onIvyModule_init: function(config) {
-			var defOpts = config.interp.getDirAttrDefaults(config.ivyMethod, ['RPCMethod']);
+			var defOpts = config.interp.getDirAttrs(config.ivyMethod, ['RPCMethod']);
 			// Если опция RPCMethod в config задана в null или пустую строку, то это значит, что мы не хотим,
 			// чтобы вызывался метод. Но если опция RPCMethod отсутствует (undefined), то используем значение
 			// по-умолчанию из опций компонента по умолчанию
 			if( typeof(config.RPCMethod) === 'undefined' ) {
-				config.RPCMethod = defOpts.RPCMethod;
+				config.RPCMethod = defOpts.RPCMethod.defaultValue;
 			}
 
 			if( config.RPCMethod != null && typeof(config.RPCMethod) !== 'string' && !(config.RPCMethod instanceof String) ) {

@@ -11,7 +11,7 @@ return FirClass(
 			if( this.empty() ) {
 				throw new Error('Range is empty!');
 			}
-			return this._rs.at(this._i);
+			return this._rs.__getAt__(this._i);
 		},
 		// Method must advance range to the next item
 		pop: function() {

@@ -126,20 +126,24 @@ define("fir/common/FirClass", [], function() {
 		var props = (typeof(src) === 'function'? __getPrototype(src): src);
 		for( key in props ) {
 			var prop = props[key];
-			// Don't copy Object's built in properties and special properties
-			if(
-				((typeof {}[key] == "undefined") || ({}[key] != prop))
-				&& SPECIAL_FIELDS.includes(key)
-			) {
-				
-				if( prop instanceof FirProperty ) {
-					// Detected instance of property descriptor
-					Object.defineProperty(proto, key, prop.descr);
-				} else {
-					proto[key] = prop;
-				}
-				__checkOwnProp(proto, key);
+			if( SPECIAL_FIELDS.includes(key) ) {
+				// These fields are special so do nothing with them
+				continue;
 			}
+			// Don't copy Object's built in properties
+			// If typeof built-in property of Object is undefined then there is no such property.
+			// Otherwise if values of property of Object not equal with our value
+			// then it means that we shall override built-in property of Object
+			if( (typeof {}[key] !== "undefined") && ({}[key] === prop) ) {
+				continue;
+			}
+			if( prop instanceof FirProperty ) {
+				// Detected instance of property descriptor
+				Object.defineProperty(proto, key, prop.descr);
+			} else {
+				proto[key] = prop;
+			}
+			__checkOwnProp(proto, key);
 		}
 
 		return proto;
@@ -220,9 +224,13 @@ define("fir/common/FirClass", [], function() {
 	}
 
 	window.FirClass = FirClass;
+
+	/** 
+	 * Allows to define properties in FirClass
+	 */
 	window.firProperty = function(getterOrDescr, setter) {
 		var descr;
-		if( maybeProps instanceof Object && typeof(maybeMixins) !== 'function' ) {
+		if( getterOrDescr instanceof Object && typeof(getterOrDescr) !== 'function' ) {
 			if( setter != null ) {
 				throw new Error('If property descriptor is passed as first argument then setter arument is not allowed')
 			}
@@ -238,11 +246,31 @@ define("fir/common/FirClass", [], function() {
 		}
 		return new FirProperty(descr);
 	};
-	window.firPODCtor = function(self, klass, args) {
-		if( self instanceof klass ) {
+
+	/**
+	 * Allows to create object that could be created without new.
+	 * Supports up to 7 parameters (for now), because of limited implementation.
+	 * Why 7? Because it's lucky number (I want to believe)
+	 */
+	window.firPODCtor = function(self, args) {
+		var Klass = args.callee;
+		if( typeof(Klass) !== 'function' ) {
+			throw new Error('Expected "arguments" object of class constructor');
+		}
+		if( self instanceof Klass ) {
 			return null;
 		}
-		return new (klass.bind(1, arguments));
+		switch( args.length ) {
+			case 0: return new Klass;
+			case 1: return new Klass(args[0]);
+			case 2: return new Klass(args[0], args[1]);
+			case 3: return new Klass(args[0], args[1], args[2]);
+			case 4: return new Klass(args[0], args[1], args[2], args[3]);
+			case 5: return new Klass(args[0], args[1], args[2], args[3], args[4]);
+			case 6: return new Klass(args[0], args[1], args[2], args[3], args[4], args[5]);
+			case 7: return new Klass(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+			default: throw new Error('To many arguments in POD ctor');
+		}
 	}
 	return FirClass;
 });

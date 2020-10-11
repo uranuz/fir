@@ -14,8 +14,13 @@ define('fir/datctrl/ivy/Deserializer', [
 	'fir/datctrl/FieldFormat',
 	'fir/datctrl/RecordFormat',
 	'ivy/types/data/consts',
+	'ivy/types/symbol/module_',
 	'ivy/types/module_object',
+	'ivy/types/symbol/directive',
 	'ivy/types/code_object',
+	'ivy/bytecode',
+	'ivy/types/symbol/dir_attr',
+	'ivy/types/symbol/dir_body_attrs',
 	'ivy/types/data/iface/class_node',
 	'fir/ivy/UnwrappableNode'
 ], function(
@@ -34,14 +39,40 @@ define('fir/datctrl/ivy/Deserializer', [
 	FieldFormat,
 	RecordFormat,
 	IvyConsts,
+	ModuleSymbol,
 	ModuleObject,
+	DirectiveSymbol,
 	CodeObject,
+	Bytecode,
+	DirAttr,
+	DirBodyAttrs,
 	IClassNode,
 	UnwrappableNode
 ) {
 
-var IvyDataType = IvyConsts.IvyDataType;
-mod.deserializeItem = function(node, moduleObj) {
+var
+	IvyDataType = IvyConsts.IvyDataType,
+	Instruction = Bytecode.Instruction;
+
+function addInstrs(codeObject, instrs) {
+	instrs.forEach(function(instr) {
+		codeObject.addInstr(Instruction(instr[0], instr[1]));
+	});
+}
+
+function parseDirAttrs(rawAttrs) {
+	var attrs = [];
+	rawAttrs.forEach(function(rawAttr) {
+		attrs.push(DirAttr(rawAttr.name, rawAttr.typeName));
+	});
+	return attrs;
+}
+
+function parseBodyAttrs(rawAttrs) {
+	return DirBodyAttrs(rawAttrs.isNoscope, rawAttrs.isNoescape);
+}
+
+mod.deserializeItem = function(node, parentModuleObject) {
 	if( node === 'undef' ) {
 		return undefined;
 	} else if(
@@ -60,18 +91,32 @@ mod.deserializeItem = function(node, moduleObj) {
 				case IvyDataType.ModuleObject: {
 					var
 						consts = node.consts,
-						moduleObj = new ModuleObject(node.fileName, consts, node.entryPointIndex);
-					for( var i = 0; i < consts.length; ++i ) {
-						consts[i] = mod.deserializeItem(consts[i], moduleObj);
+						rawCodeObject = consts[0],
+						rawSymbol = rawCodeObject.symbol,
+						moduleSymbol = new ModuleSymbol(rawSymbol.name),
+						moduleObject = new ModuleObject(moduleSymbol),
+						codeObject = moduleObject.mainCodeObject;
+
+					addInstrs(moduleObject.mainCodeObject, rawCodeObject.instrs);
+					for( var i = 1; i < consts.length; ++i ) {
+						moduleObject.addConst(mod.deserializeItem(consts[i], moduleObject));
 					}
-					return moduleObj;
+					return moduleObject;
 				}
 
 				case IvyDataType.CodeObject: {
-					if( !(moduleObj instanceof ModuleObject) ) {
+					if( !(parentModuleObject instanceof ModuleObject) ) {
 						throw new Error('ModuleObject is required to deserialize CodeObject')
 					}
-					return new CodeObject(node.name, node.instrs, moduleObj, node.attrBlocks);
+					var
+						rawSymbol = node.symbol,
+						directiveSymbol = new DirectiveSymbol(
+							rawSymbol.name,
+							parseDirAttrs(rawSymbol.attrs),
+							parseBodyAttrs(rawSymbol.bodyAttrs)),
+						codeObject = new CodeObject(directiveSymbol, parentModuleObject);
+					addInstrs(codeObject, node.instrs);
+					return codeObject;
 				}
 				case IvyDataType.DateTime:
 					return new Date(con._v);
