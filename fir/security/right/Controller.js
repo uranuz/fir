@@ -167,7 +167,7 @@ return FirClass(
 		if( ruleRS == null ) {
 			return;
 		}
-		for( var i = 0; i < ruleRS.getLength(); ++i ) {
+		for( var i = 0; i < ruleRS.length; ++i ) {
 			this._loadRuleWithChildren(ruleRS.getRecordAt(i), ruleRS);
 		}
 	},
@@ -217,7 +217,7 @@ return FirClass(
 		}
 
 		// For each item get list of children keys
-		for( var i = 0; i < objRS.getLength(); ++i ) {
+		for( var i = 0; i < objRS.length; ++i ) {
 			var
 				objRec = objRS.getRecordAt(i),
 				currChilds;
@@ -232,7 +232,7 @@ return FirClass(
 			}
 		}
 
-		for( var i = 0; i < objRS.getLength(); ++i ) {
+		for( var i = 0; i < objRS.length; ++i ) {
 			this._loadObjectWithChildren(objRS.getRecordAt(i), objRS, childKeys);
 		}
 
@@ -308,7 +308,7 @@ return FirClass(
 		if( roleRS == null ) {
 			return;
 		}
-		for( var i = 0; i < roleRS.getLength(); ++i ) {
+		for( var i = 0; i < roleRS.length; ++i ) {
 			var roleRec = roleRS.getRecordAt(i);
 			this._allRoles[roleRec.get("num")] = roleRec.get("name");
 			if( this._roleNumByName.hasOwnProperty(roleRec.get("name")) ) {
@@ -325,7 +325,7 @@ return FirClass(
 		if( rightRS == null ) {
 			return;
 		}
-		for( var i = 0; i < rightRS.getLength(); ++i ) {
+		for( var i = 0; i < rightRS.length; ++i ) {
 			var rightRec = rightRS.getRecordAt(i);
 			// Currently skip rights without role, or object, or rule specification
 			if( rightRec.get("role_num") == null || rightRec.get("object_num") == null || rightRec.get("rule_num") == null )
@@ -392,7 +392,7 @@ return FirClass(
 		if( groupObjRS == null ) {
 			return;
 		}
-		for( var i = 0; groupObjRS.getLength(); ++i ) {
+		for( var i = 0; i < groupObjRS.length; ++i ) {
 			var groupObj = groupObjRS.getRecordAt(i), it;
 			if( groupObj.get("group_num") == null || groupObj.get("object_num") == null )
 				continue;

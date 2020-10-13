@@ -1,15 +1,15 @@
 define('fir/datctrl/ivy/UserIdentity', [
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/security/right/UserIdentity',
 	'fir/ivy/UnwrappableNode'
-], function(ClassNode, UserIdentity, UnwrappableNode) {
+], function(BaseClassNode, UserIdentity, UnwrappableNode) {
 return FirClass(
 	function IvyUserIdentity(userIdentity) {
 		if( !(userIdentity instanceof UserIdentity) ) {
 			throw new Error('Expected UserIdentity');
 		}
 		this._userIdentity = userIdentity;
-	}, ClassNode, [UnwrappableNode], {
+	}, BaseClassNode, [UnwrappableNode], {
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		__getAttr__: function(name) {
 			switch( name ) {

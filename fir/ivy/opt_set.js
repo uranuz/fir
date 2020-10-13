@@ -1,5 +1,5 @@
 define('fir/ivy/opt_set', [
-	'ivy/types/data/iface/class_node'
+	'ivy/types/data/base_class_node'
 ], function(IClassNode) {
 var optSetCounter = 0;
 return OptStorage = FirClass(

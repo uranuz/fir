@@ -21,7 +21,7 @@ define('fir/datctrl/ivy/Deserializer', [
 	'ivy/bytecode',
 	'ivy/types/symbol/dir_attr',
 	'ivy/types/symbol/dir_body_attrs',
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/ivy/UnwrappableNode'
 ], function(
 	mod,

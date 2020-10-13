@@ -1,7 +1,7 @@
 define('fir/datctrl/ivy/UserRights', [
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/security/right/UserRights'
-], function(ClassNode, UserRights) {
+], function(BaseClassNode, UserRights) {
 return FirClass(
 	function IvyUserRights(rights) {
 		if( !(rights instanceof UserRights) ) {
@@ -11,7 +11,7 @@ return FirClass(
 		this._accessObject = null;
 		this._accessKind = null;
 		this._data = null;
-	}, ClassNode, {
+	}, BaseClassNode, {
 		/** Analogue to IvyData __getAttr__(string); in D impl */
 		__getAttr__: function(name) {
 			switch( name ) {

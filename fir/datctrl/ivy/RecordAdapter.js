@@ -1,12 +1,12 @@
 define('fir/datctrl/ivy/RecordAdapter', [
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/datctrl/Record',
 	'fir/datctrl/ivy/RecordFormatAdapter',
 	'fir/datctrl/ivy/EnumAdapter',
 	'fir/datctrl/Enum',
 	'fir/ivy/UnwrappableNode'
 ], function(
-	ClassNode,
+	BaseClassNode,
 	Record,
 	RecordFormatAdapter,
 	EnumAdapter,
@@ -24,7 +24,7 @@ return FirClass(
 		} else{
 			this._fmt = new RecordFormatAdapter(this._rec.getFormat());
 		}
-	}, ClassNode, [UnwrappableNode], {
+	}, BaseClassNode, [UnwrappableNode], {
 		/** Analogue to:
 		 * IvyData opIndex(string);
 		 * IvyData opIndex(size_t);
@@ -49,9 +49,9 @@ return FirClass(
 			return this._rec.toStdJSON();
 		},
 		/** Analogue to size_t length() @property; in D impl */
-		getLength: function() {
-			return this._rec.getLength();
-		},
+		length: firProperty(function() {
+			return this._rec.length;
+		}),
 		unwrap: function() {
 			return this._rec;
 		}

@@ -1,15 +1,15 @@
 define('fir/datctrl/ivy/EnumAdapter', [
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/datctrl/Enum',
 	'fir/ivy/UnwrappableNode'
-], function(ClassNode, Enum, UnwrappableNode) {
+], function(BaseClassNode, Enum, UnwrappableNode) {
 return FirClass(
 	function EnumAdapter(en) {
 		if( !(en instanceof Enum) ) {
 			throw new Error('Expected Enum');
 		}
 		this._enum = en;
-	}, ClassNode, [UnwrappableNode], {
+	}, BaseClassNode, [UnwrappableNode], {
 		/** Analogue to:
 		 * IvyData opIndex(string);
 		 * IvyData opIndex(size_t);

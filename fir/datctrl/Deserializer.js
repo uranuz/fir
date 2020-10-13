@@ -127,7 +127,7 @@ mod.deserializeRecordSet = function(data, fmt) {
 		if( !(row instanceof Array) ) {
 			throw new Error('RecordSet data row must be instance of array');
 		}
-		if( row.length !== fmt.getLength() ) {
+		if( row.length !== fmt.length ) {
 			throw new Error('RecordSet data row field count must match field count of record format!')
 		}
 		items.push(new Record({
@@ -142,7 +142,7 @@ mod.deserializeRecord = function(data, fmt) {
 	if( !(data instanceof Array) ) {
 		throw new Error('Record raw data must be instance of array');
 	}
-	if( data.length !== fmt.getLength() ) {
+	if( data.length !== fmt.length ) {
 		throw new Error('Record raw data field count must match field count of record format!')
 	}
 	var items = [];

@@ -9,9 +9,9 @@ return FirClass(
 			return this._fmt;
 		},
 		//Возвращает количество записей в наборе
-		getLength: function() {
+		length: firProperty(function() {
 			return this._d.length;
-		},
+		}),
 		//Возвращает запись по порядковому номеру index
 		getRecordAt: function(index) {
 			if( index < this._d.length )

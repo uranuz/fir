@@ -39,9 +39,9 @@ var mod = FirClass(
 			}
 		},
 
-		getLength: function() {
+		length: firProperty(function() {
 			return this._n === undefined? 1: 2;
-		},
+		}),
 
 		getFormat: function() {
 			throw new Error('Not implemented yet!');

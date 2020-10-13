@@ -1,15 +1,15 @@
 define('fir/datctrl/ivy/FieldFormatAdapter', [
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/datctrl/FieldFormat',
 	'fir/ivy/UnwrappableNode'
-], function(ClassNode, FieldFormat, UnwrappableNode) {
+], function(BaseClassNode, FieldFormat, UnwrappableNode) {
 return FirClass(
 	function FieldFormatAdapter(fmt) {
 		if( !(fmt instanceof FieldFormat) ) {
 			throw new Error('Expected FieldFormat');
 		}
 		this._fmt = fmt;
-	}, ClassNode, [UnwrappableNode], {
+	}, BaseClassNode, [UnwrappableNode], {
 		/** Analogue to:
 		 * IvyData opIndex(string);
 		 * IvyData opIndex(size_t);

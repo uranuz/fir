@@ -1,8 +1,8 @@
 define('fir/datctrl/ivy/RecordFormatAdapter', [
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/datctrl/RecordFormat',
 	'fir/ivy/UnwrappableNode'
-], function(ClassNode, RecordFormat, UnwrappableNode) {
+], function(BaseClassNode, RecordFormat, UnwrappableNode) {
 return FirClass(
 	function RecordFormatAdapter(fmt) {
 		if( !(fmt instanceof RecordFormat) ) {
@@ -10,7 +10,7 @@ return FirClass(
 		}
 
 		this._fmt = fmt;
-	}, ClassNode, [UnwrappableNode], {
+	}, BaseClassNode, [UnwrappableNode], {
 		/** Analogue to:
 		 * IvyData opIndex(string);
 		 * IvyData opIndex(size_t);

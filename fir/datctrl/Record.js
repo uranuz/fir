@@ -44,9 +44,9 @@ var mod = FirClass(
 				return val;
 			}
 		},
-		getLength: function() {
+		length: firProperty(function() {
 			return this._d.length;
-		},
+		}),
 		getFormat: function() {
 			return this._fmt;
 		},
@@ -114,7 +114,7 @@ var mod = FirClass(
 		},
 		toObject: function() {
 			var res = {};
-			for( var i = 0; i < this._fmt.getLength(); ++i ) {
+			for( var i = 0; i < this._fmt.length; ++i ) {
 				var field = this._fmt.getName(i);
 				res[field] = this.get(i);
 			}

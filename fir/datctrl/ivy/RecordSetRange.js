@@ -20,8 +20,8 @@ return FirClass(
 			return item;
 		},
 		// Method is used to check if range is empty
-		empty: function() {
-			return this._i >= this._rs.getLength();
-		}
+		empty: firProperty(function() {
+			return this._i >= this._rs.length;
+		})
 });
 });

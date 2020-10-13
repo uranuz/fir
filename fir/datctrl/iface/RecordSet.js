@@ -11,9 +11,9 @@ return FirClass(
 		/**
 		 * Возвращает количество записей в наборе
 		 */
-		getLength: function() {
+		length: firProperty(function() {
 			throw new Error('Not implemented yet!');
-		},
+		}),
 		/**
 		 * Возвращает число полей в наборе записей
 		 */

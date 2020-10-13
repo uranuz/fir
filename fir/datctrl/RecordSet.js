@@ -49,9 +49,9 @@ var mod = FirClass(
 		},
 		//Добавление записи rec в набор записей
 		append: function(rec) {
-			if( this.getLength() > 0 || this._fmt.equals(rec._fmt) )
+			if( this.length > 0 || this._fmt.equals(rec._fmt) )
 			{
-				if( this._fmt.getLength() > 0 )
+				if( this._fmt.length > 0 )
 					this._fmt = rec._fmt.copy();
 				this._indexes[rec.getKey()] = this._d.length;
 				this._d.push(rec);

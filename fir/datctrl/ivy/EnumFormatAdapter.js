@@ -1,15 +1,15 @@
 define('fir/datctrl/ivy/EnumFormatAdapter', [
-	'ivy/types/data/iface/class_node',
+	'ivy/types/data/base_class_node',
 	'fir/datctrl/EnumFormat',
 	'fir/ivy/UnwrappableNode'
-], function(ClassNode, EnumFormat, UnwrappableNode) {
+], function(BaseClassNode, EnumFormat, UnwrappableNode) {
 return FirClass(
 	function EnumFormatAdapter(fmt) {
 		if( !(fmt instanceof EnumFormat) ) {
 			throw new Error('Expected EnumFormat');
 		}
 		this._fmt = fmt;
-	}, ClassNode, [UnwrappableNode], {
+	}, BaseClassNode, [UnwrappableNode], {
 		/** Analogue to:
 		 * IvyData opIndex(string);
 		 * IvyData opIndex(size_t);
@@ -22,9 +22,9 @@ return FirClass(
 			return this._fmt.toStdJSON();
 		},
 		/** Analogue to size_t length() @property; in D impl */
-		getLength: function() {
-			return this._fmt.getLength();
-		},
+		length: firProperty(function() {
+			return this._fmt.length;
+		}),
 		unwrap: function() {
 			return this._fmt;
 		}

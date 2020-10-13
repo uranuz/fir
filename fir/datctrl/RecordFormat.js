@@ -94,9 +94,9 @@ var mod = FirClass(
 				keyFieldIndex: this._keyFieldIndex
 			});
 		},
-		getLength: function() {
+		length: firProperty(function() {
 			return this._f.length;
-		},
+		}),
 		toStdJSON: function() {
 			var items = [];
 			for( var i = 0; i < this._f.length; ++i ) {
