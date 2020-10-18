@@ -13,7 +13,9 @@ define('fir/datctrl/ivy/Deserializer', [
 	'fir/datctrl/Enum',
 	'fir/datctrl/FieldFormat',
 	'fir/datctrl/RecordFormat',
+	'ivy/types/data/datetime',
 	'ivy/types/data/consts',
+	'ivy/types/data/conv/consts',
 	'ivy/types/symbol/module_',
 	'ivy/types/module_object',
 	'ivy/types/symbol/directive',
@@ -38,7 +40,9 @@ define('fir/datctrl/ivy/Deserializer', [
 	Enum,
 	FieldFormat,
 	RecordFormat,
+	IvyDateTime,
 	IvyConsts,
+	IvyConvConsts,
 	ModuleSymbol,
 	ModuleObject,
 	DirectiveSymbol,
@@ -52,7 +56,9 @@ define('fir/datctrl/ivy/Deserializer', [
 
 var
 	IvyDataType = IvyConsts.IvyDataType,
-	Instruction = Bytecode.Instruction;
+	Instruction = Bytecode.Instruction,
+	IvySrlField = IvyConvConsts.IvySrlField,
+	IvySrlFieldType = IvyConvConsts.IvySrlFieldType;
 
 function addInstrs(codeObject, instrs) {
 	instrs.forEach(function(instr) {
@@ -85,9 +91,12 @@ mod.deserializeItem = function(node, parentModuleObject) {
 	} else if( node instanceof Array ) {
 		return node; // Do we need deserialize inner items of array?
 	} else if( node instanceof Object ) {
-		if( node.hasOwnProperty('_t') && typeof(node._t) === 'number' ) {
+		var
+			ivyType = node.hasOwnProperty(IvySrlField.type)? node[IvySrlField.type]: null,
+			wtType = node.hasOwnProperty('t')? node['t']: null;
+		if( ['number', 'string'].includes(typeof(ivyType)) ) {
 			// It's Ivy-style serialized value
-			switch( node._t ) {
+			switch( ivyType ) {
 				case IvyDataType.ModuleObject: {
 					var
 						consts = node.consts,
@@ -118,19 +127,19 @@ mod.deserializeItem = function(node, parentModuleObject) {
 					addInstrs(codeObject, node.instrs);
 					return codeObject;
 				}
-				case IvyDataType.DateTime:
-					return new Date(con._v);
+
+				case IvySrlFieldType.dateTime: {
+					return new IvyDateTime(new Date(node[IvySrlField.value]));
+				}
 				default: break;
 			}
-		} else if( node.hasOwnProperty('t') && typeof(node.t) === 'string' ) {
+		} else if( typeof(wtType) === 'string' ) {
 			// It's webtank-style serialized value
-			var
-				typeStr = node.t,
-				container = Deserializer.deserializeItem(node);
+			var container = Deserializer.deserializeItem(node);
 			if( container == null ) {
 				return null; // Не шмогли...
 			}
-			switch( typeStr ) {
+			switch( wtType ) {
 				case 'recordset':
 					return new RecordSetAdapter(container);
 				case 'record':

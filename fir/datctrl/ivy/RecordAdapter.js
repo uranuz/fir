@@ -4,6 +4,7 @@ define('fir/datctrl/ivy/RecordAdapter', [
 	'fir/datctrl/ivy/RecordFormatAdapter',
 	'fir/datctrl/ivy/EnumAdapter',
 	'fir/datctrl/Enum',
+	'ivy/types/data/datetime',
 	'fir/ivy/UnwrappableNode'
 ], function(
 	BaseClassNode,
@@ -11,6 +12,7 @@ define('fir/datctrl/ivy/RecordAdapter', [
 	RecordFormatAdapter,
 	EnumAdapter,
 	Enum,
+	IvyDateTime,
 	UnwrappableNode
 ) {
 return FirClass(
@@ -33,6 +35,9 @@ return FirClass(
 			var val = this._rec.get(index);
 			if( val instanceof Enum ) {
 				return new EnumAdapter(val);
+			}
+			if( val instanceof Date ) {
+				return new IvyDateTime(val);
 			}
 			return val;
 		},

@@ -7,15 +7,15 @@ return FirClass(
 		this._i = 0;
 	}, DataNodeRange, {
 		// Method must return first item of range or raise error if range is empty
-		front: function() {
-			if( this.empty() ) {
+		front: firProperty(function() {
+			if( this.empty ) {
 				throw new Error('Range is empty!');
 			}
 			return this._rs.__getAt__(this._i);
-		},
+		}),
 		// Method must advance range to the next item
 		pop: function() {
-			var item = this.front();
+			var item = this.front;
 			++this._i;
 			return item;
 		},

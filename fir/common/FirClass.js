@@ -28,9 +28,10 @@ define("fir/common/FirClass", [], function() {
 			proto.superproto.constructor.apply(this, ctorArgs);
 			for( var i = 0; i < proto.mixins.length; ++i ) {
 				var mixin = proto.mixins[i];
-				if( typeof mixin === 'function' ) {
-					mixin.apply(this, ctorArgs);
+				if( typeof(mixin) !== 'function' ) {
+					continue;
 				}
+				mixin.apply(this, ctorArgs);
 			}
 			return; // Constructor and mixins get called - so exit
 		}
@@ -73,6 +74,38 @@ define("fir/common/FirClass", [], function() {
 		}
 	}
 
+	function __getParentProps(proto) {
+		var
+			res = {},
+			mixins = proto.mixins || [],
+			props = proto.props || {};
+		// Passing through all the mixins for this class and try to find their Fir
+		for( var i = 0; i < mixins.length; ++i ) {
+			var mixin = mixins[i];
+			var
+				mixinProto = __getPrototype(mixin),
+				parentProps = __getParentProps(mixinProto);
+			for( var key in parentProps ) {
+				if( !parentProps.hasOwnProperty(key) ) {
+					continue;
+				}
+				res[key] = parentProps[key];
+			}
+		}
+		for( var key in props ) {
+			if( !props.hasOwnProperty(key) ) {
+				continue;
+			}
+			var prop = props[key];
+			// Taking FirProperty instances
+			if( !(prop instanceof FirProperty) ) {
+				continue;
+			}
+			res[key] = prop;
+		}
+		return res;
+	}
+
 	var
 		__hasProp = {}.hasOwnProperty,
 		SPECIAL_FIELDS = [
@@ -81,7 +114,8 @@ define("fir/common/FirClass", [], function() {
 			'superproto',
 			'superctor',
 			'mixins',
-			'isInstanceOf'
+			'isInstanceOf',
+			'props'
 		];
 	function __extends(child, parent, mixins) {
 		parent = parent || Object; // By default base is Object
@@ -93,7 +127,13 @@ define("fir/common/FirClass", [], function() {
 
 		var proto = new classCtor();
 
-		__mixinProto(proto, mixins); // Mixin all properties into ctor
+		// If prototype has its own mixin property then use it. If not then create it
+		proto.mixins = mixins;
+
+		// Contains property descriptors
+		proto.props = {};
+
+		__mixinProto(proto); // Mixin all properties into ctor
 
 		proto.constructor = child; // Set up constructor function
 
@@ -101,9 +141,6 @@ define("fir/common/FirClass", [], function() {
 		proto.superproto = parentProto;
 		// ... and special function to call parent's and all mixins constructors (if they are classes)
 		proto.superctor = __superctor;
-
-		// If prototype has its own mixin property then use it. If not then create it
-		proto.mixins = mixins;
 
 		proto.isInstanceOf = __isInstanceOf;
 
@@ -117,14 +154,14 @@ define("fir/common/FirClass", [], function() {
 		return child;
 	}
 
-	function __mixinProtoSingle(proto, src) {
-		if( src == null ) {
+	function __mixinProtoSingle(proto, mixin) {
+		if( mixin == null ) {
 			return proto;
-		} else if( !(src instanceof Object) ) {
+		} else if( !(mixin instanceof Object) ) {
 			throw new Error('Expected object as class mixin');
 		}
-		var props = (typeof(src) === 'function'? __getPrototype(src): src);
-		for( key in props ) {
+		var props = (typeof(mixin) === 'function'? __getPrototype(mixin): mixin);
+		for( var key in props ) {
 			var prop = props[key];
 			if( SPECIAL_FIELDS.includes(key) ) {
 				// These fields are special so do nothing with them
@@ -139,25 +176,31 @@ define("fir/common/FirClass", [], function() {
 			}
 			if( prop instanceof FirProperty ) {
 				// Detected instance of property descriptor
-				Object.defineProperty(proto, key, prop.descr);
+				// Add it to props and shall define later
+				proto.props[key] = prop;
 			} else {
 				proto[key] = prop;
+				__checkOwnProp(proto, key);
 			}
-			__checkOwnProp(proto, key);
 		}
 
 		return proto;
 	}
-	function __mixinProto(proto, src) {
-		if( src == null )
+	function __mixinProto(proto) {
+		var mixins = proto.mixins;
+		if( mixins == null )
 			return proto;
-
-		if( src instanceof Array ) {
-			for( var i = 0; i < src.length; ++i ) {
-				__mixinProtoSingle(proto, src[i]);
+		for( var i = 0; i < mixins.length; ++i ) {
+			__mixinProtoSingle(proto, mixins[i]);
+		}
+		var props = __getParentProps(proto);
+		for( var key in props ) {
+			if( !props.hasOwnProperty(key) ) {
+				continue;
 			}
-		} else {
-			__mixinProtoSingle(proto, src);
+			var prop = props[key];
+			Object.defineProperty(proto, key, prop.descr);
+			__checkOwnProp(proto, key);
 		}
 		return proto;
 	}
