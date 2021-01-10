@@ -1,7 +1,7 @@
 expr {=
 	from fir.controls.utils import cls, firScopeOptsEnc;
 	def CheckBoxList {=
-		def.kv
+		var
 			moduleName: "fir/controls/CheckBoxList/CheckBoxList"
 			cssBaseClass: "fir-CheckBoxList"
 			cssClass: null
@@ -13,7 +13,7 @@ expr {=
 			keyField: "value"
 			displayField: "name"
 			selectedKeys: [];
-		def.body {*
+		do {*
 		<div data-fir-module="{{moduleName}}">
 			<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: ['items', 'keyField']}"/>
 		{=if hasMasterSwitch {*

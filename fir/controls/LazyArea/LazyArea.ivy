@@ -1,12 +1,12 @@
 expr {=
 from fir.controls.utils import cls, firScopeOptsEnc;
 def LazyArea {=
-	def.kv
+	var
 		instanceName: null
 		cssBaseClass: 'fir-LazyArea'
 		moduleName: 'fir/controls/LazyArea/LazyArea'
 		config: {};
-	def.body {*
+	do {*
 		<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
 			<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: ['config'] }"/>
 			<div class="{=cls 'container'}"></div>

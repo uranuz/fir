@@ -3,11 +3,11 @@ from fir.controls.utils import cls, firScopeOptsEnc;
 from fir.controls.OpenDialog import OpenDialog;
 
 def DefaultItemTemplate {=
-	def.kv
+	var
 		record
 		displayField
 		emptyText;
-	def.body noscope {*
+	do noscope {*
 	<a href="#!"
 		class="{=cls 'selectBtn'}"
 		>{=if record {=at record displayField} else emptyText}</a>
@@ -15,14 +15,14 @@ def DefaultItemTemplate {=
 };
 
 def ItemTemplateProxy {=
-	def.kv
+	var
 		cssBaseClass
 		instanceName
 		record
 		displayField
 		emptyText
 		itemTemplate;
-	def.body {*
+	do {*
 	<div
 		class="{=cls 'itemWrapper'}"
 		data-ivy-method="{{_ivyMethod}}">
@@ -38,7 +38,7 @@ def ItemTemplateProxy {=
 };
 
 def SelectorField {=
-	def.kv
+	var
 		moduleName: "fir/controls/SelectorField/SelectorField"
 		cssBaseClass: "fir-SelectorField"
 		instanceName
@@ -49,7 +49,7 @@ def SelectorField {=
 		itemTemplate: DefaultItemTemplate
 		dialogConfig: {}
 		record: null;
-	def.body {*
+	do {*
 	{=set dialogConfig.instanceName: instanceName ~ 'Selector'}
 	<div class="{=cls 'block'}" data-fir-module="{{moduleName}}">
 		<input type="hidden" data-fir-opts="{=firScopeOptsEnc fields: [

@@ -1,7 +1,7 @@
 expr {=
 from fir.controls.utils import cls, firScopeOptsEnc;
 def PlainListBox {=
-	def.kv
+	var
 		moduleName: "fir/controls/PlainListBox/PlainListBox"
 		cssBaseClass: "fir-PlainListBox"
 		cssClass: null
@@ -12,7 +12,7 @@ def PlainListBox {=
 		displayField: "caption"
 		selectedKey: undef
 		disabled: null;
-	def.body {*
+	do {*
 	<div data-fir-module="{{moduleName}}">
 		<input type="hidden" data-fir-opts="{=firScopeOptsEnc}"/>
 		<div class="{=cls "listScroller"}">

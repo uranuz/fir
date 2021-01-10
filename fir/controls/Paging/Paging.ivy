@@ -1,7 +1,7 @@
 expr {=
 from fir.controls.utils import cls, firScopeOptsEnc;
 def Paging {=
-	def.kv
+	var
 		moduleName: "fir/controls/Paging/Paging"
 		cssBaseClass: "fir-Paging"
 		instanceName: "pagination"
@@ -16,7 +16,7 @@ def Paging {=
 		title: 'Страницы'
 		notFoundMsg: 'По заданному критерию не найдено ни одной записи'
 		recordCountTitle: 'Найдено записей';
-	def.body {*
+	do {*
 		{=
 			if {=empty nav}
 				{=set nav: {} };

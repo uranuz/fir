@@ -1,7 +1,7 @@
 expr {=
 	def cls {=
-		def.pos el, baseClass: null;
-		def.body noscope {%
+		var el, baseClass: null;
+		do noscope {%
 			expr "e-" ~ el ~ " ";
 			if instanceName
 				"i-" ~ instanceName ~ " ";
@@ -29,8 +29,8 @@ expr {=
 	];
 
 	def _addValues {=
-		def.kv result fields allScope;
-		def.body {=
+		var result fields allScope;
+		do {=
 			if fields {=
 				for name in fields {=
 					if {=has allScope name} {=
@@ -42,9 +42,9 @@ expr {=
 	};
 
 	def firScopeOpts {=
-		def.kv
+		var
 			fields: null;
-		def.body noscope {=
+		do noscope {=
 			var
 				result: {}
 				allScope: {=scope};
@@ -55,19 +55,19 @@ expr {=
 	};
 
 	def firScopeOptsEnc {=
-		def.kv
+		var
 			fields: null;
-		def.body noscope {=
+		do noscope {=
 			optStorage {=firScopeOpts fields: fields}
 		}
 	};
 
 	def enumFormatWithNull {
-		def.pos
+		var
 			enumFormat: null
 			nullName: ''
 			nullValue: null;
-		def.body {=
+		do {=
 			var res: [];
 			insert res {name: nullName, value: nullValue} {=len res};
 			repeat it in enumFormat {=
@@ -78,12 +78,12 @@ expr {=
 	};
 
 	def hasRight {
-		def.kv
+		var
 			obj: null
 			subobj: null
 			kind: null
 			data: null;
-		def.body noscope {=
+		do noscope {=
 			var copyRight: userRights;
 			set copyRight.object: {=
 				if obj
@@ -100,9 +100,9 @@ expr {=
 	};
 
 	def isInRoles {=
-		def.pos
+		var
 			roles;
-		def.body {=
+		do {=
 			for role in roles {=
 				for userRole in userIdentity.accessRoles {=
 					if role == userRole
@@ -114,11 +114,11 @@ expr {=
 	};
 
 	def treeMetaInfo {=
-		def.kv
+		var
 			rs
 			keyProperty
 			parentProperty;
-		def.body {=
+		do {=
 			var
 				roots: []
 				idxByKey: {}

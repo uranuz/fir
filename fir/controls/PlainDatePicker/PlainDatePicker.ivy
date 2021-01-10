@@ -2,7 +2,7 @@ expr {=
 	from fir.controls.utils import cls, firScopeOptsEnc;
 	from fir.controls.Validation.Controller import ValidationController;
 	def PlainDatePicker {=
-		def.kv
+		var
 			instanceName: undef
 			moduleName: "fir/controls/PlainDatePicker/PlainDatePicker"
 			cssBaseClass: "fir-PlainDatePicker"
@@ -23,7 +23,7 @@ expr {=
 			dayInvalidMessage: 'Введите корректный день месяца в интервале от 1 до 31'
 			yearInvalidMessage: 'Введите корректный год в виде целого числа'
 			disabled: null;
-		def.body {*
+		do {*
 			{=
 				if {=empty dayFormField} and formField {=set dayFormField: formField ~ '__day'};
 				if {=empty monthFormField} and formField {=set monthFormField: formField ~ '__month'};
