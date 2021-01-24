@@ -128,7 +128,7 @@ return FirClass(
 				}
 			}
 
-			config.interp.runModuleDirective(
+			config.interp.execModuleDirective(
 				config.ivyMethod, data, this._getExtraGlobals(config.optSets)
 			).then(
 				function(res) {

@@ -1,6 +1,5 @@
 define('fir/ivy/RemoteModuleLoader', [
-	'fir/datctrl/ivy/Deserializer',
-	'ivy/types/data/consts'
+	'fir/datctrl/ivy/Deserializer'
 ], function(
 	IvyDeserializer
 ) {
