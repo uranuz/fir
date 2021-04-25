@@ -9,6 +9,11 @@ return FirClass(
 		this._deferred = new $.Deferred();
 	}, {
 		then: function(doneFn, failFn) {
+			if( (doneFn != null) && (failFn == null) && (typeof doneFn !== 'function') ) {
+				// Probably Deferred passed
+				this._deferred.then(doneFn);
+				return;
+			}
 			if( (doneFn != null) && (typeof doneFn !== 'function') ) {
 				throw new Error('doneFn argument expected to be function, undefined or null');
 			}

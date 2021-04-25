@@ -16,8 +16,6 @@ return new (FirClass(
 		/**
 		 * Starts loading of control from somewhere using following options:
 		 * opts: {
-		 * 	success: function to pass result
-		 * 	error: error handler function
 		 * 	params: required options
 		 * 	method: name of method to retrieve data
 		 * 	ivyModule: name of module where control is located

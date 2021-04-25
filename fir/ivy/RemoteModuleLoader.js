@@ -1,7 +1,9 @@
 define('fir/ivy/RemoteModuleLoader', [
-	'fir/datctrl/ivy/Deserializer'
+	'fir/datctrl/ivy/Deserializer',
+	'fir/common/Deferred'
 ], function(
-	IvyDeserializer
+	IvyDeserializer,
+	Deferred
 ) {
 return FirClass(
 function RemoteModuleLoader(endpoint) {
@@ -13,10 +15,6 @@ function RemoteModuleLoader(endpoint) {
 }, {
 	get: function(moduleName) {
 		return this._moduleObjects[moduleName];
-	},
-
-	add: function(moduleObj) {
-		this._moduleObjects[moduleObj._name] = moduleObj;
 	},
 
 	clearCache: function() {
@@ -31,24 +29,26 @@ function RemoteModuleLoader(endpoint) {
 		return this._moduleObjects;
 	},
 
-	load: function(moduleName, callback) {
-		var self = this;
-		$.ajax(this._endpoint + '?moduleName=' + moduleName + '&generalTemplate=no', {
+	load: function(moduleName) {
+		var
+			self = this,
+			fResult = new Deferred();
+		$.ajax(this._endpoint + '?moduleName=' + moduleName + '&appTemplate=no', {
 			success: function(json) {
-				callback(self.parseModules(json.result), moduleName);
+				fResult.resolve(self.parseModules(json.result), moduleName);
 			},
-			error: function(error) {
-				console.error(error);
-			}
+			error: fResult.reject.bind(fResult)
 		});
+		return fResult;
 	},
+
 	parseModules: function(json) {
 		var moduleObjects = json.moduleObjects;
 		for( var i = 0; i < moduleObjects.length; ++i )
 		{
 			var rawModule = moduleObjects[i];
 			if( this._moduleObjects.hasOwnProperty(rawModule.symbol) ) {
-				return; // Module is loaded already
+				return; // Module is loaded already. No need to spend time for deserialization
 			}
 			var moduleObject = IvyDeserializer.deserialize(rawModule);
 			this._moduleObjects[moduleObject.symbol.name] = moduleObject;

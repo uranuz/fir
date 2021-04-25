@@ -74,10 +74,6 @@ function parseDirAttrs(rawAttrs) {
 	return attrs;
 }
 
-function parseBodyAttrs(rawAttrs) {
-	return DirBodyAttrs(rawAttrs.isNoscope, rawAttrs.isNoescape);
-}
-
 mod.deserializeItem = function(node, parentModuleObject) {
 	if( node === 'undef' ) {
 		return undefined;
@@ -119,10 +115,7 @@ mod.deserializeItem = function(node, parentModuleObject) {
 					}
 					var
 						rawSymbol = node.symbol,
-						directiveSymbol = new DirectiveSymbol(
-							rawSymbol.name,
-							parseDirAttrs(rawSymbol.attrs),
-							parseBodyAttrs(rawSymbol.bodyAttrs)),
+						directiveSymbol = new DirectiveSymbol(rawSymbol.name, parseDirAttrs(rawSymbol.attrs)),
 						codeObject = new CodeObject(directiveSymbol, parentModuleObject);
 					addInstrs(codeObject, node.instrs);
 					return codeObject;

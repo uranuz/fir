@@ -1,0 +1,84 @@
+expr {=
+from fir.controls.FirControl import FirControl;
+
+class FirApp extends FirControl {=
+	var
+		moduleName: "fir/controls/App/App";
+	def __init__ {=
+		var
+			layout: null
+			title: null
+			webpackLib: null
+			userRightData: null;
+		do {=
+			set
+				this.layout: layout
+				this.webpackLib: webpackLib
+				this.userRightData: userRightData
+				this.title: title;
+		}
+	};
+
+	def render {=
+		do {*
+		<!doctype html>
+		<html>
+
+		<head>
+			<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+			<title>{{this.title}}</title>
+			<link rel="stylesheet" href="{{context.vpaths.sitePublic}}bootstrap/scss/app.css">
+			<link rel="stylesheet" href="{{context.vpaths.sitePublic}}ext/jquery-ui-1.12.1.custom/jquery-ui.min.css">
+			<link rel="stylesheet" href="{{context.vpaths.sitePublic}}ext/jquery-ui-1.12.1.custom/jquery-ui.theme.min.css">
+			<link rel="stylesheet" href="{{context.vpaths.sitePublic}}fir.css">
+			<link rel="stylesheet" href="{{context.vpaths.sitePublic}}{{this.moduleName}}.css">
+			<link rel="stylesheet" href="{{context.vpaths.sitePublic}}{{this.webpackLib}}.css">
+			<link rel="shortcut icon" href="{{context.vpaths.siteImg}}znak.png" type="image/png">
+
+			<script type="text/javascript">
+				window.userRightData = {=to_json_str this.userRightData};
+
+				// Список webpack-библиотек, где искать модули
+				window.webpackLibs = [
+					'{{this.webpackLib}}', // Сборка для текущей страницы
+					'{{this.moduleName}}', // Конфигурация приложения
+					// Другие библиотеки...
+					'fir',
+					'ivy'
+				];
+				function runFirGlobals() {
+					window.fir_globals('./fir/common/globals.js');
+				}
+				function runFirApp() {
+					window.FirApp = new (window['{{this.moduleName}}']('./{{this.moduleName}}.js'))();
+				}
+			</script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}ext/jquery-2.2.4.min.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}ext/jquery.cookie-1.4.1.min.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}ext/popper-1.12.5.min.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}bootstrap/dist/js/bootstrap.min.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}ext/jquery-ui-1.12.1.custom/jquery-ui.min.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}ext/require.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}fir_globals.js" defer></script>
+			<script type="text/javascript" src="data:text/javascript;charset=utf-8,runFirGlobals();" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}ivy.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}fir.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}{{this.webpackLib}}.js" defer></script>
+			<script type="text/javascript" src="{{context.vpaths.sitePublic}}{{this.moduleName}}.js" defer></script>
+			<script type="text/javascript" src="data:text/javascript;charset=utf-8,runFirApp();" defer></script>
+		</head>
+
+		<body>
+			{=this.renderOpts}
+			{=if not {=empty this.layout}
+				{=this.layout.render}
+			}
+		</body>
+
+		</html>
+		*}
+	}
+};
+}

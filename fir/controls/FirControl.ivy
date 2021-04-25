@@ -1,0 +1,89 @@
+expr {=
+class FirControl {=
+	var
+		moduleName: "fir/controls/FirControl"
+		instanceName: null
+		cssBaseClass: null
+		accessObject: null;
+	def __init__ {=
+		var instanceName: null;
+		do {=
+			set this.instanceName: instanceName;
+		}
+	};
+
+	def cls {=
+		var element;
+		do {%
+			expr "e-" ~ element ~ " ";
+			if this.instanceName
+				"i-" ~ this.instanceName ~ " ";
+			if this.cssBaseClass
+				this.cssBaseClass ~ " ";
+		}
+	};
+
+	def baseOpts {=
+		do {=
+			return {
+				instanceName: this.instanceName,
+				cssBaseClass: this.cssBaseClass
+			}
+		}
+	};
+
+	def opts {=
+		do {=this.baseOpts}
+	};
+
+	def renderOpts {=
+		do {*<input type="hidden" data-fir-opts="{=optStorage {=this.opts} }"/>*}
+	};
+
+	def hasRight {=
+		var
+			obj: null
+			subobj: null
+			kind: null
+			data: null;
+		do {=
+			var copyRight: context.rights;
+			set
+				copyRight.object: {=
+					if obj
+						obj
+					elif subobj and this.accessObject
+						this.accessObject ~ '.' ~ subobj
+					else
+						this.accessObject
+				}
+				copyRight.kind: kind
+				copyRight.data: data;
+			expr copyRight.hasRight;
+		}
+	};
+
+	def isInRoles {=
+		var roles;
+		do {=
+			for role in roles {=
+				if {=has context.user.accessRoles role} {=
+					return true
+				}
+			};
+			return false
+		}
+	};
+
+	def __serialize__ {=
+		do {=
+			return {
+				instanceName: this.instanceName,
+				moduleName: this.moduleName,
+				cssBaseClass: this.cssBaseClass,
+				accessObject: this.accessObject
+			}
+		};
+	};
+}
+}

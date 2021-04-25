@@ -25,12 +25,12 @@ return FirClass(
 				return false;
 				//throw new Error('Expected at least module and directive names in ivy rule name');
 			}
-			var moduleName, dirName;
+			var moduleName, methodName;
 
 			if( splitted.length == 2 )
 			{
 				moduleName = splitted[0];
-				dirName = splitted[1];
+				methodName = splitted[1];
 			}
 			else
 			{
@@ -38,19 +38,23 @@ return FirClass(
 					throw new Error('Expected "ivy" prefix as first argument');
 				}
 				moduleName = splitted[1];
-				dirName = splitted[2];
+				methodName = splitted[2];
 			}
 
-			var ivyProg = this._ivyEngine.getByModuleName(moduleName);
-			if( ivyProg == null ) {
-				throw new Error('Ivy module has not been loaded');
-			}
-
-			var res = ivyProg.runMethodSync(dirName, {
-				identity: new IvyUserIdentity(identity),
-				data: data
+			var
+				res,
+				asyncRes = this._ivyEngine.runMethod(
+					moduleName,
+					methodName, {
+						identity: new IvyUserIdentity(identity),
+						data: data
+					});
+			if( !asyncRes.isResolved )
+				throw new Error('Expected Undef, Null or Boolean as rights check result');
+			asyncRes.then(function(it) {
+				res = it;
 			});
-			
+
 			if(![
 				IvyDataType.Undef,
 				IvyDataType.Null,

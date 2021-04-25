@@ -51,7 +51,11 @@ return FirClass(
 				throw new Error('Ivy view method name required!');
 			}
 
-			this._ivyEngine.getByModuleName(config.ivyModule, this._onIvyModule_load.bind(this, config));
+			var modExecRes = this._ivyEngine.runModule(config.ivyModule, this._getExtraGlobals(config.optSets));
+			config.interp = modExecRes.interp;
+			modExecRes.asyncResult.then(
+				this._onIvyModule_init.bind(this, config),
+				config.deferred.reject.bind(config.deferred));
 			return config.deferred;
 		},
 
@@ -62,14 +66,6 @@ return FirClass(
 				vpaths: this._vpaths,
 				optSets: optSets // Наборы опций для компонентов
 			}
-		},
-
-		_onIvyModule_load: function(config, prog) {
-			var modRes = prog.runSaveState(this._getExtraGlobals(config.optSets));
-			config.interp = modRes.interp;
-			modRes.asyncResult.then(
-				this._onIvyModule_init.bind(this, config),
-				config.deferred.reject.bind(config.deferred));
 		},
 
 		_onIvyModule_init: function(config) {
@@ -129,7 +125,7 @@ return FirClass(
 			}
 
 			config.interp.execModuleDirective(
-				config.ivyMethod, data, this._getExtraGlobals(config.optSets)
+				config.ivyMethod, data
 			).then(
 				function(res) {
 					def.resolve(idat.toString(res));

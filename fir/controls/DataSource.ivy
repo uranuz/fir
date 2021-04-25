@@ -1,0 +1,30 @@
+expr {=
+class FirDataSource {=
+	def __init__ {=
+		var
+			service
+			method
+			endpoint: '';
+		do {=
+			set
+				this.service: service
+				this.method: method
+				this.endpoint: endpoint;
+		}
+	};
+
+	def query {=
+		var params: null;
+		do {=
+			await {=this.queryAsync params}
+		}
+	};
+
+	def queryAsync {=
+		var params: null;
+		do {=
+			remoteCall this.service this.endpoint this.method params
+		}
+	}
+};
+}
