@@ -1,0 +1,32 @@
+expr {=
+	from fir.controls.FirControl import FirControl;
+	from fir.controls.List import FirList;
+	from fir.controls.List.Table.Item import FirTableItem;
+	from fir.controls.List.Table.ContentArea import FirTableContentArea;
+	from fir.controls.List.Table.Head import FirTableHead;
+	from fir.controls.List.Table.HeadArea import FirTableHeadArea;
+
+	class FirTable extends FirList {=
+		def __init__ {=
+			var
+				items: []
+				columns: []
+				keyField: null;
+			do {=
+				call FirList.__init__ {
+					this: this
+				};
+				set
+					this.moduleName: "fir/controls/List/Table/Table"
+					this.cssBaseClass: "fir-Table"
+					this.itemTemplate: FirTableItem
+					this.contentAreaTemplate: FirTableContentArea
+					this.headTemplate: FirTableHead
+					this.headAreaTemplate: FirTableHeadArea
+					this.items: items
+					this.columns: columns
+					this.keyField: keyField;
+			}
+		};
+	}
+}

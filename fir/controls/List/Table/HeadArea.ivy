@@ -1,0 +1,14 @@
+expr {=
+def FirTableHeadArea {=
+	var
+		columns: []
+		opts: {};
+	do {*
+		<thead class="{=opts.cls 'headArea'}">{=
+			opts.headTemplate
+				columns: columns
+				opts: opts
+		}</thead>
+	*}
+}
+}

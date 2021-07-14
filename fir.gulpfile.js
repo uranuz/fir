@@ -11,6 +11,7 @@ var
 	vfs = require('vinyl-fs'),
 	glob = require('glob'),
 	yargs = require('yargs'),
+	exec = require('child_process').exec,
 	argv = yargs.argv,
 	config = {};
 
@@ -131,6 +132,24 @@ function buildLib(config, callback) {
 	});
 }
 
+gulp.task("compile-ivy-js-builder", function(cb) {
+	cb();
+});
+
+gulp.task('fir-ivy-js-build-impl', function (cb) {
+	exec(
+		'/home/uranuz/projects/yar_mkk/ivy/bin/ivy_js_builder --sourcePath="' + config.outTemplates + '/fir" --outPath="' + config.outPub + '"',
+		{
+			cwd: path.resolve(config.outTemplates) // Set current working dir
+		},
+		function (err, stdout, stderr) {
+			console.log(stdout);
+			console.log(stderr);
+			cb(err);
+		}
+	);
+});
+
 gulp.task("fir-webpack", function(callback) {
 	if( !config.outPub ) {
 		throw new Error('Need to pass "--outPub" or "--outSite" option to specify output directory!');
@@ -158,10 +177,12 @@ gulp.task("fir-symlink-js", function() {
 		}));
 });
 
-// Create bundles then add nonexisting files as symlinks...
-gulp.task("fir-js", gulp.series(["fir-webpack", "fir-symlink-js"]));
+gulp.task("fir-ivy-js-build", gulp.series(["compile-ivy-js-builder", "fir-ivy-js-build-impl"]));
 
-gulp.task("fir", gulp.series(["fir-js", "fir-symlink-templates"]));
+// Create bundles then add nonexisting files as symlinks...
+gulp.task("fir-js", gulp.series(["fir-ivy-js-build", "fir-webpack", "fir-symlink-js"]));
+
+gulp.task("fir", gulp.series(["fir-symlink-templates", "fir-js"]));
 
 
 gulp.task("default", gulp.series(['fir']));

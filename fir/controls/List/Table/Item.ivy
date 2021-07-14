@@ -1,0 +1,15 @@
+expr {=
+def FirTableItem {=
+	var
+		item: {},
+		columns: [],
+		opts: {};
+	do {*
+		<tr class="{=opts.cls 'item'}">
+		{=repeat column in columns {*
+			<td class="{=opts.cls 'field'}">{=at item column.field}</td>
+		*} }
+		</tr>
+	*}
+}
+}

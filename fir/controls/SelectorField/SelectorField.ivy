@@ -7,7 +7,7 @@ def DefaultItemTemplate {=
 		record
 		displayField
 		emptyText;
-	do noscope {*
+	do {*
 	<a href="#!"
 		class="{=cls 'selectBtn'}"
 		>{=if record {=at record displayField} else emptyText}</a>

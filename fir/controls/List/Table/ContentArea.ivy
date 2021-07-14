@@ -1,0 +1,18 @@
+expr {=
+def FirTableContentArea {=
+	var
+		items: [],
+		columns: [],
+		opts: {};
+	do {*
+	<tbody class="{=opts.cls 'contentArea'}">
+		{=repeat item in items {=
+			opts.itemTemplate
+				item: item
+				columns: columns
+				opts: opts
+		} }
+	</tbody>
+	*}
+}
+}

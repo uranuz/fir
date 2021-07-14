@@ -1,0 +1,16 @@
+expr {=
+def FirTableHead {=
+	var
+		columns: []
+		opts: {};
+	do {*
+	<tr class="{=opts.cls 'head'}">
+	{=repeat column in columns {*
+		<td
+			class="{=opts.cls 'headColumn'}"
+			>{{column.name}}</td>
+	*} }
+	</tr>
+	*}
+}
+}

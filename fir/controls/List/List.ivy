@@ -1,0 +1,52 @@
+expr {=
+from fir.controls.FirControl import FirControl;
+
+class FirList extends FirControl {=
+	def __init__ {=
+		var
+			items: []
+			columns: []
+			keyField: null;
+		do {=
+			call FirControl.__init__ {
+				this: this
+			};
+			set
+				this.moduleName: "fir/controls/List/List"
+				this.cssBaseClass: "fir-List"
+				this.instanceName: 'firList'
+				this.itemTemplate: null
+				this.contentAreaTemplate: null
+				this.headAreaTemplate: null
+				this.headTemplate: null
+				this.items: items
+				this.columns: columns
+				this.keyField: keyField;
+		}
+	};
+
+
+	def render {=
+		do {*
+		<div class="{=this.cls 'block'}">
+			<div class="{=this.cls 'tableBlock'}">
+				<div class="{=this.cls 'tableScroller'}">
+					<table class="{=this.cls 'table'}">
+						{=this.headAreaTemplate
+							columns: this.columns
+							opts: this
+						}
+						{=this.contentAreaTemplate
+							items: this.items
+							columns: this.columns
+							opts: this
+						}
+					</table>
+				</div>
+			</div>
+		</div>
+		*}
+	};
+};
+
+}
